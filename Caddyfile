@@ -1,0 +1,25 @@
+{$HOSTNAME}
+
+encode zstd gzip
+
+reverse_proxy /api/* api:8000
+
+header /* {
+    Cache-Control "max-age=864000"
+}
+
+route /bookimage/* {
+    uri strip_prefix /bookimage
+    file_server {
+        root /bookimage/
+    }
+}
+
+route /static/* {
+    uri strip_prefix /static
+    file_server {
+        root /front/static/
+    }
+}
+
+reverse_proxy /* ssr:8000

@@ -1,0 +1,16 @@
+{$HOSTNAME}
+
+encode zstd gzip
+
+reverse_proxy /api/* api:8000
+
+header /* {
+    Cache-Control "max-age=0"
+}
+
+route /static/* {
+    uri strip_prefix /static
+    file_server {
+        root /front/static/
+    }
+}
