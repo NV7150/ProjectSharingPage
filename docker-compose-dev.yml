@@ -1,0 +1,44 @@
+version: "3"
+services:
+    api:
+        build: api
+        links:
+            - db
+        depends_on:
+            - db
+        environment:
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"
+        volumes:
+            - ./api:/code
+    
+    caddy:
+        image: caddy
+        volumes:
+            - "./CaddyfileDev:/etc/caddy/Caddyfile"
+            - "./front:/front"
+        links:
+            - api
+        environment: 
+            TZ: "UTC"
+            HOSTNAME: "localhost"
+        depends_on:
+            - api
+        ports:
+            - 8080:80
+            - 8081:443
+
+    db:
+        image: postgres
+        environment: 
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
+        volumes:
+            - "pgdata:/var/lib/postgresql/data"
+        ports:
+          - 5432:5432  # Debug
+
+        
+volumes: 
+    pgdata:
+        driver: "local"
