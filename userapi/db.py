@@ -84,7 +84,7 @@ class User(Base):
     hashed_password = Column('hashed_password', String, nullable=False)
     display_name = Column('display_name', String, nullable=False)
     icon = Column('icon', String, nullable=True)
-    bio = Column('icon', String, nullable=True)
+    bio = Column('bio', String, nullable=True)
 
     # SNS
     twitter = Column('twitter', String, nullable=True)
@@ -103,6 +103,31 @@ class User(Base):
     is_active = Column('is_active', Boolean, nullable=False, default=True)
 
     tokens = relationship("Token", backref='user')
+
+    @staticmethod
+    def create(raw_password: str, **kwargs):
+        """Create new user
+        Parameters
+        ----------
+        raw_password: str
+        **kwargs:
+            User class args without is_admin, is_active
+
+        Return
+        ------
+        new_user: User
+            new_user.is_admin == False
+            new_user.is_active == True
+        """
+        salt = bcrypt.gensalt(rounds=12, prefix=b'2b')
+        hashed_password = bcrypt.hashpw(raw_password.encode(), salt)
+
+        return User(
+            hashed_password=hashed_password,
+            is_admin=False,
+            is_active=True,
+            **kwargs,
+        )
 
 
 class Token(Base):
@@ -129,10 +154,10 @@ class Token(Base):
 
         with session_scope() as s:
             token = Token(
-                hashed_token = hashed_token,
+                hashed_token=hashed_token,
                 user_id=user.id,
             )
             s.add(token)
             s.commit()
-        
+
         return raw_token
