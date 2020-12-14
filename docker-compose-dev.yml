@@ -9,6 +9,7 @@ services:
         environment:
             POSTGRES_USER: "postgres"
             POSTGRES_PASSWORD: "pg_password"
+            DB_ECHO: "True"
         volumes:
             - ./userapi:/code
     
