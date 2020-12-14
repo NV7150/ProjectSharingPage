@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 import db
 import schema
 
@@ -21,3 +21,16 @@ async def index():
 @app.post("/userapi/create", response_model=schema.User)
 async def create_user(c_user: schema.UserCreate):
     return c_user.create()
+
+
+@app.get("/userapi/user/{username:str}", response_model=schema.User)
+async def get_user(username: str):
+    with db.session_scope() as s:
+        users_query = s.query(db.User).filter(
+            db.User.username == username
+        )
+        users = list(users_query)
+        if len(users) != 1:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found.")
+
+        return schema.User.from_db(users[0])

@@ -1,4 +1,3 @@
-from enum import unique
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base

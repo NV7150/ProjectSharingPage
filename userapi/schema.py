@@ -1,7 +1,5 @@
 from pydantic import BaseModel
 from typing import Optional
-import bcrypt
-from pydantic.typing import display_as_type
 import db
 
 
