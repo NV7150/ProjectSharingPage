@@ -2,7 +2,7 @@
 
 encode zstd gzip
 
-reverse_proxy /api/* api:8000
+reverse_proxy /userapi/* userapi:8000
 
 header /* {
     Cache-Control "max-age=864000"

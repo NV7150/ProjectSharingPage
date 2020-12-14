@@ -1,7 +1,7 @@
 version: "3"
 services:
-    api:
-        build: api
+    userapi:
+        build: userapi
         links:
             - db
         depends_on:
@@ -10,7 +10,7 @@ services:
             POSTGRES_USER: "postgres"
             POSTGRES_PASSWORD: "pg_password"
         volumes:
-            - ./api:/code
+            - ./userapi:/code
     
     caddy:
         image: caddy
@@ -18,12 +18,12 @@ services:
             - "./CaddyfileDev:/etc/caddy/Caddyfile"
             - "./front:/front"
         links:
-            - api
+            - userapi
         environment: 
             TZ: "UTC"
             HOSTNAME: "localhost"
         depends_on:
-            - api
+            - userapi
         ports:
             - 8080:80
             - 8081:443
