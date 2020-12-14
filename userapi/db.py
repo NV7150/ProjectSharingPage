@@ -70,6 +70,7 @@ class User(Base):
     facebook: Optional[str]
     tiktok: Optional[str]
     linkedin: Optional[str]
+    wantedly: Optional[str]
     url: Optional[str]
 
     is_admin: bool
@@ -94,6 +95,7 @@ class User(Base):
     facebook = Column('facebook', String, nullable=True)
     tiktok = Column('tiktok', String, nullable=True)
     linkedin = Column('linkedin', String, nullable=True)
+    wantedly = Column('wantedly', String, nullable=True)
     url = Column('url', String, nullable=True)
 
     # Flag
