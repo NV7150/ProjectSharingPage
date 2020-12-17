@@ -122,7 +122,16 @@ class UserCreate(BaseModel):
     wantedly: Optional[str]
     url: Optional[str]
 
+    skilltags: List[int]
+
     def create(self) -> User:
+        db_skilltags = []
+        with db.session_scope() as s:
+            for tagid in self.skilltags:
+                tag = s.query(db.SkillTag).get(tagid)
+                if tag is not None:
+                    db_skilltags.append(tag)
+
         user = db.User.create(
             raw_password=self.raw_password,
             username=self.username,
@@ -139,7 +148,8 @@ class UserCreate(BaseModel):
             tiktok=self.tiktok,
             linkedin=self.linkedin,
             wantedly=self.wantedly,
-            url=self.url
+            url=self.url,
+            skilltags=db_skilltags,
         )
         with db.session_scope() as s:
             s.add(user)
