@@ -1,1 +1,2 @@
-front/project-sharing-page/node_modules/
+.vscode/
+.mypy_cache/

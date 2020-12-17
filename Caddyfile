@@ -15,8 +15,8 @@ route /favicon.ico {
     }
 }
 
-route /api/* {
-    reverse_proxy api:8000
+route /userapi/* {
+    reverse_proxy userapi:8000
 }
 
 route /* {
