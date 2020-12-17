@@ -124,13 +124,14 @@ class UserCreate(BaseModel):
 
     skilltags: List[int]
 
-    def create(self) -> User:
+    def create(self) -> Optional[User]:
         db_skilltags = []
         with db.session_scope() as s:
             for tagid in self.skilltags:
                 tag = s.query(db.SkillTag).get(tagid)
-                if tag is not None:
-                    db_skilltags.append(tag)
+                if tag is None:
+                    return None
+                db_skilltags.append(tag)
 
         user = db.User.create(
             raw_password=self.raw_password,

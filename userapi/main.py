@@ -5,8 +5,8 @@ import schema
 
 
 app = FastAPI(
-    docs_url="/userapi/docs",
-    openapi_url="/userapi/openapi.json",
+    docs_url='/userapi/docs',
+    openapi_url='/userapi/openapi.json',
 )
 
 
@@ -14,19 +14,44 @@ app = FastAPI(
 db.Base.metadata.create_all(bind=db.engine)
 
 
-@app.get("/userapi/")
+@app.get('/userapi/')
 async def index():
-    return {"message": "Hello, userapi!"}
+    return {'message': 'Hello, userapi!'}
 
 
 # User
 
-@app.post("/userapi/create", response_model=schema.User)
+@app.post(
+    '/userapi/create',
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_201_CREATED: {
+            'model': schema.User,
+            'description': 'Successful response',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'description': 'Bad request'
+        }
+    }
+)
 async def create_user(c_user: schema.UserCreate):
-    return c_user.create()
+    user: Optional[schema.User] = c_user.create()
+    if user is None:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST)
 
 
-@app.post("/userapi/login")
+@app.post(
+    '/userapi/login',
+    status_code=status.HTTP_202_ACCEPTED,
+    responses={
+        status.HTTP_202_ACCEPTED: {
+            'description': 'login accepted'
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'unauthorized'
+        },
+    },
+)
 async def login_user(login_request: schema.UserLogin):
     token: Optional[str] = login_request.login()
     if token is None:
@@ -42,7 +67,18 @@ async def login_user(login_request: schema.UserLogin):
     return Response(None, status.HTTP_202_ACCEPTED, headers=headers)
 
 
-@app.get("/userapi/user/{username:str}", response_model=schema.User)
+@app.get(
+    '/userapi/user/{username:str}',
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.User,
+            'descrption': 'Successful response'
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'User not found'
+        }
+    }
+)
 async def get_user(username: str):
     with db.session_scope() as s:
         users_query = s.query(db.User).filter(
@@ -50,14 +86,26 @@ async def get_user(username: str):
         )
         users = list(users_query)
         if len(users) != 1:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found.")
+            raise HTTPException(status.HTTP_404_NOT_FOUND, 'User not found.')
 
         return schema.User.from_db(users[0])
 
 
 # SkillTag
 
-@app.post('/userapi/skilltag/create', response_model=schema.SkillTag)
+@app.post(
+    '/userapi/skilltag/create',
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_201_CREATED: {
+            'model': schema.SkillTag,
+            'description': 'Successful response',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'description': 'Bad request',
+        }
+    }
+)
 async def create_skilltag(tag: schema.SkillTagCreate):
     result = tag.create()
     if result is None:
