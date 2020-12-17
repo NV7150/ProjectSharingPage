@@ -42,7 +42,8 @@
 </template>
 
 <script>
-import logo from "../assets/logo.png";
+import PlaceHolder from "../assets/PlaceHolder.png";
+import logo from "../assets/logo.png"
 
 export default {
   name: "ProjectCard",
@@ -51,7 +52,13 @@ export default {
   ],
   data() {
     return {
-      project : null,
+      //place holder
+      project : {
+        name: "Loading...",
+        projectId: -1,
+        keyImage: PlaceHolder,
+        description: ""
+      },
       loading : true,
       hovered : false
     }
@@ -60,10 +67,10 @@ export default {
     //TODO:projectIdを使ってAPIからプロジェクトデータを取得(axios)
     //仮置き
     this.project = {
-      name: "Foo",
-      projectId: 0,
+      name: "Foo" + this.projectId,
+      projectId: this.projectId,
       keyImage: logo,
-      description: "This is demo"
+      description: "This is " + this.projectId + "th demo"
     };
     this.loading = false;
     //仮置きここまで
