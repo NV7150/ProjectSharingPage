@@ -2,15 +2,27 @@
 
 encode zstd gzip
 
-reverse_proxy /userapi/* userapi:8000
-
-header /* {
-    Cache-Control "max-age=0"
+route /assets/* {
+    uri strip_prefix /assets
+    file_server {
+        root /assets/
+    }
 }
 
-route /static/* {
-    uri strip_prefix /static
+route /favicon.ico {
     file_server {
-        root /front/static/
+        root /public
     }
+}
+
+route /api/* {
+    reverse_proxy api:8000
+}
+
+route /* {
+    rewrite /* /index.html
+}
+
+file_server {
+    root /public
 }
