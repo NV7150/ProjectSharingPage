@@ -164,24 +164,43 @@ class User(Base):
         ------
         success: bool
         """
+        if self.is_active is False:
+            return False
+
         hashed_password = str(self.hashed_password)
         return bcrypt.checkpw(
             raw_password.encode(),
             hashed_password.encode(),
         )
 
-    def set_password(self, new_password: str) -> None:
+    def set_password(self, new_password: str) -> bool:
         """Set new password
         WARNING: THIS METHOD DOESN'T CHECK OLD PASSWORD
+        WARNING: This method doen't commit changes
 
         Parameters
         ----------
         new_password: str
+
+        Returns
+        -------
+        result: bool
+            if True, user is not active
         """
+        if self.is_active is False:
+            return False
+
         salt = bcrypt.gensalt(rounds=12, prefix=b'2b')
         hashed_password = bcrypt.hashpw(new_password.encode(), salt)
 
         self.hashed_password = hashed_password.decode()
+        return True
+
+    def delete(self) -> None:
+        """Set False to is_active
+        WARNING: This method doesn't commit changes
+        """
+        self.is_active = False
 
 
 class Token(Base):

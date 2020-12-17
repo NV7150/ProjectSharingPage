@@ -23,7 +23,8 @@ async def index():
 # User
 
 @app.post(
-    '/userapi/create',
+    '/userapi/user',
+    description='Create User',
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {
@@ -102,8 +103,11 @@ async def logout_user(token: Optional[str] = Cookie(None)):
             'description': 'Invalid token was given',
         },
         status.HTTP_400_BAD_REQUEST: {
-            'descripiton': 'old/new password is incorrect'
-        }
+            'descripiton': 'old/new password is incorrect',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'User not found.',
+        },
     }
 )
 async def update_password(
@@ -123,10 +127,40 @@ async def update_password(
             status.HTTP_400_BAD_REQUEST,
             'Old password is wrong',
         )
+    if result == schema.PasswordUpdateResult.USER_NOT_FOUND:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            'User not found.'
+        )
     if result == schema.PasswordUpdateResult.SUCCESS:
         return
 
     raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@app.delete(
+    '/userapi/user',
+    description='Delete user',
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful response (deleted)'
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'not logged in'
+        },
+    }
+)
+async def delete_user(
+    user: schema.UserDelete, token: Optional[str] = Cookie(None)
+):
+    if token is None:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+
+    result = user.delete(token)
+    if result is False:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    return
 
 
 @app.get(
@@ -150,7 +184,11 @@ async def get_user(username: str):
         if len(users) != 1:
             raise HTTPException(status.HTTP_404_NOT_FOUND, 'User not found.')
 
-        return schema.User.from_db(users[0])
+        user = users[0]
+        if user.is_active is False:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, 'User not found.')
+
+        return schema.User.from_db(user)
 
 
 # SkillTag

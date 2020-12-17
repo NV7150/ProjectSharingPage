@@ -199,9 +199,29 @@ class UserLogin(BaseModel):
             return token
 
 
+class UserDelete(BaseModel):
+    username: str
+    raw_password: str
+
+    def delete(self, token: str) -> bool:
+        userid = db.Token.get_userid(token)
+        with db.session_scope() as s:
+            user = s.query(db.User).get(userid)
+            if user.username != self.username:
+                return False
+            if user.login(self.raw_password) is False:
+                return False
+
+            user.delete()
+            s.commit()
+
+        return True
+
+
 class PasswordUpdateResult(enum.Enum):
     TOKEN_WRONG = enum.auto()
     OLD_PASSWORD_WRONG = enum.auto()
+    USER_NOT_FOUND = enum.auto()
     SUCCESS = enum.auto()
 
 
@@ -217,9 +237,15 @@ class UserPasswordUpdate(BaseModel):
         with db.session_scope() as s:
             userid = db.Token.get_userid(token)
             user = s.query(db.User).get(userid)
+
+            if user.is_active is False:
+                return PasswordUpdateResult.USER_NOT_FOUND
+
             if user.login(self.old_password) is False:
                 return PasswordUpdateResult.OLD_PASSWORD_WRONG
-            user.set_password(self.new_password)
+            result = user.set_password(self.new_password)
+            if result is False:
+                return PasswordUpdateResult.USER_NOT_FOUND
             s.commit()
 
         return PasswordUpdateResult.SUCCESS
