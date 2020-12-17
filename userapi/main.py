@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, status
+from typing import Optional
+from fastapi import FastAPI, HTTPException, status, Response
 import db
 import schema
 
@@ -23,6 +24,22 @@ async def index():
 @app.post("/userapi/create", response_model=schema.User)
 async def create_user(c_user: schema.UserCreate):
     return c_user.create()
+
+
+@app.post("/userapi/login")
+async def login_user(login_request: schema.UserLogin):
+    token: Optional[str] = login_request.login()
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    maxage = ''
+    if login_request.remember_password:
+        maxage = 'Max-Age=7776000;'
+
+    cookie = f'token={token}; HttpOnly; '
+    cookie += f'SameSite=Strict; Secure; {maxage} path=/;'
+    headers = {'Set-Cookie': cookie}
+    return Response(None, status.HTTP_202_ACCEPTED, headers=headers)
 
 
 @app.get("/userapi/user/{username:str}", response_model=schema.User)

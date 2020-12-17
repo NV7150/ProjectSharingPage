@@ -155,3 +155,26 @@ class UserCreate(BaseModel):
             s.add(user)
             s.commit()
             return User.from_db(user)
+
+
+class UserLogin(BaseModel):
+    username: str
+    raw_password: str
+    remember_password: bool
+
+    def login(self) -> Optional[str]:
+        with db.session_scope() as s:
+            users: List[db.User] = list(
+                s.query(db.User).filter(
+                    db.User.username == self.username
+                )
+            )
+            if len(users) != 1:
+                return None
+
+            user: db.User = users[0]
+            if user.login(self.raw_password) is False:
+                return None
+
+            token = db.Token.issue_token(user)
+            return token

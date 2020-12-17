@@ -148,10 +148,26 @@ class User(Base):
         hashed_password = bcrypt.hashpw(raw_password.encode(), salt)
 
         return User(
-            hashed_password=hashed_password,
+            hashed_password=hashed_password.decode(),
             is_admin=False,
             is_active=True,
             **kwargs,
+        )
+
+    def login(self, raw_password: str) -> bool:
+        """Login user
+        Parameters
+        ----------
+        raw_password: str
+
+        Return
+        ------
+        success: bool
+        """
+        hashed_password = str(self.hashed_password)
+        return bcrypt.checkpw(
+            raw_password.encode(),
+            hashed_password.encode(),
         )
 
 
@@ -184,7 +200,7 @@ class Token(Base):
             )
             s.add(token)
             s.commit()
-
+        # TODO: Expire token
         return raw_token
 
 
