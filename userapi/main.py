@@ -18,6 +18,8 @@ async def index():
     return {"message": "Hello, userapi!"}
 
 
+# User
+
 @app.post("/userapi/create", response_model=schema.User)
 async def create_user(c_user: schema.UserCreate):
     return c_user.create()
@@ -34,3 +36,13 @@ async def get_user(username: str):
             raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found.")
 
         return schema.User.from_db(users[0])
+
+
+# SkillTag
+
+@app.post('/userapi/skilltag/create', response_model=schema.SkillTag)
+async def create_skilltag(tag: schema.SkillTagCreate):
+    result = tag.create()
+    if result is None:
+        HTTPException(status.HTTP_400_BAD_REQUEST)
+    return result

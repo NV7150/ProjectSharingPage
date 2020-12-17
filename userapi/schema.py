@@ -1,6 +1,59 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import db
+
+
+class SkillTag(BaseModel):
+    id: int
+    name: str
+    parents: List  # List[SkillTag]
+
+    @staticmethod
+    def from_db(db_skilltag: db.SkillTag):
+        # Tracing back the family tree
+        print('DB_SKILLTAG', db_skilltag)
+        db_parents: List[db.SkillTag] = []
+        ds = db_skilltag
+        while True:
+            with db.session_scope() as s:
+                parent_id = ds.parent_id
+                parent = s.query(db.SkillTag).get(parent_id)
+
+            if parent is None:
+                break
+            db_parents.append(parent)
+            ds = parent
+
+        parents = [
+            SkillTag(id=dp.id, name=dp.name, parents=[])
+            for dp in db_parents
+        ]
+        parents.reverse()
+
+        return SkillTag(
+            id=db_skilltag.id,
+            name=db_skilltag.name,
+            parents=parents
+        )
+
+
+class SkillTagCreate(BaseModel):
+    name: str
+    parent_id: Optional[int]
+
+    def create(self) -> Optional[SkillTag]:
+        with db.session_scope() as s:
+            parent = None
+            if self.parent_id is not None:
+                parent = s.query(db.SkillTag).get(self.parent_id).id
+
+            skilltag = db.SkillTag(
+                name=self.name,
+                parent_id=parent,
+            )
+            s.add(skilltag)
+            s.commit()
+            return SkillTag.from_db(skilltag)
 
 
 class User(BaseModel):
@@ -21,8 +74,15 @@ class User(BaseModel):
     wantedly: Optional[str]
     url: Optional[str]
 
+    skilltags: List[SkillTag]
+
     @staticmethod
     def from_db(db_user: db.User):
+        skilltags_db = db_user.skilltags
+        skilltags = [
+            SkillTag.from_db(x)
+            for x in skilltags_db
+        ]
         return User(
             username=db_user.username,
             display_name=db_user.display_name,
@@ -38,6 +98,7 @@ class User(BaseModel):
             linkedin=db_user.linkedin,
             wantedly=db_user.wantedly,
             url=db_user.linkedin,
+            skilltags=skilltags
         )
 
 

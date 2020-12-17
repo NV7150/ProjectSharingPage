@@ -22,7 +22,10 @@ engine = create_engine(
 )
 
 Session = scoped_session(
-    sessionmaker(autocommit=False, autoflush=True, bind=engine)
+    sessionmaker(
+        autocommit=False, autoflush=True,
+        bind=engine, expire_on_commit=False
+    )
 )
 
 
@@ -42,12 +45,27 @@ def session_scope() -> scoped_session:
 Base: DeclarativeMeta = declarative_base()
 
 
+class SkillTagUser(Base):
+    """
+    Association Object
+    """
+    __tablename__ = 'skill_user'
+    user_id = Column(
+        Integer, ForeignKey('user.id'),
+        primary_key=True, nullable=False,
+    )
+    tag_id = Column(
+        Integer, ForeignKey('skilltag.id'),
+        primary_key=True, nullable=False,
+    )
+
+
 class User(Base):
     """[DB] User class
 
     Parameters
     ----------
-    id: int
+    id: int (auto)
     username: str
         unique username
     email: str
@@ -71,6 +89,8 @@ class User(Base):
     linkedin: Optional[str]
     wantedly: Optional[str]
     url: Optional[str]
+
+    skilltags: List[SkillTag]
 
     is_admin: bool
     is_active: bool
@@ -96,6 +116,12 @@ class User(Base):
     linkedin = Column('linkedin', String, nullable=True)
     wantedly = Column('wantedly', String, nullable=True)
     url = Column('url', String, nullable=True)
+
+    # Skill
+    skilltags = relationship(
+        'SkillTag', secondary=SkillTagUser.__tablename__,
+        back_populates='users',
+    )
 
     # Flag
     is_admin = Column('is_admin', Boolean, nullable=False, default=False)
@@ -160,3 +186,27 @@ class Token(Base):
             s.commit()
 
         return raw_token
+
+
+class SkillTag(Base):
+    """[DB] User skill tag
+    Parameters
+    ----------
+    id: int (auto)
+        primary key
+    name: str
+        unique skill name
+    parent_id: Option[int]
+        parent skilltag id
+    users: List[User]
+        tagged user
+    """
+    __tablename__ = "skilltag"
+    id = Column('id', Integer, primary_key=True)
+    name = Column('name', String, nullable=False, unique=True)
+    parent_id = Column('parent_id', ForeignKey('skilltag.id'), nullable=True)
+
+    users = relationship(
+        'User', secondary=SkillTagUser.__tablename__,
+        back_populates='skilltags',
+    )
