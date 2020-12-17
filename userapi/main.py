@@ -88,10 +88,45 @@ async def logout_user(token: Optional[str] = Cookie(None)):
 
     if result is False:
         raise HTTPException(status.HTTP_403_FORBIDDEN)
-    
+
     cookie = 'token=xxx; Max-Age=0; path=/'
     headers = {'Set-Cookie': cookie}
     return Response(None, status.HTTP_200_OK, headers)
+
+
+@app.patch(
+    '/userapi/password',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'Invalid token was given',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'descripiton': 'old/new password is incorrect'
+        }
+    }
+)
+async def update_password(
+    request: schema.UserPasswordUpdate,
+    token: Optional[str] = Cookie(None),
+):
+    if token is None:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+    if schema.UserToken(raw_token=token).auth() is False:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+
+    result = request.update(token)
+    if result == schema.PasswordUpdateResult.TOKEN_WRONG:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+    if result == schema.PasswordUpdateResult.OLD_PASSWORD_WRONG:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            'Old password is wrong',
+        )
+    if result == schema.PasswordUpdateResult.SUCCESS:
+        return
+
+    raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @app.get(

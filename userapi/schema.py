@@ -1,3 +1,4 @@
+import enum
 from pydantic import BaseModel
 from typing import Optional, List
 import db
@@ -161,6 +162,12 @@ class UserCreate(BaseModel):
 class UserToken(BaseModel):
     raw_token: str
 
+    def auth(self) -> bool:
+        t = db.Token.get_token(self.raw_token)
+        if t is None:
+            return False
+        return True
+
     def expire(self) -> bool:
         token: Optional[db.Token] = db.Token.get_token(self.raw_token)
         if token is None:
@@ -190,3 +197,29 @@ class UserLogin(BaseModel):
 
             token = db.Token.issue_token(user)
             return token
+
+
+class PasswordUpdateResult(enum.Enum):
+    TOKEN_WRONG = enum.auto()
+    OLD_PASSWORD_WRONG = enum.auto()
+    SUCCESS = enum.auto()
+
+
+class UserPasswordUpdate(BaseModel):
+    old_password: str
+    new_password: str
+
+    def update(self, token: str) -> PasswordUpdateResult:
+        t = db.Token.get_token(token)
+        if t is None:
+            return PasswordUpdateResult.TOKEN_WRONG
+
+        with db.session_scope() as s:
+            userid = db.Token.get_userid(token)
+            user = s.query(db.User).get(userid)
+            if user.login(self.old_password) is False:
+                return PasswordUpdateResult.OLD_PASSWORD_WRONG
+            user.set_password(self.new_password)
+            s.commit()
+
+        return PasswordUpdateResult.SUCCESS

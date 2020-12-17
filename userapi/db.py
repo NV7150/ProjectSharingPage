@@ -170,6 +170,19 @@ class User(Base):
             hashed_password.encode(),
         )
 
+    def set_password(self, new_password: str) -> None:
+        """Set new password
+        WARNING: THIS METHOD DOESN'T CHECK OLD PASSWORD
+
+        Parameters
+        ----------
+        new_password: str
+        """
+        salt = bcrypt.gensalt(rounds=12, prefix=b'2b')
+        hashed_password = bcrypt.hashpw(new_password.encode(), salt)
+
+        self.hashed_password = hashed_password.decode()
+
 
 class Token(Base):
     """[DB]User Token
