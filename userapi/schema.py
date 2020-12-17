@@ -158,6 +158,17 @@ class UserCreate(BaseModel):
             return User.from_db(user)
 
 
+class UserToken(BaseModel):
+    raw_token: str
+
+    def expire(self) -> bool:
+        token: Optional[db.Token] = db.Token.get_token(self.raw_token)
+        if token is None:
+            return False
+        token.expire()
+        return True
+
+
 class UserLogin(BaseModel):
     username: str
     raw_password: str

@@ -1,5 +1,6 @@
 from typing import Optional
 from fastapi import FastAPI, HTTPException, status, Response
+from fastapi import Cookie
 import db
 import schema
 
@@ -39,6 +40,8 @@ async def create_user(c_user: schema.UserCreate):
     if user is None:
         raise HTTPException(status.HTTP_400_BAD_REQUEST)
 
+    return user
+
 
 @app.post(
     '/userapi/login',
@@ -65,6 +68,30 @@ async def login_user(login_request: schema.UserLogin):
     cookie += f'SameSite=Strict; Secure; {maxage} path=/;'
     headers = {'Set-Cookie': cookie}
     return Response(None, status.HTTP_202_ACCEPTED, headers=headers)
+
+
+@app.post(
+    '/userapi/logout',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'Not logged in or used wrong token',
+        }
+    }
+)
+async def logout_user(token: Optional[str] = Cookie(None)):
+    if token is None:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+
+    t = schema.UserToken(raw_token=token)
+    result = t.expire()
+
+    if result is False:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+    
+    cookie = 'token=xxx; Max-Age=0; path=/'
+    headers = {'Set-Cookie': cookie}
+    return Response(None, status.HTTP_200_OK, headers)
 
 
 @app.get(

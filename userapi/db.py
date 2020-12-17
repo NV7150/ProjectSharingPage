@@ -8,7 +8,7 @@ import bcrypt
 import os
 from contextlib import contextmanager
 import uuid
-from typing import Optional
+from typing import Optional, Any
 
 
 PG_USER = os.environ.get('POSTGRES_USER')
@@ -195,13 +195,48 @@ class Token(Base):
 
         with session_scope() as s:
             token = Token(
-                hashed_token=hashed_token,
+                hashed_token=hashed_token.decode(),
                 user_id=user.id,
             )
             s.add(token)
             s.commit()
         # TODO: Expire token
         return raw_token
+
+    def _check_token(self, raw_token: str) -> bool:
+        hashed: str = self.hashed_token
+        return bcrypt.checkpw(
+            raw_token.encode(), hashed.encode()
+        )
+
+    @staticmethod
+    def get_userid(raw_token: str) -> Optional[int]:
+        id: Optional[int] = None
+        try:
+            id = int(raw_token.split('@')[-1])
+        except (ValueError, IndexError):
+            return None
+
+        return id
+
+    @staticmethod
+    def get_token(raw_token) -> Optional[Any]:
+        userid = Token.get_userid(raw_token)
+        with session_scope() as s:
+            user = s.query(User).get(userid)
+            if user is None:
+                return None
+            for token in user.tokens:
+                if token.is_active is False:
+                    continue
+                if token._check_token(raw_token):
+                    return token
+        return None
+
+    def expire(self) -> None:
+        with session_scope() as s:
+            self.is_active = False
+            s.commit()
 
 
 class SkillTag(Base):
