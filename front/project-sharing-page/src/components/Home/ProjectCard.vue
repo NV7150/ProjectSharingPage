@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import PlaceHolder from "../assets/PlaceHolder.png";
-import logo from "../assets/logo.png"
+import PlaceHolder from "../../assets/PlaceHolder.png";
+import logo from "../../assets/logo.png"
 
 export default {
   name: "ProjectCard",
