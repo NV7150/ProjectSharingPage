@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="baf2a95e-ec0a-4e2b-98ee-efe297272f06" name="Default Changelist" comment="" />
+    <list default="true" id="baf2a95e-ec0a-4e2b-98ee-efe297272f06" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/main.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,7 +39,8 @@
       <updated>1607825361373</updated>
       <workItem from="1607825362491" duration="617000" />
       <workItem from="1607928035737" duration="359000" />
-      <workItem from="1608122269681" duration="2685000" />
+      <workItem from="1608122269681" duration="3519000" />
+      <workItem from="1608163895097" duration="642000" />
     </task>
     <servers />
   </component>
