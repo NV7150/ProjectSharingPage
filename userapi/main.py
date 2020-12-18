@@ -194,7 +194,8 @@ async def get_user(username: str):
 # SkillTag
 
 @app.post(
-    '/userapi/skilltag/create',
+    '/userapi/skilltag',
+    description='Create SkillTag',
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {
