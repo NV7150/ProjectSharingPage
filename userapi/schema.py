@@ -1,3 +1,4 @@
+import enum
 from pydantic import BaseModel
 from typing import Optional, List
 import db
@@ -124,13 +125,14 @@ class UserCreate(BaseModel):
 
     skilltags: List[int]
 
-    def create(self) -> User:
+    def create(self) -> Optional[User]:
         db_skilltags = []
         with db.session_scope() as s:
             for tagid in self.skilltags:
                 tag = s.query(db.SkillTag).get(tagid)
-                if tag is not None:
-                    db_skilltags.append(tag)
+                if tag is None:
+                    return None
+                db_skilltags.append(tag)
 
         user = db.User.create(
             raw_password=self.raw_password,
@@ -155,3 +157,95 @@ class UserCreate(BaseModel):
             s.add(user)
             s.commit()
             return User.from_db(user)
+
+
+class UserToken(BaseModel):
+    raw_token: str
+
+    def auth(self) -> bool:
+        t = db.Token.get_token(self.raw_token)
+        if t is None:
+            return False
+        return True
+
+    def expire(self) -> bool:
+        token: Optional[db.Token] = db.Token.get_token(self.raw_token)
+        if token is None:
+            return False
+        token.expire()
+        return True
+
+
+class UserLogin(BaseModel):
+    username: str
+    raw_password: str
+    remember_password: bool
+
+    def login(self) -> Optional[str]:
+        with db.session_scope() as s:
+            users: List[db.User] = list(
+                s.query(db.User).filter(
+                    db.User.username == self.username
+                )
+            )
+            if len(users) != 1:
+                return None
+
+            user: db.User = users[0]
+            if user.login(self.raw_password) is False:
+                return None
+
+            token = db.Token.issue_token(user)
+            return token
+
+
+class UserDelete(BaseModel):
+    username: str
+    raw_password: str
+
+    def delete(self, token: str) -> bool:
+        userid = db.Token.get_userid(token)
+        with db.session_scope() as s:
+            user = s.query(db.User).get(userid)
+            if user.username != self.username:
+                return False
+            if user.login(self.raw_password) is False:
+                return False
+
+            user.delete()
+            s.commit()
+
+        return True
+
+
+class PasswordUpdateResult(enum.Enum):
+    TOKEN_WRONG = enum.auto()
+    OLD_PASSWORD_WRONG = enum.auto()
+    USER_NOT_FOUND = enum.auto()
+    SUCCESS = enum.auto()
+
+
+class UserPasswordUpdate(BaseModel):
+    old_password: str
+    new_password: str
+
+    def update(self, token: str) -> PasswordUpdateResult:
+        t = db.Token.get_token(token)
+        if t is None:
+            return PasswordUpdateResult.TOKEN_WRONG
+
+        with db.session_scope() as s:
+            userid = db.Token.get_userid(token)
+            user = s.query(db.User).get(userid)
+
+            if user.is_active is False:
+                return PasswordUpdateResult.USER_NOT_FOUND
+
+            if user.login(self.old_password) is False:
+                return PasswordUpdateResult.OLD_PASSWORD_WRONG
+            result = user.set_password(self.new_password)
+            if result is False:
+                return PasswordUpdateResult.USER_NOT_FOUND
+            s.commit()
+
+        return PasswordUpdateResult.SUCCESS

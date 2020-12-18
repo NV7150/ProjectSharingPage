@@ -8,7 +8,7 @@ import bcrypt
 import os
 from contextlib import contextmanager
 import uuid
-from typing import Optional
+from typing import Optional, Any
 
 
 PG_USER = os.environ.get('POSTGRES_USER')
@@ -148,11 +148,59 @@ class User(Base):
         hashed_password = bcrypt.hashpw(raw_password.encode(), salt)
 
         return User(
-            hashed_password=hashed_password,
+            hashed_password=hashed_password.decode(),
             is_admin=False,
             is_active=True,
             **kwargs,
         )
+
+    def login(self, raw_password: str) -> bool:
+        """Login user
+        Parameters
+        ----------
+        raw_password: str
+
+        Return
+        ------
+        success: bool
+        """
+        if self.is_active is False:
+            return False
+
+        hashed_password = str(self.hashed_password)
+        return bcrypt.checkpw(
+            raw_password.encode(),
+            hashed_password.encode(),
+        )
+
+    def set_password(self, new_password: str) -> bool:
+        """Set new password
+        WARNING: THIS METHOD DOESN'T CHECK OLD PASSWORD
+        WARNING: This method doen't commit changes
+
+        Parameters
+        ----------
+        new_password: str
+
+        Returns
+        -------
+        result: bool
+            if True, user is not active
+        """
+        if self.is_active is False:
+            return False
+
+        salt = bcrypt.gensalt(rounds=12, prefix=b'2b')
+        hashed_password = bcrypt.hashpw(new_password.encode(), salt)
+
+        self.hashed_password = hashed_password.decode()
+        return True
+
+    def delete(self) -> None:
+        """Set False to is_active
+        WARNING: This method doesn't commit changes
+        """
+        self.is_active = False
 
 
 class Token(Base):
@@ -179,13 +227,48 @@ class Token(Base):
 
         with session_scope() as s:
             token = Token(
-                hashed_token=hashed_token,
+                hashed_token=hashed_token.decode(),
                 user_id=user.id,
             )
             s.add(token)
             s.commit()
-
+        # TODO: Expire token
         return raw_token
+
+    def _check_token(self, raw_token: str) -> bool:
+        hashed: str = self.hashed_token
+        return bcrypt.checkpw(
+            raw_token.encode(), hashed.encode()
+        )
+
+    @staticmethod
+    def get_userid(raw_token: str) -> Optional[int]:
+        id: Optional[int] = None
+        try:
+            id = int(raw_token.split('@')[-1])
+        except (ValueError, IndexError):
+            return None
+
+        return id
+
+    @staticmethod
+    def get_token(raw_token) -> Optional[Any]:
+        userid = Token.get_userid(raw_token)
+        with session_scope() as s:
+            user = s.query(User).get(userid)
+            if user is None:
+                return None
+            for token in user.tokens:
+                if token.is_active is False:
+                    continue
+                if token._check_token(raw_token):
+                    return token
+        return None
+
+    def expire(self) -> None:
+        with session_scope() as s:
+            self.is_active = False
+            s.commit()
 
 
 class SkillTag(Base):
