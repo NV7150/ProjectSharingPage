@@ -160,7 +160,9 @@ async def delete_user(
     if result is False:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-    return
+    cookie = 'token=xxx; Max-Age=0; path=/'
+    headers = {'Set-Cookie': cookie}
+    return Response(None, status.HTTP_200_OK, headers)
 
 
 @app.get(
