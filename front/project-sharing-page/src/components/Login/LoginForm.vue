@@ -1,17 +1,24 @@
 <template>
   <v-card>
+
     <v-card-title>
       Login
     </v-card-title>
     <v-form
         ref="form"
         v-model="valid"
-        lazy-validation
     >
       <v-card-text>
+        <div
+            v-if="errorLogin"
+            class="error--text"
+        >
+          Invalid username or password
+        </div>
+
         <v-text-field
             label="UserName"
-            v-model="user.userName"
+            v-model="user.username"
             :rules="usrNameRules"
         ></v-text-field>
         <v-text-field
@@ -22,7 +29,7 @@
         >
         </v-text-field>
         <v-checkbox
-            v-model="user.remember"
+            v-model="user.remember_password"
             label="remember-password"
         >
         </v-checkbox>
@@ -42,18 +49,21 @@
 
 <script>
 
+import axios from "axios";
+
 export default {
   name: "LoginForm",
   data(){
     return{
       valid: false,
+      errorLogin: false,
       user: {
-        userName: '',
+        username: '',
         password: '',
-        remember: false
+        remember_password: false
       },
       usrNameRules : [
-        value => !!value || 'Required'
+          value => !!value || 'Required'
       ],
       passwordRules : [
           value => !!value || 'Required'
@@ -61,8 +71,33 @@ export default {
     }
   },
   methods : {
+    error(){
+      this.errorLogin = true;
+    },
+
     login(){
-      axios.post()
+      let _this = this;
+
+      axios
+          .post('/userapi/login', {
+            "username": _this.user.username,
+            "raw_password": _this.user.password,
+            "remember_password": _this.user.remember_password
+          })
+          .then(() => {
+            _this.$router.push({
+              name: 'UserPage',
+              params: { userName: _this.user.username }
+            })
+          })
+          .catch((error) => {
+            let code = error.response.status;
+            if (code === 401){
+              _this.error();
+            }else{
+              //TODO:エラーページへのリダイレクト
+            }
+          });
     }
   }
 }

@@ -77,7 +77,6 @@ export default {
   },
   methods:{
     toProjectPage() {
-      // this.$router.push({path:'/project'});
       this.$router.push({
         name:'Project',
         params: { projectId: this.project.projectId }

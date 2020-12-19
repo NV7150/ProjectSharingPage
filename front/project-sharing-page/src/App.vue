@@ -5,6 +5,13 @@
       color="primary"
       dark
     >
+      <v-btn
+          text
+          color="real accent-4"
+          @click="toLogin"
+      >
+        Login
+      </v-btn>
     </v-app-bar>
 
     <v-main>
@@ -24,5 +31,10 @@ export default {
   data: () => ({
     //
   }),
+  methods: {
+    toLogin(){
+      this.$router.push({name: 'Login'})
+    }
+  }
 };
 </script>

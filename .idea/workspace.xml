@@ -2,8 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="baf2a95e-ec0a-4e2b-98ee-efe297272f06" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/views/User.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/components/Home/ProjectCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Home/ProjectCard.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/components/Login/LoginForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Login/LoginForm.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/plugins/vuetify.js" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/plugins/vuetify.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/router/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
