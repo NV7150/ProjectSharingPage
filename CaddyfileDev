@@ -2,13 +2,6 @@
 
 encode zstd gzip
 
-route /assets/* {
-    uri strip_prefix /assets
-    file_server {
-        root /assets/
-    }
-}
-
 route /favicon.ico {
     file_server {
         root /public
@@ -20,7 +13,7 @@ route /userapi/* {
 }
 
 route /* {
-    rewrite /* /index.html
+    reverse_proxy front:8080
 }
 
 file_server {

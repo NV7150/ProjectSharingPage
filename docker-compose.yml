@@ -1,5 +1,8 @@
 version: "3"
 services:
+    front:
+        build: front/project-sharing-page
+
     userapi:
         build: userapi
         links:
@@ -19,11 +22,13 @@ services:
             - "./front/project-sharing-page/src/assets:/src/assets"
         links:
             - userapi
+            - front
         environment: 
             TZ: "UTC"
             HOSTNAME: "localhost"
         depends_on:
             - userapi
+            - front
         ports:
             - 80:80
             - 443:443
