@@ -11,18 +11,18 @@
       <v-card-text>
         <v-text-field
             label="UserName"
-            v-model="userName"
+            v-model="user.userName"
             :rules="usrNameRules"
         ></v-text-field>
         <v-text-field
             label="Password"
-            v-model="password"
+            v-model="user.password"
             :rules="passwordRules"
             type="password"
         >
         </v-text-field>
         <v-checkbox
-            v-model="rememberUser"
+            v-model="user.remember"
             label="remember-password"
         >
         </v-checkbox>
@@ -41,27 +41,28 @@
 </template>
 
 <script>
+
 export default {
   name: "LoginForm",
   data(){
     return{
       valid: false,
-      userName : '',
+      user: {
+        userName: '',
+        password: '',
+        remember: false
+      },
       usrNameRules : [
         value => !!value || 'Required'
       ],
-      password : '',
       passwordRules : [
           value => !!value || 'Required'
-      ],
-      rememberUser: false
+      ]
     }
   },
   methods : {
     login(){
-      this.$refs.form.validate()
-      //TODO:ログイン処理
-      alert('login:' + this.userName + " " + this.password)
+      axios.post()
     }
   }
 }
