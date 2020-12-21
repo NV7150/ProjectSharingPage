@@ -1,8 +1,8 @@
 <template>
-  <v-container>
+  <v-main>
     <Navigation></Navigation>
     <Projects></Projects>
-  </v-container>
+  </v-main>
 </template>
 
 <script>

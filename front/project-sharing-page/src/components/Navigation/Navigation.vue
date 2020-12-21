@@ -27,9 +27,9 @@
     <template v-slot:extension>
       <v-tabs>
         <v-tab
-          v-for="page in navPages"
+          v-for="(page, i) in navPages"
           @click="moveTo(page.link)"
-          :key="page"
+          :key="i"
         >
           {{page.name}}
         </v-tab>

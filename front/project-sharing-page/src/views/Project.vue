@@ -1,8 +1,8 @@
 <template>
-  <v-container>
+  <v-main>
     <Navigation></Navigation>
     <p>This user Id is {{$route.params.projectId}}</p>
-  </v-container>
+  </v-main>
 </template>
 
 <script>
