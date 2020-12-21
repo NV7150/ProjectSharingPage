@@ -47,39 +47,43 @@
 
 <script>
 import axios from "axios";
+import PlaceHolder from "../../assets/PlaceHolder.png";
 
 export default {
   name: "UserMenu",
+  props: {
+    'user': {
+      type: Object,
+      default: {
+        username: '',
+        name: 'Loading...',
+        icon: PlaceHolder
+      }
+    }
+  },
   data(){
+    let _this = this;
     return{
       menuItems: [
         {
           name: "Profile",
           func: () => {
-
+            _this.$router.push({
+              name:'UserPage',
+              params: {
+                userName: _this.user.username
+              }
+            });
           }
         },
         {
           name: "Logout",
           func: () => {
-            axios.post("userapi/logout");
+            _this.$emit('logout');
           }
         }
-
       ]
     }
-  },
-  computed:{
-    user(){
-      //TODO:ユーザの取得
-      //仮置き
-      return {
-        name: "TestUser",
-        icon: "https://gochiusa.com/core_sys/images/contents/00000022/base/l1.png"
-      };
-    }
-  },
-  methods: {
   }
 }
 </script>

@@ -11,7 +11,7 @@
     <template
       v-if="logined"
     >
-      <UserMenu></UserMenu>
+      <UserMenu v-on:logout="logout"></UserMenu>
     </template>
     <template
       v-else
@@ -40,28 +40,41 @@
 
 <script>
 import UserMenu from "./UserMenu";
+import axios from "axios";
 
 export default {
   name: "Navigation",
+  components: {UserMenu},
   data(){
     return{
+      logined: false,
+      user: null,
       navPages: [
         {name: "Home", link: "Home"}
       ]
-
     }
   },
-  components: {UserMenu},
-  computed: {
-    logined(){
-      //TODO:ログイン状態を取得
-      return true;
-    }
+  created() {
+    let _this = this;
+    axios.get('/userapi/user')
+    .then(response=> {
+      //TODO:loginとの分岐
+
+      _this.user = response.data;
+      _this.logined = true;
+    })
+    .catch(() => {
+      _this.logout();
+    });
   },
   methods: {
     moveTo(pageName){
       this.$router.push({name: pageName});
     },
+    logout(){
+      axios.post("userapi/logout");
+      this.logined = false;
+    }
   }
 }
 </script>
