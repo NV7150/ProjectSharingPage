@@ -46,7 +46,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import PlaceHolder from "../../assets/PlaceHolder.png";
 
 export default {
@@ -54,10 +53,12 @@ export default {
   props: {
     'user': {
       type: Object,
-      default: {
-        username: '',
-        name: 'Loading...',
-        icon: PlaceHolder
+      default:function(){
+        return {
+          username: '',
+          name: 'Loading...',
+          icon: PlaceHolder
+        };
       }
     }
   },
