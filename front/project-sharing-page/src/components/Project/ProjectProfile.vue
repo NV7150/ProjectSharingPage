@@ -22,7 +22,7 @@
       <v-col
         cols="12"
       >
-        <ProjectSub :project="project", :members="members"></ProjectSub>
+        <ProjectSub :project="project" :members="members"></ProjectSub>
       </v-col>
     </v-row>
   </v-container>

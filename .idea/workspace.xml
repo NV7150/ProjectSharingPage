@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="baf2a95e-ec0a-4e2b-98ee-efe297272f06" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectProfile.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectProfile/ProjectMain.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectProfile/ProjectSub.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectProfile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectProfile/ProjectSub.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectProfile/ProjectSub.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/views/Project.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/views/Project.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +63,7 @@
       <workItem from="1608469683057" duration="5604000" />
       <workItem from="1608524593666" duration="2436000" />
       <workItem from="1608547559130" duration="12808000" />
-      <workItem from="1608616898975" duration="4184000" />
+      <workItem from="1608616898975" duration="7423000" />
     </task>
     <servers />
   </component>

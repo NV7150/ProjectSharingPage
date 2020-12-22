@@ -1,35 +1,35 @@
 <template>
   <v-card>
     <v-list>
-      <v-list-item-group>
-        <!--Tags-->
-        <v-list-item>
-          <v-list-item-title>Tags</v-list-item-title>
-          <v-list-item-content
-              class="d-flex flex-row flex-wrap"
-          >
+      <!--Tags-->
+      <v-list-item class="mb-3">
+        <v-list-item-content>
+          <v-list-item-title class="mb-2">Tags</v-list-item-title>
+          <v-list-item-subtitle class="d-flex flex-row flex-wrap">
             <v-card
                 outlined
-                class="ml-2 rounded-b-pill"
+                class="ma-1 pa-2 rounded-pill"
                 v-for="(item, i) in project.tags"
                 :key="i"
             >
               {{item}}
             </v-card>
-          </v-list-item-content>
+          </v-list-item-subtitle>
           <v-divider class="my-3"></v-divider>
-        </v-list-item>
+        </v-list-item-content>
+      </v-list-item>
 
-        <!--Members-->
-        <v-list-item>
-          <v-list-item-title>Members</v-list-item-title>
-          <v-list-item-content
+      <!--Members-->
+      <v-list-item class="mb-3">
+        <v-list-item-content>
+          <v-list-item-title class="mb-2">Members</v-list-item-title>
+          <v-list-item-subtitle
               class="d-flex flex-row flex-wrap"
           >
             <v-tooltip
                 v-for="(member, i) in members"
                 :key="i"
-                class="ml-2"
+                top
             >
               <template v-slot:activator="{on}">
                 <v-avatar
@@ -42,11 +42,10 @@
               </template>
               <span>{{member.display_name}}</span>
             </v-tooltip>
-          </v-list-item-content>
+          </v-list-item-subtitle>
           <v-divider class="my-3"></v-divider>
-        </v-list-item>
-
-      </v-list-item-group>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
   </v-card>
 </template>
