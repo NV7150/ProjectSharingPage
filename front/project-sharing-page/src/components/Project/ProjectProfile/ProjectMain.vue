@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      {{project.title}}
+      Description
     </v-card-title>
     <v-divider class="my-3"></v-divider>
     <v-card-text>
