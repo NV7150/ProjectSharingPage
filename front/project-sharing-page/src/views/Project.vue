@@ -61,13 +61,11 @@
       <v-card-text>
         <v-tabs-items v-model="tabs">
           <v-tab-item>
-            <ProjectProfile :project="project" :members="project.members"></ProjectProfile>
+            <ProjectProfileTab :project="project" :members="project.members"></ProjectProfileTab>
           </v-tab-item>
 
           <v-tab-item>
-            <v-card height="100">
-              ここにチャット
-            </v-card>
+            <ProjectChatTab></ProjectChatTab>
           </v-tab-item>
 
           <v-tab-item>
@@ -84,11 +82,12 @@
 
 <script>
 import Navigation from "../components/Navigation/Navigation";
-import ProjectProfile from "../components/Project/ProjectProfile";
+import ProjectProfileTab from "../components/Project/ProjectProfileTab";
+import ProjectChatTab from "../components/Project/ProjectChatTab";
 
 export default {
   name: "Project",
-  components: {ProjectProfile, Navigation},
+  components: {ProjectChatTab, ProjectProfileTab, Navigation},
   data(){
     return {
       tabs: 0,
