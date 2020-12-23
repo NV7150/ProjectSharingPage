@@ -2,16 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="baf2a95e-ec0a-4e2b-98ee-efe297272f06" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/assets/scripts/ChatSettings.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectChat/ChatInput.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectChat/ChatRoomList.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectChat/ChatWindow.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectChat/ProjectChat.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectChatTab.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectProfileTab.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/views/Project.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/views/Project.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectChat/ChatInput.vue" beforeDir="false" afterPath="$PROJECT_DIR$/front/project-sharing-page/src/components/Project/ProjectChat/ChatInput.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +64,7 @@
       <workItem from="1608547559130" duration="12808000" />
       <workItem from="1608616898975" duration="9359000" />
       <workItem from="1608689990048" duration="2909000" />
-      <workItem from="1608717202368" duration="9206000" />
+      <workItem from="1608717202368" duration="9818000" />
     </task>
     <servers />
   </component>
