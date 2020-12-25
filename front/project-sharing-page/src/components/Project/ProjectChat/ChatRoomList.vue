@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import ChatSettings from "../../../assets/scripts/ChatSettings";
+import ChatSettings from "../../../assets/scripts/ProjectPageSettings";
 
 export default {
   name: "ChatRoomList",

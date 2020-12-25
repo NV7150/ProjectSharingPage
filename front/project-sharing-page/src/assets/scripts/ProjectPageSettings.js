@@ -10,5 +10,5 @@ export default {
         {name: "OpenChat", status: "open-chat"},
         {name: "Announce", status: "announce"},
         {name: "Problems", status: "problems"}
-    ]
+    ],
 }

@@ -5,24 +5,38 @@
         cols="12"
         md="10"
       >
-        <ProjectMain :project="project"></ProjectMain>
+        <v-row>
+          <v-col cols="12">
+            <ProjectMain :project="project"></ProjectMain>
+          </v-col>
+        </v-row>
+
+        <v-row class="d-md-flex d-none">
+          <v-col cols="12">
+            <ProjectContact :project="project"></ProjectContact>
+          </v-col>
+        </v-row>
       </v-col>
 
-      <!--Display over md-->
+
       <v-col
-        class="d-md-flex d-none "
+        class="d-md-flex d-none"
         md="2"
       >
         <ProjectSub :project="project" :members="members"></ProjectSub>
       </v-col>
+
     </v-row>
 
-    <!--Display less than md-->
     <v-row class="d-md-none d-flex">
-      <v-col
-        cols="12"
-      >
+      <v-col cols="12">
         <ProjectSub :project="project" :members="members"></ProjectSub>
+      </v-col>
+    </v-row>
+
+    <v-row class="d-md-none d-flex">
+      <v-col cols="12">
+        <ProjectContact :project="project"></ProjectContact>
       </v-col>
     </v-row>
   </v-container>
@@ -31,9 +45,10 @@
 <script>
 import ProjectMain from "./ProjectProfile/ProjectMain";
 import ProjectSub from "./ProjectProfile/ProjectSub";
+import ProjectContact from "./ProjectProfile/ProjectContact";
 export default {
   name: "ProjectProfile",
-  components: {ProjectSub, ProjectMain},
+  components: {ProjectContact, ProjectSub, ProjectMain},
   props: ['project', 'members']
 }
 </script>

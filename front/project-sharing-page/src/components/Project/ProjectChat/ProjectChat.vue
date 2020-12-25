@@ -43,7 +43,7 @@
 
 <script>
 import ChatRoomList from "./ChatRoomList";
-import ChatSettings from "../../../assets/scripts/ChatSettings";
+import ChatSettings from "../../../assets/scripts/ProjectPageSettings";
 import ChatWindow from "./ChatWindow";
 
 export default {

@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import ChatInput from "./ChatInput";
+import ChatInput from "./ChatWindow/ChatInput";
 export default {
   name: "ChatWindow",
   components: {ChatInput},
