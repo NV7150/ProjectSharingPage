@@ -8,7 +8,7 @@
           <v-list-item-subtitle class="d-flex flex-row flex-wrap">
             <v-card
                 outlined
-                class="ma-1 pa-2 rounded-pill"
+                class="ma-2 pa-2 rounded-pill"
                 v-for="(item, i) in project.tags"
                 :key="i"
             >
@@ -33,7 +33,7 @@
             >
               <template v-slot:activator="{on}">
                 <v-avatar
-                    class="ml-2"
+                    class="ma-2"
                     @click="userPage(member)"
                     v-on="on"
                 >

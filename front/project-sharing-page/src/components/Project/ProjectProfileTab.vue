@@ -3,7 +3,8 @@
     <v-row>
       <v-col
         cols="12"
-        md="10"
+        md="9"
+        lg="10"
       >
         <v-row>
           <v-col cols="12">
@@ -21,7 +22,8 @@
 
       <v-col
         class="d-md-flex d-none"
-        md="2"
+        md="3"
+        lg="2"
       >
         <ProjectSub :project="project" :members="members"></ProjectSub>
       </v-col>
