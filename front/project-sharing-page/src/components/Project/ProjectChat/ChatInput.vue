@@ -11,7 +11,7 @@
         <v-col cols="1">
           <v-btn
             color="primary"
-            @click="sendMessage"
+            @click="send"
           >
             Send
           </v-btn>
