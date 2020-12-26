@@ -5,11 +5,13 @@
         <v-col cols="11">
           <v-text-field
             label="Message"
+            v-model="message"
           ></v-text-field>
         </v-col>
         <v-col cols="1">
           <v-btn
             color="primary"
+            @click="sendMessage"
           >
             Send
           </v-btn>
@@ -21,7 +23,19 @@
 
 <script>
 export default {
-name: "ChatInput"
+  name: "ChatInput",
+  props: ["project", "channel", "room"],
+  data(){
+    return {
+      message : ""
+    };
+  },
+  methods : {
+    send(){
+      //TODO:メッセージを送る
+      alert(this.message);
+    }
+  }
 }
 </script>
 

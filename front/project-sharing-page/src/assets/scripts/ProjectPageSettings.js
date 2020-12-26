@@ -6,7 +6,7 @@ export default {
         "open" : {icon: "mdi-alert-circle", color: "#C62828"},
         "solved" : {icon: "mdi-alert-circle-check", color: "#43A047"}
     },
-    categories: [
+    channels: [
         {name: "OpenChat", status: "open-chat"},
         {name: "Announce", status: "announce"},
         {name: "Problems", status: "problems"}

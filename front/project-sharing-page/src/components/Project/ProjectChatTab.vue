@@ -5,7 +5,7 @@
   >
     <v-row>
       <v-col cols="12">
-        <ProjectChat></ProjectChat>
+        <ProjectChat :project="project"></ProjectChat>
       </v-col>
     </v-row>
   </v-container>
@@ -15,7 +15,8 @@
 import ProjectChat from "./ProjectChat/ProjectChat";
 export default {
   name: "ProjectChatTab",
-  components: {ProjectChat}
+  components: {ProjectChat},
+  props: ["project"]
 }
 </script>
 

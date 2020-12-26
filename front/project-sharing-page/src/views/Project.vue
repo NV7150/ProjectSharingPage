@@ -20,7 +20,7 @@
           </v-tab-item>
 
           <v-tab-item>
-            <ProjectChatTab></ProjectChatTab>
+            <ProjectChatTab :project="project"></ProjectChatTab>
           </v-tab-item>
 
         </v-tabs-items>

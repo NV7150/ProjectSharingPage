@@ -17,23 +17,33 @@
           v-model="window"
         >
           <v-window-item>
-            <ChatRoomList
-              :rooms="categories"
-              :selected-callback="selectCategory"
-            ></ChatRoomList>
+            <v-card>
+              <ChatRoomList
+                :rooms="channels"
+                :selected-callback="selectChannel"
+              ></ChatRoomList>
+            </v-card>
           </v-window-item>
 
           <v-window-item>
-            <ChatRoomList
-              :rooms="getCategoryRoom()"
-              :selected-callback="selectRoom"
-            ></ChatRoomList>
+            <v-card>
+              <ChatRoomList
+                :rooms="getRooms()"
+                :selected-callback="selectRoom"
+              ></ChatRoomList>
+            </v-card>
           </v-window-item>
 
           <v-window-item>
-            <ChatWindow
-              :chat-messages="getChatMessages()"
-            ></ChatWindow>
+            <v-card>
+              <ChatWindow
+                  :project="project"
+                  :channel="selectingChannel"
+                  :room="selectingRoom"
+              ></ChatWindow>
+              <v-spacer></v-spacer>
+              <ChatInput></ChatInput>
+            </v-card>
           </v-window-item>
         </v-window>
       </v-col>
@@ -45,28 +55,30 @@
 import ChatRoomList from "./ChatRoomList";
 import ChatSettings from "../../../assets/scripts/ProjectPageSettings";
 import ChatWindow from "./ChatWindow";
+import ChatInput from "./ChatInput";
 
 export default {
   name: "ProjectChat",
-  components: {ChatWindow, ChatRoomList},
+  props:["project"],
+  components: {ChatWindow, ChatRoomList, ChatInput},
   data(){
     return{
       window: 0,
-      categories: ChatSettings.categories,
-      selectingCategory: {},
+      channels: ChatSettings.channels,
+      selectingChannel: {},
       selectingRoom: {}
     }
   },
   methods: {
-    selectCategory(category){
-      this.selectingCategory = category;
+    selectChannel(channel){
+      this.selectingChannel = channel;
       this.window = 1;
     },
     selectRoom(room){
       this.selectingRoom = room;
       this.window = 2;
     },
-    getCategoryRoom(){
+    getRooms(){
       //TODO:サーバからチャットルームを取得
       //仮置き
       return [
@@ -74,14 +86,6 @@ export default {
         {name: "Test2", status: "solved"},
         {name: "Test3", status: "open"}
       ];
-    },
-    getChatMessages(){
-      //TODO:サーバからチャットを取得
-      //仮置き
-      return [
-        {message: "これはテストです", date: 23, month: 'Dec', year:2020, user: {display_name: "テスト", icon: "https://gochiusa.com/core_sys/images/contents/00000022/base/l1.png"}},
-        {message: "これはテストです2", date: 23, month: 'Dec', year:2020, user: {display_name: "テスト", icon: "https://gochiusa.com/core_sys/images/contents/00000021/base/l1.png"}}
-      ]
     },
     back(){
       this.window--;
@@ -94,7 +98,7 @@ export default {
     toolbarText(){
       switch (this.window){
         case 1:
-          return this.selectingCategory.name;
+          return this.selectingChannel.name;
         case 2:
           return this.selectingRoom.name;
       }
