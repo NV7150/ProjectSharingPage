@@ -9,6 +9,20 @@
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
       <v-toolbar-title>{{toolbarText}}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-tooltip bottom>
+        <template v-slot:activator="{on}">
+          <v-btn
+              icon
+              @click="goToPage"
+              v-on="on"
+              :disabled="window < 2"
+          >
+            <v-icon>mdi-application</v-icon>
+          </v-btn>
+        </template>
+        <span>Go to chat page</span>
+      </v-tooltip>
     </v-toolbar>
 
     <v-row>
@@ -92,6 +106,16 @@ export default {
       if(this.window < 0){
         this.window = 0;
       }
+    },
+    goToPage(){
+      this.$router.push({
+        name: "Chat",
+        params: {
+          projectId: this.$route.params.projectId,
+          channel: this.selectingChannel.name,
+          room: this.selectingRoom.name
+        }
+      });
     }
   },
   computed: {
