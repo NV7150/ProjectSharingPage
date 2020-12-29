@@ -18,8 +18,6 @@ services:
         image: caddy
         volumes:
             - "./Caddyfile:/etc/caddy/Caddyfile"
-            - "./front/project-sharing-page/public:/public"
-            - "./front/project-sharing-page/src/assets:/src/assets"
         links:
             - userapi
             - front
