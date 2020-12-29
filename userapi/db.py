@@ -243,6 +243,9 @@ class Token(Base):
 
     @staticmethod
     def get_userid(raw_token: str) -> Optional[int]:
+        """Get userif from token
+        WARNING: This method not check the validity of the token
+        """
         id: Optional[int] = None
         try:
             id = int(raw_token.split('@')[-1])

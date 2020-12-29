@@ -22,6 +22,34 @@ async def index():
 
 # User
 
+@app.get(
+    '/userapi/user',
+    description='Get login user',
+    status_code=200,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.User,
+            'description': 'Successful response',
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Not logged in (cookie token is required)'
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'User not found'
+        }
+    }
+)
+async def get_login_user(token: Optional[str] = Cookie(None)):
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    u: Optional[schema.LoginUser] = schema.LoginUser.from_token(token)
+    if u is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return u
+
+
 @app.post(
     '/userapi/user',
     description='Create User',
