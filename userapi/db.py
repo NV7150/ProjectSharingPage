@@ -13,7 +13,7 @@ from typing import Optional, Any
 
 PG_USER = os.environ.get('POSTGRES_USER')
 PG_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
-DB_URL = f'postgresql://{PG_USER}:{PG_PASSWORD}@db'
+DB_URL = f'postgresql://{PG_USER}:{PG_PASSWORD}@userdb'
 DB_ECHO = (os.environ.get('DB_ECHO') != 'False')
 
 engine = create_engine(

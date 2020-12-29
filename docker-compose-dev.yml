@@ -4,17 +4,35 @@ services:
         build: front/project-sharing-page
 
     userapi:
-        build: userapi
+        build: 
+            context: userapi
+            dockerfile: Dockerfile_dev
         links:
-            - db
+            - userdb
         depends_on:
-            - db
+            - userdb
         environment:
             POSTGRES_USER: "postgres"
             POSTGRES_PASSWORD: "pg_password"
             DB_ECHO: "True"
         volumes:
             - ./userapi:/code
+    
+    projectapi:
+        build:
+            context: projectapi
+            dockerfile: Dockerfile_dev
+        links:
+            - projectdb
+        depends_on:
+            - projectdb
+        environment:
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"
+            DB_ECHO: "True"
+        volumes: 
+            - ./projectapi:/code
+
     
     caddy:
         image: caddy
@@ -33,17 +51,29 @@ services:
             - 8080:80
             - 8081:443
 
-    db:
+    userdb:
         image: postgres
         environment: 
             POSTGRES_USER: "postgres"
             POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
         volumes:
-            - "pgdata:/var/lib/postgresql/data"
+            - "userpgdata:/var/lib/postgresql/data"
         ports:
           - 5432:5432  # Debug
+    
+    projectdb:
+        image: postgres
+        environment: 
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
+        volumes:
+            - "projectpgdata:/var/lib/postgresql/data"
+        ports:
+          - 5433:5433  # Debug
 
         
 volumes: 
-    pgdata:
+    userpgdata:
+        driver: "local"
+    projectpgdata:
         driver: "local"
