@@ -2,11 +2,11 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 
 import os
 from contextlib import contextmanager
-from typing import List
+from typing import Any, List, Optional
 
 
 PG_USER = os.environ.get('POSTGRES_USER')
@@ -67,6 +67,11 @@ class Project(Base):
     linkedin: Optional[str]
     wantedly: Optional[str]
     url: Optional[str]
+
+    skilltags: List[int]
+        list of skilltag id
+    is_active: bool (default: True)
+        set false when logically deleted
     """
     __tablename__ = 'project'
     id = Column('id', Integer, primary_key=True)
@@ -90,6 +95,7 @@ class Project(Base):
 
     # skill
     __skilltags = Column('skilltags', String, nullable=False)
+    is_active = Column('is_active', Boolean, nullable=False, default=True)
 
     @property
     def skilltags(self) -> List[int]:
@@ -115,3 +121,14 @@ class Project(Base):
     @members.setter
     def members(self, members: List[int]):
         self.__members = ','.join([str(m) for m in members])
+
+    @classmethod
+    def get(cls, s: scoped_session, id: int) -> Optional[Any]:
+        p = s.query(cls).get(id)
+        if p is None:
+            return None
+
+        if p.is_active is False:
+            return None
+
+        return p

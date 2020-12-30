@@ -1,6 +1,5 @@
+from typing import Optional
 from fastapi import FastAPI, HTTPException, status
-from fastapi import Cookie
-from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 import db
 import schema
 
@@ -36,7 +35,7 @@ async def index():
 )
 async def get_project(id: int):
     with db.session_scope() as s:
-        p = s.query(db.Project).get(id)
+        p: Optional[db.Project] = db.Project.get(s, id)
         if p is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND)
 
@@ -78,3 +77,25 @@ async def update_project(project: schema.Project):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     return result
+
+
+@app.delete(
+    '/projectapi/project/{id:int}',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful response (deleted)',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Project not found',
+        },
+    },
+)
+async def delete_project(id: int):
+    with db.session_scope() as s:
+        p: Optional[db.Project] = s.query(db.Project).get(id)
+        if p is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+        p.is_active = False
+        s.commit()

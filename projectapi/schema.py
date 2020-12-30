@@ -54,7 +54,7 @@ class Project(BaseModel):
 
     def update(self) -> Optional[Any]:
         with db.session_scope() as s:
-            p = s.query(db.Project).get(self.id)
+            p = db.Project.get(s, self.id)
             if p is None:
                 return None
 
