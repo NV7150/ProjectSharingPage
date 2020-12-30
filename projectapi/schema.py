@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 import db
-from typing import Optional, List
+from typing import Any, Optional, List
 
 
 class Sns(BaseModel):
@@ -51,6 +51,32 @@ class Project(BaseModel):
             members=db_proj.members,
             sns=sns,
         )
+
+    def update(self) -> Optional[Any]:
+        with db.session_scope() as s:
+            p = s.query(db.Project).get(self.id)
+            if p is None:
+                return None
+
+            p.title = self.title
+            p.subtitle = self.subtitle
+            p.bg_image = self.bg_image
+            p.description = self.description
+            p.skilltags = self.skilltags
+            p.members = self.members
+            p.twitter = self.sns.twitter
+            p.instagram = self.sns.instagram
+            p.github = self.sns.github
+            p.youtube = self.sns.youtube
+            p.vimeo = self.sns.vimeo
+            p.facebook = self.sns.facebook
+            p.tiktok = self.sns.tiktok
+            p.linkedin = self.sns.linkedin
+            p.wantedly = self.sns.wantedly
+            p.url = self.sns.url
+
+            s.commit()
+            return self.from_db(p)
 
 
 class ProjectCreate(BaseModel):
