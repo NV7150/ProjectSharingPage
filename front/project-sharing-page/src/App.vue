@@ -1,22 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <v-btn
-          text
-          color="real accent-4"
-          @click="toLogin"
-      >
-        Login
-      </v-btn>
-    </v-app-bar>
-
-    <v-main>
-      <router-view />
-    </v-main>
+    <router-view />
   </v-app>
 </template>
 
@@ -32,9 +16,6 @@ export default {
     //
   }),
   methods: {
-    toLogin(){
-      this.$router.push({name: 'Login'})
-    }
   }
 };
 </script>

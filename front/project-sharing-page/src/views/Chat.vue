@@ -1,55 +1,62 @@
 <template>
   <v-main>
-    <Navigation></Navigation>
+    <Navigation />
 
-    <ProjectTop :project="project"></ProjectTop>
-
-    <v-card>
-      <v-tabs
-        v-model="tabs"
-        grow
-      >
-        <v-tab>General</v-tab>
-        <v-tab>Chat</v-tab>
-      </v-tabs>
-
-      <v-card-text>
-        <v-tabs-items v-model="tabs">
-          <v-tab-item>
-            <ProjectProfileTab :project="project" :members="project.members"></ProjectProfileTab>
-          </v-tab-item>
-
-          <v-tab-item>
-            <ProjectChatTab :project="project"></ProjectChatTab>
-          </v-tab-item>
-
-        </v-tabs-items>
-      </v-card-text>
-    </v-card>
+    <v-container>
+      <v-row>
+        <v-col
+          cols="12"
+        >
+          <v-card>
+            <v-toolbar>
+              <v-btn
+                  icon
+                  :disabled="window <= 0"
+                  @click="back"
+              >
+                <v-icon>mdi-arrow-left</v-icon>
+              </v-btn>
+              <v-toolbar-title>{{$route.params.room}}</v-toolbar-title>
+            </v-toolbar>
+            <ChatWindow :project="project" :channel="channel" :room="room" />
+            <ChatInput />
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
 
   </v-main>
 </template>
 
 <script>
 import Navigation from "../components/Navigation/Navigation";
-import ProjectProfileTab from "../components/Project/ProjectProfileTab";
-import ProjectChatTab from "../components/Project/ProjectChatTab";
-import ProjectTop from "../components/Project/ProjectChat/ProjectTop";
+import ChatWindow from "../components/Project/ProjectChat/ChatWindow";
+import ChatInput from "../components/Project/ProjectChat/ChatInput";
 
 export default {
-  name: "Project",
-  components: {ProjectTop, ProjectChatTab, ProjectProfileTab, Navigation},
+  name: "Chat",
+  components: {ChatInput, ChatWindow, Navigation},
   data(){
     return {
-      tabs: 0,
-      project: {}
+      project: {},
+      channel: {},
+      room: {}
     }
   },
+  methods: {
+    back(){
+      this.$router.push({
+        name:'Project',
+        params: { projectId: this.$route.params.projectId }
+      });
+    }
+  },
+
   created() {
     //TODO:プロジェクトをAPIから取得
     this.project = {
       title: "Test",
-        titleColor: "#1E88E5",
+      titleColor: "#1E88E5",
       keyImage: "https://gochiusa.com/bloom/core_sys/images/main/home/main_img2_4.jpg",
       about: "これはテストです",
       description:"これはテストですこれはテストですこれはテストですこれはテストですこれはテストですこれはテストですこれはテストですYpaaaaaaaこれはテストですこれはテストですこれはテストですこれはテストですこれはテストですこれはテストですこれはテストです",
@@ -64,11 +71,14 @@ export default {
         {name: "tiktok", link:""}
       ]
     };
-  }
+
+    //TODO:チャンネルとルームを取得
+    this.channel = {name: this.$route.params.channel};
+    this.room = {name: this.$route.params.room};
+  },
 }
 </script>
 
 <style scoped>
-
 
 </style>

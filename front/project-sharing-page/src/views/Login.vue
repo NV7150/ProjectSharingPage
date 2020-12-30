@@ -1,11 +1,11 @@
 <template>
-  <v-container>
+  <v-main>
     <v-row justify="center">
       <v-col lg="4" md="6" sm="7" cols="11">
         <LoginForm></LoginForm>
       </v-col>
     </v-row>
-  </v-container>
+  </v-main>
 </template>
 
 <script>
