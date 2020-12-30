@@ -11,7 +11,7 @@
     <template
       v-if="logined"
     >
-      <UserMenu v-on:logout="logout"></UserMenu>
+      <UserMenu v-on:logout="logout" :user="user"></UserMenu>
     </template>
     <template
       v-else
@@ -55,16 +55,13 @@ export default {
     }
   },
   created() {
-    let _this = this;
     axios.get('/userapi/user')
-    .then(response=> {
-      //TODO:loginとの分岐
-
-      _this.user = response.data;
-      _this.logined = true;
+    .then((response)=> {
+      this.user = response.data;
+      this.logined = true;
     })
     .catch(() => {
-      _this.logout();
+      this.logout();
     });
   },
   methods: {

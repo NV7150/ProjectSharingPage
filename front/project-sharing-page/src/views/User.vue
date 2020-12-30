@@ -72,8 +72,7 @@ export default {
     axios
       .get('/userapi/user/' + this.$route.params.userName)
       .then((response) => {
-        this.user = response.data
-        console.log(this.user);
+        this.user = response.data;
       })
       .catch(() =>{
         //TODO:404ページへ

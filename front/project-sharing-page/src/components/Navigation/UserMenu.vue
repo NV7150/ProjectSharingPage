@@ -21,7 +21,7 @@
             <v-avatar>
               <img :src="user.icon">
             </v-avatar>
-            <v-card-title>{{user.name}}</v-card-title>
+            <v-card-title>{{user.display_name}}</v-card-title>
           </div>
 
           <div
@@ -56,7 +56,7 @@ export default {
       default:function(){
         return {
           username: '',
-          name: 'Loading...',
+          display_name: 'Loading...',
           icon: PlaceHolder
         };
       }
