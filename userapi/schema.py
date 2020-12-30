@@ -1,6 +1,6 @@
 import enum
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Any
 import db
 
 
@@ -57,12 +57,7 @@ class SkillTagCreate(BaseModel):
             return SkillTag.from_db(skilltag)
 
 
-class User(BaseModel):
-    username: str
-    display_name: str
-    icon: Optional[str]
-    bio: Optional[str]
-
+class Sns(BaseModel):
     # SNS
     twitter: Optional[str]
     instagram: Optional[str]
@@ -75,6 +70,15 @@ class User(BaseModel):
     wantedly: Optional[str]
     url: Optional[str]
 
+
+class User(BaseModel):
+    username: str
+    display_name: str
+    icon: Optional[str]
+    bio: Optional[str]
+
+    sns: Sns
+
     skilltags: List[SkillTag]
 
     @staticmethod
@@ -84,11 +88,7 @@ class User(BaseModel):
             SkillTag.from_db(x)
             for x in skilltags_db
         ]
-        return User(
-            username=db_user.username,
-            display_name=db_user.display_name,
-            icon=db_user.icon,
-            bio=db_user.bio,
+        sns = Sns(
             twitter=db_user.twitter,
             instagram=db_user.instagram,
             github=db_user.github,
@@ -98,9 +98,63 @@ class User(BaseModel):
             tiktok=db_user.tiktok,
             linkedin=db_user.linkedin,
             wantedly=db_user.wantedly,
-            url=db_user.linkedin,
+            url=db_user.url,
+        )
+        return User(
+            username=db_user.username,
+            display_name=db_user.display_name,
+            icon=db_user.icon,
+            bio=db_user.bio,
+            sns=sns,
             skilltags=skilltags
         )
+
+
+class LoginUser(User):
+    email: str
+
+    @staticmethod
+    def from_db(db_user: db.User):
+        skilltags_db = db_user.skilltags
+        skilltags = [
+            SkillTag.from_db(x)
+            for x in skilltags_db
+        ]
+        sns = Sns(
+            twitter=db_user.twitter,
+            instagram=db_user.instagram,
+            github=db_user.github,
+            youtube=db_user.youtube,
+            vimeo=db_user.vimeo,
+            facebook=db_user.facebook,
+            tiktok=db_user.tiktok,
+            linkedin=db_user.linkedin,
+            wantedly=db_user.wantedly,
+            url=db_user.url,
+        )
+        return LoginUser(
+            username=db_user.username,
+            email=db_user.email,
+            display_name=db_user.display_name,
+            icon=db_user.icon,
+            bio=db_user.bio,
+            sns=sns,
+            skilltags=skilltags
+        )
+
+    @classmethod
+    def from_token(cls, token: str) -> Optional[Any]:
+        with db.session_scope() as s:
+            # check token
+            t: Optional[db.Token] = db.Token.get_token(token)
+            if t is None:
+                return None
+
+            user: Optional[db.User] = s.query(db.User).get(t.user_id)
+            if user is None:
+                return None
+
+            return cls.from_db(user)
 
 
 class UserCreate(BaseModel):
