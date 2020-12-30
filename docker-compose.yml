@@ -25,6 +25,17 @@ services:
             POSTGRES_PASSWORD: "pg_password"
             DB_ECHO: "False"
     
+    chatapi:
+        build: chatapi
+        links:
+            - chatdb
+        depends_on:
+            - chatdb
+        environment:
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"
+            DB_ECHO: "False"
+    
     caddy:
         image: caddy
         volumes:
@@ -57,10 +68,20 @@ services:
             POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
         volumes:
             - "projectpgdata:/var/lib/postgresql/data"
+    
+    chatdb:
+        image: postgres
+        environment: 
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
+        volumes:
+            - "chatpgdata:/var/lib/postgresql/data"
 
         
 volumes: 
     userpgdata:
         driver: "local"
     projectpgdata:
+        driver: "local"
+    chatpgdata:
         driver: "local"

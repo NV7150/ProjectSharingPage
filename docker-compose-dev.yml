@@ -32,7 +32,21 @@ services:
             DB_ECHO: "True"
         volumes: 
             - ./projectapi:/code
-
+    
+    chatapi:
+        build:
+            context: chatapi
+            dockerfile: Dockerfile_dev
+        links:
+            - chatdb
+        depends_on:
+            - chatdb
+        environment:
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"
+            DB_ECHO: "True"
+        volumes: 
+            - ./chatapi:/code
     
     caddy:
         image: caddy
@@ -69,11 +83,22 @@ services:
         volumes:
             - "projectpgdata:/var/lib/postgresql/data"
         ports:
-          - 5433:5433  # Debug
+          - 5433:5432  # Debug
 
-        
+    chatdb:
+        image: postgres
+        environment: 
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
+        volumes:
+            - "chatpgdata:/var/lib/postgresql/data"
+        ports:
+          - 5434:5432  # Debug
+
 volumes: 
     userpgdata:
         driver: "local"
     projectpgdata:
+        driver: "local"
+    chatpgdata:
         driver: "local"
