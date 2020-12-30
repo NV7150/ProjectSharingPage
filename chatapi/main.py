@@ -17,6 +17,28 @@ async def index():
     return {'message': 'Hello, chatapi!'}
 
 
+@app.get(
+    '/chatapi/thread/{id:int}',
+    description='Get thread',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'message': 'Successful Response',
+            'model': schema.Thread,
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'message': 'Thread not found',
+        },
+    },
+)
+async def get_thread(id: int):
+    with db.session_scope() as s:
+        t = s.query(db.Thread).get(id)
+        if t is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+        return schema.Thread.from_db(t)
+
+
 @app.post(
     '/chatapi/thread',
     description='Create thread',
