@@ -14,10 +14,10 @@
     </template>
 
     <v-img
-        :src="project.keyImage"
+        :src="project.bg_image"
         class="align-end"
     >
-      <v-card-title v-text="project.name"></v-card-title>
+      <v-card-title v-text="project.title"></v-card-title>
     </v-img>
 
     <v-expand-transition>
@@ -25,9 +25,9 @@
           v-if="hovered"
           class="transition-fast-in-fast-out hover-trans"
       >
-        <v-card-title v-text="project.name"></v-card-title>
+        <v-card-title v-text="project.title"></v-card-title>
         <v-card-text>
-          <p>{{project.description}}</p>
+          <p>{{project.subtitle}}</p>
           <v-btn
             text
             color="real accent-4"
@@ -42,8 +42,8 @@
 </template>
 
 <script>
+import axios from "axios";
 import PlaceHolder from "../../assets/PlaceHolder.png";
-import logo from "../../assets/logo.png"
 
 export default {
   name: "ProjectCard",
@@ -63,23 +63,22 @@ export default {
       hovered : false
     }
   },
-  mounted() {
-    //TODO:projectIdを使ってAPIからプロジェクトデータを取得(axios)
-    //仮置き
-    this.project = {
-      name: "Foo" + this.projectId,
-      projectId: this.projectId,
-      keyImage: logo,
-      description: "This is " + this.projectId + "th demo"
-    };
-    this.loading = false;
-    //仮置きここまで
+  created() {
+    axios
+        .get("projectapi/project/" + this.projectId)
+        .then((response) => {
+          this.project = response.data;
+          this.loading = false;
+        })
+        .catch(() => {
+          //TODO:エラー処理
+        });
   },
   methods:{
     toProjectPage() {
       this.$router.push({
         name:'Project',
-        params: { projectId: this.project.projectId }
+        params: { projectId: this.project.id }
       })
     }
   }

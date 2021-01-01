@@ -61,7 +61,7 @@ export default {
       this.logined = true;
     })
     .catch(() => {
-      this.logout();
+      this.logined = false;
     });
   },
   methods: {
