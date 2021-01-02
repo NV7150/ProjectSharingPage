@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 import db
 
+
 class Thread(BaseModel):
     id: int
     type: db.ThreadType

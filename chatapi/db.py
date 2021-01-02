@@ -2,12 +2,11 @@ from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 import enum
 
 import os
 from contextlib import contextmanager
-from typing import Any, List, Optional
 
 
 PG_USER = os.environ.get('POSTGRES_USER')
@@ -44,15 +43,15 @@ def session_scope() -> scoped_session:
 Base: DeclarativeMeta = declarative_base()
 
 
-class ThreadType(int, enum.Enum):
-    OPENCHAT = 1
-    ANNOUNCE = 2
-    PROBLEMS = 3
+class ThreadType(str, enum.Enum):
+    OPENCHAT = 'THREADTYPE_OPENCHAT'
+    ANNOUNCE = 'THREADTYPE_ANNOUNCE'
+    PROBLEMS = 'THREADTYPE_PROBLEMS'
 
 
-class ThreadStatus(int, enum.Enum):
-    OPEN = 1
-    CLOSED = 2
+class ThreadStatus(str, enum.Enum):
+    OPEN = 'THREADSTATUS_OPEN'
+    CLOSED = 'THREADSTATUS_CLOSED'
 
 
 class Thread(Base):
@@ -61,15 +60,15 @@ class Thread(Base):
     Parameters
     ----------
     id: int (auto)
-    type: ThreadType (int)
-    status: ThreadStatus (int)
+    type: ThreadType (str)
+    status: ThreadStatus (str)
     title: str
     """
     __tablename__ = 'thread'
     id = Column('id', Integer, primary_key=True)
-    type = Column('type', Integer, nullable=False)
+    type = Column('type', String, nullable=False, default=ThreadType.OPENCHAT)
     status = Column(
-        'status', Integer, nullable=False, default=ThreadStatus.OPEN
+        'status', String, nullable=False, default=ThreadStatus.OPEN
     )
     title = Column('title', String, nullable=False)
     messages = relationship('Message', backref='thread')
