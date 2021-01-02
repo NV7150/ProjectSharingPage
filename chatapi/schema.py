@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel
 import db
 from datetime import datetime
@@ -14,6 +13,8 @@ class Thread(BaseModel):
     status: db.ThreadStatus
     project_id: int
     title: str
+    created_at: datetime
+    updated_at: datetime
 
     @classmethod
     def from_db(cls, db_thread: db.Thread):
@@ -23,6 +24,8 @@ class Thread(BaseModel):
             status=db_thread.status,
             project_id=db_thread.project_id,
             title=db_thread.title,
+            created_at=db_thread.created_at,
+            updated_at=db_thread.updated_at,
         )
 
 
@@ -39,6 +42,8 @@ class ThreadCreate(BaseModel):
                 status=self.status,
                 project_id=self.project_id,
                 title=self.title,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
             )
             s.add(t)
             s.commit()
@@ -73,12 +78,14 @@ class MessageCreate(BaseModel):
             if thread is None:
                 raise ForeignKeyError
 
+            now = datetime.now()
             m = db.Message(
                 thread_id=thread.id,
                 username=username,
                 content=self.content,
-                created_at=datetime.now(),
+                created_at=now,
             )
+            thread.updated_at = now
             s.add(m)
             s.commit()
             return Message.from_db(m)

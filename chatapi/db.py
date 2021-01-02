@@ -4,7 +4,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 import enum
-
 import os
 from contextlib import contextmanager
 
@@ -64,6 +63,9 @@ class Thread(Base):
     status: ThreadStatus (str)
     project_id: int
     title: str
+    created_at: datetime
+    updated_at: datetime
+    messages: List[Message]
     """
     __tablename__ = 'thread'
     id = Column('id', Integer, primary_key=True)
@@ -73,6 +75,8 @@ class Thread(Base):
     )
     project_id = Column('project_id', Integer, nullable=False)
     title = Column('title', String, nullable=False)
+    created_at = Column('created_at', DateTime, nullable=False)
+    updated_at = Column('updated_at', DateTime, nullable=False)
     messages = relationship('Message', backref='thread')
 
 
