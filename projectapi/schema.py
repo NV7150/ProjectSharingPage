@@ -24,6 +24,7 @@ class Project(BaseModel):
     bg_image: Optional[str]
     description: str
     members: List[str]
+    likes: int
     sns: Sns
     skilltags: List[int]
 
@@ -47,9 +48,10 @@ class Project(BaseModel):
             subtitle=db_proj.subtitle,
             bg_image=db_proj.bg_image,
             description=db_proj.description,
-            skilltags=db_proj.skilltags,
             members=db_proj.members,
+            likes=len(db_proj.likes),
             sns=sns,
+            skilltags=db_proj.skilltags,
         )
 
     def update(self) -> Optional[Any]:
