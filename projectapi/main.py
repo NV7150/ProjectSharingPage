@@ -31,7 +31,7 @@ async def index():
             'model': schema.Project,
             'description': 'Successful Response',
         },
-        status.HTTP_400_BAD_REQUEST: {
+        status.HTTP_404_NOT_FOUND: {
             'description': 'Project not found',
         },
     },
