@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, status, Cookie
 import schema
 import db
 from utils import project, user
-from typing import Optional
+from typing import List, Optional
 
 # Init db
 db.Base.metadata.create_all(bind=db.engine)
@@ -77,6 +77,35 @@ async def create_thread(
     return t.create()
 
 
+@app.get(
+    '/chatapi/thread/project/{project_id:int}',
+    description='Get threads by project',
+    responses={
+        status.HTTP_200_OK: {
+            'model': List[schema.Thread],
+            'description': 'Successful response (sorted by latest update)',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Project not found',
+        },
+    },
+)
+async def get_thread_by_project(project_id: int):
+    if project.project_exist_check(project_id) is False:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    with db.session_scope() as s:
+        threads = s.query(db.Thread).filter(
+            db.Thread.project_id == project_id,
+        )
+        sorted_threads = sorted(
+            threads,
+            key=lambda t: t.updated_at.timestamp(),
+            reverse=True,  # desc
+        )
+        return [schema.Thread.from_db(t) for t in sorted_threads]
+
+
 # Message
 
 @app.get(
@@ -98,7 +127,7 @@ async def get_message(id: int):
         msg: Optional[db.Message] = s.query(db.Message).get(id)
         if msg is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND)
-        
+
         return schema.Message.from_db(msg)
 
 
