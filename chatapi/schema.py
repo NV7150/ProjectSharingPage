@@ -1,5 +1,11 @@
+from typing import Optional
 from pydantic import BaseModel
 import db
+from datetime import datetime
+
+
+class ForeignKeyError(Exception):
+    pass
 
 
 class Thread(BaseModel):
@@ -37,3 +43,42 @@ class ThreadCreate(BaseModel):
             s.add(t)
             s.commit()
             return Thread.from_db(t)
+
+
+class Message(BaseModel):
+    id: int
+    thread_id: int
+    username: str
+    content: str
+    created_at: datetime
+
+    @classmethod
+    def from_db(cls, db_msg: db.Message):
+        return cls(
+            id=db_msg.id,
+            thread_id=db_msg.thread_id,
+            username=db_msg.username,
+            content=db_msg.content,
+            created_at=db_msg.created_at,
+        )
+
+
+class MessageCreate(BaseModel):
+    thread_id: int
+    content: str
+
+    def create(self, username: str):
+        with db.session_scope() as s:
+            thread = s.query(db.Thread).get(self.thread_id)
+            if thread is None:
+                raise ForeignKeyError
+
+            m = db.Message(
+                thread_id=thread.id,
+                username=username,
+                content=self.content,
+                created_at=datetime.now(),
+            )
+            s.add(m)
+            s.commit()
+            return Message.from_db(m)

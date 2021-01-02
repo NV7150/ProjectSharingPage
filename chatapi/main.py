@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, status, Cookie
-from starlette.status import HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
 import schema
 import db
 from utils import project, user
@@ -20,17 +20,19 @@ async def index():
     return {'message': 'Hello, chatapi!'}
 
 
+# Thread
+
 @app.get(
     '/chatapi/thread/{id:int}',
     description='Get thread',
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_200_OK: {
-            'message': 'Successful Response',
+            'description': 'Successful Response',
             'model': schema.Thread,
         },
         status.HTTP_404_NOT_FOUND: {
-            'message': 'Thread not found',
+            'description': 'Thread not found',
         },
     },
 )
@@ -48,14 +50,14 @@ async def get_thread(id: int):
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {
-            'message': 'Successful Response (created)',
+            'description': 'Successful Response (created)',
             'model': schema.Thread,
         },
         status.HTTP_401_UNAUTHORIZED: {
-            'message': 'Authentication is required.',
+            'description': 'Authentication is required.',
         },
         status.HTTP_404_NOT_FOUND: {
-            'message': 'Project not found (project_id is wrong)',
+            'description': 'Project not found (project_id is wrong)',
         },
     },
 )
@@ -74,3 +76,38 @@ async def create_thread(
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     return t.create()
+
+
+# Message
+
+@app.post(
+    '/chatapi/message',
+    description='Create Message',
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_201_CREATED: {
+            'description': 'Successful Response (created)',
+            'model': schema.Message,
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Authorization is required',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Thread is not found (thread_id is wrong)',
+        },
+    }
+)
+async def create_message(
+    msg: schema.MessageCreate,
+    token: Optional[str] = Cookie(None),
+):
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    username = user.auth(token)
+    if username is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        return msg.create(username)
+    except schema.ForeignKeyError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
