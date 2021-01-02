@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException, status, Cookie
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
 import schema
 import db
 from utils import project, user
@@ -79,6 +78,29 @@ async def create_thread(
 
 
 # Message
+
+@app.get(
+    '/chatapi/message/{id:int}',
+    description='Get Message',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful response',
+            'model': schema.Message,
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Message not found',
+        },
+    },
+)
+async def get_message(id: int):
+    with db.session_scope() as s:
+        msg: Optional[db.Message] = s.query(db.Message).get(id)
+        if msg is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+        
+        return schema.Message.from_db(msg)
+
 
 @app.post(
     '/chatapi/message',
