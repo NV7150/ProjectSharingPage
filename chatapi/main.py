@@ -1,7 +1,9 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Cookie
+from starlette.status import HTTP_401_UNAUTHORIZED
 import schema
 import db
-from utils import project
+from utils import project, user
+from typing import Optional
 
 # Init db
 db.Base.metadata.create_all(bind=db.engine)
@@ -49,12 +51,26 @@ async def get_thread(id: int):
             'message': 'Successful Response (created)',
             'model': schema.Thread,
         },
+        status.HTTP_401_UNAUTHORIZED: {
+            'message': 'Authentication is required.',
+        },
         status.HTTP_404_NOT_FOUND: {
             'message': 'Project not found (project_id is wrong)',
         },
     },
 )
-async def create_thread(t: schema.ThreadCreate):
+async def create_thread(
+    t: schema.ThreadCreate,
+    token: Optional[str] = Cookie(None),
+):
+    # auth
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if user.auth(token) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    # project_id check
     if project.project_exist_check(t.project_id) is False:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
+
     return t.create()
