@@ -112,3 +112,13 @@ class ProjectCreate(BaseModel):
             s.add(p)
             s.commit()
             return Project.from_db(p)
+
+
+class Likes(BaseModel):
+    users: List[str]
+
+    @classmethod
+    def get_from_project(cls, p: db.Project):
+        return cls(
+            users=[like.username for like in p.likes]
+        )

@@ -106,6 +106,29 @@ async def delete_project(id: int):
 
 # Like
 
+@app.get(
+    '/projectapi/project/{id:int}/like',
+    description='Get users who likes project',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.Likes,
+            'description': 'Successful response (liked)',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Project not found',
+        },
+    },
+)
+def get_likes(id: int):
+    with db.session_scope() as s:
+        p = s.query(db.Project).get(id)
+        if p is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return schema.Likes.get_from_project(p)
+
+
 @app.patch(
     '/projectapi/project/{id:int}/like',
     description='like to project',
