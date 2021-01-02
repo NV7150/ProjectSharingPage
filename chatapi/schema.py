@@ -6,6 +6,7 @@ class Thread(BaseModel):
     id: int
     type: db.ThreadType
     status: db.ThreadStatus
+    project_id: int
     title: str
 
     @classmethod
@@ -14,6 +15,7 @@ class Thread(BaseModel):
             id=db_thread.id,
             type=db_thread.type,
             status=db_thread.status,
+            project_id=db_thread.project_id,
             title=db_thread.title,
         )
 
@@ -21,6 +23,7 @@ class Thread(BaseModel):
 class ThreadCreate(BaseModel):
     type: db.ThreadType
     status: db.ThreadStatus
+    project_id: int
     title: str
 
     def create(self):
@@ -28,6 +31,7 @@ class ThreadCreate(BaseModel):
             t = db.Thread(
                 type=self.type,
                 status=self.status,
+                project_id=self.project_id,
                 title=self.title,
             )
             s.add(t)

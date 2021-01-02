@@ -62,6 +62,7 @@ class Thread(Base):
     id: int (auto)
     type: ThreadType (str)
     status: ThreadStatus (str)
+    project_id: int
     title: str
     """
     __tablename__ = 'thread'
@@ -70,6 +71,7 @@ class Thread(Base):
     status = Column(
         'status', String, nullable=False, default=ThreadStatus.OPEN
     )
+    project_id = Column('project_id', Integer, nullable=False)
     title = Column('title', String, nullable=False)
     messages = relationship('Message', backref='thread')
 
@@ -81,11 +83,13 @@ class Message(Base):
     ----------
     id: int
     thread: Thread
+    username: str
     content: str
     created_at: datetime
     """
     __tablename__ = 'message'
     id = Column('id', Integer, primary_key=True)
     thread_id = Column(Integer, ForeignKey('thread.id'))
+    username = Column('username', String, nullable=False)
     content = Column('content', String, nullable=False)
     created_at = Column('created_at', DateTime, nullable=False)

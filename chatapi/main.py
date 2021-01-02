@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, status
 import schema
 import db
+from utils import project
 
 # Init db
 db.Base.metadata.create_all(bind=db.engine)
@@ -48,7 +49,12 @@ async def get_thread(id: int):
             'message': 'Successful Response (created)',
             'model': schema.Thread,
         },
+        status.HTTP_404_NOT_FOUND: {
+            'message': 'Project not found (project_id is wrong)',
+        },
     },
 )
 async def create_thread(t: schema.ThreadCreate):
+    if project.project_exist_check(t.project_id) is False:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
     return t.create()
