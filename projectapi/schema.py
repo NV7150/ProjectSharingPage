@@ -23,7 +23,7 @@ class Project(BaseModel):
     subtitle: Optional[str]
     bg_image: Optional[str]
     description: str
-    members: List[int]
+    members: List[str]
     sns: Sns
     skilltags: List[int]
 
@@ -84,7 +84,7 @@ class ProjectCreate(BaseModel):
     subtitle: Optional[str]
     bg_image: Optional[str]
     description: str
-    members: List[int]
+    members: List[str]
     sns: Sns
     skilltags: List[int]
 

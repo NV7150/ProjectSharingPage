@@ -111,16 +111,16 @@ class Project(Base):
         self.__skilltags = s
 
     @property
-    def members(self) -> List[int]:
+    def members(self) -> List[str]:
         return [
-            int(member.replace(' ', ''))
+            member.replace(' ', '')
             for member in self.__members.split(',')
             if member not in ['', ' ']
         ]
 
     @members.setter
-    def members(self, members: List[int]):
-        self.__members = ','.join([str(m) for m in members])
+    def members(self, members: List[str]):
+        self.__members = ','.join(members)
 
     @classmethod
     def get(cls, s: scoped_session, id: int) -> Optional[Any]:
