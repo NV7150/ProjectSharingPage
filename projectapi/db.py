@@ -1,8 +1,8 @@
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 
 import os
 from contextlib import contextmanager
@@ -43,6 +43,22 @@ def session_scope() -> scoped_session:
 Base: DeclarativeMeta = declarative_base()
 
 
+class Like(Base):
+    """[DB] Like for Project
+
+    Parametes
+    ---------
+    id: int (auto)
+    username: str
+    project: int
+        foreign key (Project)
+    """
+    __tablename__ = 'like'
+    id = Column('id', Integer, primary_key=True)
+    username = Column('username', String, nullable=False)
+    project_id = Column('project_id', ForeignKey('project.id'))
+
+
 class Project(Base):
     """[DB] Project Class
 
@@ -55,7 +71,8 @@ class Project(Base):
     description: str
     members: List[str]
         list of username
-    tags: List[int]
+    likes: List[Like]
+        list of username
 
     twitter: Optional[str]
     instagram: Optional[str]
@@ -80,6 +97,7 @@ class Project(Base):
     bg_image = Column('bg_image', String, nullable=True)
     description = Column('description', String, nullable=False)
     __members = Column('members', String, nullable=False)
+    likes = relationship('Like', backref='project')
 
     # SNS
     twitter = Column('twitter', String, nullable=True)
@@ -111,16 +129,16 @@ class Project(Base):
         self.__skilltags = s
 
     @property
-    def members(self) -> List[int]:
+    def members(self) -> List[str]:
         return [
-            int(member.replace(' ', ''))
+            member.replace(' ', '')
             for member in self.__members.split(',')
             if member not in ['', ' ']
         ]
 
     @members.setter
-    def members(self, members: List[int]):
-        self.__members = ','.join([str(m) for m in members])
+    def members(self, members: List[str]):
+        self.__members = ','.join(members)
 
     @classmethod
     def get(cls, s: scoped_session, id: int) -> Optional[Any]:
