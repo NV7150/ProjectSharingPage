@@ -77,6 +77,9 @@ async def create_thread(
     if t.type == db.ThreadType.PROBLEMS:
         if user.check_proj_member(t.project_id, username) is False:
             raise HTTPException(status.HTTP_403_FORBIDDEN)
+    if t.type == db.ThreadType.ANNOUNCE:
+        if user.check_proj_announce_member(t.project_id, username) is False:
+            raise HTTPException(status.HTTP_403_FORBIDDEN)
 
     # project_id check
     if project.project_exist_check(t.project_id) is False:
@@ -153,6 +156,9 @@ async def get_message(id: int):
         status.HTTP_401_UNAUTHORIZED: {
             'description': 'Authorization is required',
         },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'User not in Project (of Thread) as member'
+        },
         status.HTTP_404_NOT_FOUND: {
             'description': 'Thread is not found (thread_id is wrong)',
         },
@@ -167,6 +173,17 @@ async def create_message(
     username = user.auth(token)
     if username is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    # permission
+    with db.session_scope() as s:
+        t: Optional[db.Thread] = s.query(
+            db.Thread
+        ).get(msg.thread_id)
+        if t is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+        if t.type == db.ThreadType.ANNOUNCE:
+            if user.check_proj_announce_member(t.project_id, username) is False:
+                raise HTTPException(status.HTTP_403_FORBIDDEN)
 
     try:
         return msg.create(username)

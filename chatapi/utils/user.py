@@ -73,3 +73,35 @@ def check_proj_member(proj_id: int, username: str) -> Optional[bool]:
         return False
 
     return True
+
+
+def check_proj_announce_member(proj_id: int, username: str) -> Optional[bool]:
+    """Check user in project as member
+    Parameters
+    ----------
+    proj_id: int
+    username: str
+
+    Returns
+    -------
+    result: Optional[bool]
+        if proj_id not found:
+            return None
+        else:
+            True or False
+    """
+    resp = requests.get(
+        f'http://projectapi:8000/projectapi/project/{proj_id}'
+    )
+
+    if resp.status_code not in [404, 200]:
+        raise ProjectAPIError
+
+    if resp.status_code == 400:
+        return None
+
+    resp_json = resp.json()
+    if username not in resp_json['announce_users']:
+        return False
+
+    return True
