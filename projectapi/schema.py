@@ -23,7 +23,8 @@ class Project(BaseModel):
     subtitle: Optional[str]
     bg_image: Optional[str]
     description: str
-    members: List[int]
+    members: List[str]
+    likes: int
     sns: Sns
     skilltags: List[int]
 
@@ -47,9 +48,10 @@ class Project(BaseModel):
             subtitle=db_proj.subtitle,
             bg_image=db_proj.bg_image,
             description=db_proj.description,
-            skilltags=db_proj.skilltags,
             members=db_proj.members,
+            likes=len(db_proj.likes),
             sns=sns,
+            skilltags=db_proj.skilltags,
         )
 
     def update(self) -> Optional[Any]:
@@ -84,7 +86,7 @@ class ProjectCreate(BaseModel):
     subtitle: Optional[str]
     bg_image: Optional[str]
     description: str
-    members: List[int]
+    members: List[str]
     sns: Sns
     skilltags: List[int]
 
@@ -110,3 +112,13 @@ class ProjectCreate(BaseModel):
             s.add(p)
             s.commit()
             return Project.from_db(p)
+
+
+class Likes(BaseModel):
+    users: List[str]
+
+    @classmethod
+    def get_from_project(cls, p: db.Project):
+        return cls(
+            users=[like.username for like in p.likes]
+        )
