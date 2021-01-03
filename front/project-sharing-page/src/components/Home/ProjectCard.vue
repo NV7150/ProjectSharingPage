@@ -3,6 +3,7 @@
       :loading="loading"
       @mouseover="hovered = true"
       @mouseleave="hovered = false"
+      height="30vh"
   >
     <template slot="progress">
       <v-progress-linear
@@ -14,10 +15,11 @@
     </template>
 
     <v-img
+        height="100%"
         :src="project.bg_image"
         class="align-end"
     >
-      <v-card-title v-text="project.title"></v-card-title>
+      <v-card-title class="white--text"> {{project.title}} </v-card-title>
     </v-img>
 
     <v-expand-transition>
@@ -30,6 +32,7 @@
           <p>{{project.subtitle}}</p>
           <v-btn
             text
+            :disabled="loading"
             color="real accent-4"
             @click="toProjectPage"
           >
@@ -54,10 +57,10 @@ export default {
     return {
       //place holder
       project : {
-        name: "Loading...",
+        title: "Loading...",
         projectId: -1,
-        keyImage: PlaceHolder,
-        description: ""
+        bg_image: PlaceHolder,
+        subtitle: ""
       },
       loading : true,
       hovered : false
