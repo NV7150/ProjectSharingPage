@@ -2,6 +2,10 @@ import requests
 from typing import Optional
 
 
+class UserAPIError(Exception):
+    pass
+
+
 def auth(token: str) -> Optional[str]:
     """Auth
     Parameters
@@ -22,8 +26,11 @@ def auth(token: str) -> Optional[str]:
         'http://userapi:8000/userapi/user',
         cookies=cookies,
     )
-    if resp.status_code != 200:
+    if resp.status_code not in [200, 401, 404]:
         # failed
+        raise UserAPIError
+
+    if resp.status_code != 200:
         return None
 
     result = resp.json()
@@ -31,9 +38,21 @@ def auth(token: str) -> Optional[str]:
     try:
         username = result['username']
     except KeyError:
-        return None
+        raise UserAPIError
 
     if type(username) != str:
-        return None
+        raise UserAPIError
 
     return username
+
+
+def exist(username: str) -> bool:
+    resp = requests.get(
+        f'http://userapi:8000/userapi/user/{username}',
+    )
+    if resp.status_code not in [200, 404]:
+        raise UserAPIError
+    if resp.status_code != 200:
+        return False
+
+    return True

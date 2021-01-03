@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 import db
 from typing import Optional, List
+import enum
 
 
 class Sns(BaseModel):
@@ -142,6 +143,17 @@ class ProjectCreate(BaseModel):
             s.commit()
 
             return Project.from_db(p)
+
+
+class MemberType(str, enum.Enum):
+    MEMBER = 'MEMBERTYPE_MEMBER'
+    ANNOUNCE = 'MEMBERTYPE_ANNOUNCE'
+    ADMIN = 'MEMBERTYPE_ADMIN'
+
+
+class ProjectJoin(BaseModel):
+    username: str
+    type: MemberType
 
 
 class Likes(BaseModel):

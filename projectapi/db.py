@@ -67,7 +67,10 @@ class ProjectUser(Base):
         Integer, ForeignKey('project.id'),
         primary_key=True, nullable=False,
     )
-    username = Column('username', String, nullable=False)
+    username = Column(
+        'username', String, nullable=False,
+        primary_key=True,
+    )
 
 
 class ProjectAnnounceUser(Base):
@@ -78,7 +81,10 @@ class ProjectAnnounceUser(Base):
         Integer, ForeignKey('project.id'),
         primary_key=True, nullable=False,
     )
-    username = Column('username', String, nullable=False)
+    username = Column(
+        'username', String, nullable=False,
+        primary_key=True,
+    )
 
 
 class ProjectAdminUser(Base):
@@ -89,7 +95,10 @@ class ProjectAdminUser(Base):
         Integer, ForeignKey('project.id'),
         primary_key=True, nullable=False,
     )
-    username = Column('username', String, nullable=False)
+    username = Column(
+        'username', String, nullable=False,
+        primary_key=True,
+    )
 
 
 class Project(Base):
