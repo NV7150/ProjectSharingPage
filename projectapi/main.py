@@ -1,6 +1,5 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 import db
 import schema
 from utils import auth
@@ -141,8 +140,14 @@ async def delete_project(id: int, token: Optional[str] = Cookie(None)):
         if p is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND)
 
-        # p.
-        # TODO: token auth, permission
+        # permission
+        if token is None:
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        if (username := auth.auth(token)) is None:
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+        if username not in [au.username for au in p.admin_users]:
+            raise HTTPException(status.HTTP_403_FORBIDDEN)
 
         p.is_active = False
         s.commit()

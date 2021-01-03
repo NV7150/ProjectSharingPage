@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 import db
-from typing import Any, Optional, List
+from typing import Optional, List
 
 
 class Sns(BaseModel):
