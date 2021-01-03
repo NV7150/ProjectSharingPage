@@ -72,7 +72,6 @@ export default {
       })
     },
     getProject(){
-      console.log(this.projectId);
       axios
           .get("/projectapi/project/" + this.projectId)
           .then((response) => {

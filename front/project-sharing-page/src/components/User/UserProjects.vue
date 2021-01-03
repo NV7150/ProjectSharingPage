@@ -14,9 +14,7 @@
           :key = "i"
           class="mb-2"
         >
-<!--          <v-responsive width="100%">-->
-            <UserProjectCard :project-id="project" height="10vh" />
-<!--          </v-responsive>-->
+          <UserProjectCard :project-id="project" height="10vh" />
         </v-list-item>
       </v-list>
     </v-card-text>

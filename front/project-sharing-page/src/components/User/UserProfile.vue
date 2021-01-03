@@ -2,7 +2,7 @@
   <v-card
     rounded
     outlined
-    height="500"
+    height="70vh"
   >
     <v-card-title>
       <v-row align="center">
