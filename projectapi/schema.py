@@ -24,6 +24,8 @@ class Project(BaseModel):
     bg_image: Optional[str]
     description: str
     members: List[str]
+    announce_users: List[str]
+    admin_users: List[str]
     likes: int
     sns: Sns
     skilltags: List[int]
@@ -49,6 +51,8 @@ class Project(BaseModel):
             bg_image=db_proj.bg_image,
             description=db_proj.description,
             members=[pu.username for pu in db_proj.members],
+            announce_users=[au.username for au in db_proj.announce_users],
+            admin_users=[au.username for au in db_proj.admin_users],
             likes=len(db_proj.likes),
             sns=sns,
             skilltags=db_proj.skilltags,
@@ -115,7 +119,17 @@ class ProjectCreate(BaseModel):
                 project_id=p.id,
                 username=username,
             )
+            au = db.ProjectAnnounceUser(
+                project_id=p.id,
+                username=username,
+            )
+            adu = db.ProjectAdminUser(
+                project_id=p.id,
+                username=username,
+            )
             s.add(pu)
+            s.add(au)
+            s.add(adu)
             s.commit()
 
             return Project.from_db(p)

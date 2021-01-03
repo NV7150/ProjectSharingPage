@@ -70,6 +70,28 @@ class ProjectUser(Base):
     username = Column('username', String, nullable=False)
 
 
+class ProjectAnnounceUser(Base):
+    """Association object
+    """
+    __tablename__ = 'project_announce_user'
+    project_id = Column(
+        Integer, ForeignKey('project.id'),
+        primary_key=True, nullable=False,
+    )
+    username = Column('username', String, nullable=False)
+
+
+class ProjectAdminUser(Base):
+    """Association object
+    """
+    __tablename__ = 'project_admin_user'
+    project_id = Column(
+        Integer, ForeignKey('project.id'),
+        primary_key=True, nullable=False,
+    )
+    username = Column('username', String, nullable=False)
+
+
 class Project(Base):
     """[DB] Project Class
 
@@ -108,6 +130,8 @@ class Project(Base):
     bg_image = Column('bg_image', String, nullable=True)
     description = Column('description', String, nullable=False)
     members = relationship('ProjectUser', backref='project')
+    announce_users = relationship('ProjectAnnounceUser', backref='project')
+    admin_users = relationship('ProjectAdminUser', backref='project')
     likes = relationship('Like', backref='project')
 
     # SNS
