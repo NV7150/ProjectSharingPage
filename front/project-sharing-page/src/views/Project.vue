@@ -35,7 +35,7 @@ import axios from "axios";
 import Navigation from "../components/Navigation/Navigation";
 import ProjectProfileTab from "../components/Project/ProjectProfileTab";
 import ProjectChatTab from "../components/Project/ProjectChatTab";
-import ProjectTop from "../components/Project/ProjectChat/ProjectTop";
+import ProjectTop from "../components/Project/ProjectTop";
 
 export default {
   name: "Project",
