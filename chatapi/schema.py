@@ -31,7 +31,6 @@ class Thread(BaseModel):
 
 class ThreadCreate(BaseModel):
     type: db.ThreadType
-    status: db.ThreadStatus
     project_id: int
     title: str
 
@@ -39,7 +38,7 @@ class ThreadCreate(BaseModel):
         with db.session_scope() as s:
             t = db.Thread(
                 type=self.type,
-                status=self.status,
+                status=db.ThreadStatus.OPEN,
                 project_id=self.project_id,
                 title=self.title,
                 created_at=datetime.now(),
