@@ -78,7 +78,7 @@ async def create_thread(
 
 
 @app.get(
-    '/chatapi/thread/project/{project_id:int}',
+    '/chatapi/thread/project/{project_id:int}/{project_type:db.Threadtype}',
     description='Get threads by project',
     responses={
         status.HTTP_200_OK: {
@@ -90,13 +90,15 @@ async def create_thread(
         },
     },
 )
-async def get_thread_by_project(project_id: int):
+async def get_thread_by_project(project_id: int, thread_type: db.ThreadType):
     if project.project_exist_check(project_id) is False:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     with db.session_scope() as s:
         threads = s.query(db.Thread).filter(
             db.Thread.project_id == project_id,
+        ).filter(
+            db.Thread.type == thread_type
         )
         sorted_threads = sorted(
             threads,
