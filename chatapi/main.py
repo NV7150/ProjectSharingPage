@@ -55,6 +55,9 @@ async def get_thread(id: int):
         status.HTTP_401_UNAUTHORIZED: {
             'description': 'Authentication is required.',
         },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'User not in Project as member'
+        },
         status.HTTP_404_NOT_FOUND: {
             'description': 'Project not found (project_id is wrong)',
         },
@@ -67,8 +70,13 @@ async def create_thread(
     # auth
     if token is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-    if user.auth(token) is None:
+    if (username := user.auth(token)) is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    # permission
+    if t.type == db.ThreadType.PROBLEMS:
+        if user.check_proj_member(t.project_id, username) is False:
+            raise HTTPException(status.HTTP_403_FORBIDDEN)
 
     # project_id check
     if project.project_exist_check(t.project_id) is False:
