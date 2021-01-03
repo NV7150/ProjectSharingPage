@@ -32,7 +32,7 @@
           <p>{{project.subtitle}}</p>
           <v-btn
             text
-            :disabled="loading"
+            :disabled="loading || failed"
             color="real accent-4"
             @click="toProjectPage"
           >
@@ -46,7 +46,7 @@
 
 <script>
 import axios from "axios";
-import PlaceHolder from "../../assets/PlaceHolder.png";
+import ProjectPageSettings from "@/assets/scripts/ProjectPageSettings";
 
 export default {
   name: "ProjectCard",
@@ -56,14 +56,10 @@ export default {
   data() {
     return {
       //place holder
-      project : {
-        title: "Loading...",
-        projectId: -1,
-        bg_image: PlaceHolder,
-        subtitle: ""
-      },
+      project : ProjectPageSettings.defaultProject,
       loading : true,
-      hovered : false
+      hovered : false,
+      failed : false
     }
   },
   created() {
@@ -74,7 +70,9 @@ export default {
           this.loading = false;
         })
         .catch(() => {
-          //TODO:エラー処理
+          this.project = ProjectPageSettings.failedProject;
+          this.loading = false;
+          this.failed = true;
         });
   },
   methods:{

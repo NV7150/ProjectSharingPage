@@ -1,3 +1,5 @@
+import PlaceHolder from "../img/PlaceHolder.png";
+
 export default {
     statusIcons: {
         "open-chat" : {icon: "mdi-account-group", color: "#424242"},
@@ -11,4 +13,16 @@ export default {
         {name: "Announce", status: "announce"},
         {name: "Problems", status: "problems"}
     ],
+    defaultProject : {
+        title: "Loading...",
+        projectId: -1,
+        bg_image: PlaceHolder,
+        subtitle: ""
+    },
+    failedProject : {
+        title: "404 Not Found",
+        projectId: -1,
+        bg_image: PlaceHolder,
+        subtitle: "Something went wrong..."
+    }
 }
