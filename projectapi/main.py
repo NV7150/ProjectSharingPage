@@ -1,5 +1,6 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
+from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
 import db
 import schema
 from utils import auth
@@ -85,10 +86,31 @@ async def create_project(
         status.HTTP_404_NOT_FOUND: {
             'description': 'Project is not found (id is wrong)'
         },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'not logged in',
+        },
     },
 )
-async def update_project(project: schema.Project):
-    result = project.update()
+async def update_project(
+    project_update: schema.ProjectUpdate,
+    token: Optional[str] = Cookie(None),
+):
+    # Permission
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if (username := auth.auth(token)) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    with db.session_scope() as s:
+        t = s.query(db.Project).get(project_update.id)
+        if t is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+        if username not in [au.username for au in t.admin_users]:
+            raise HTTPException(status.HTTP_403_FORBIDDEN)
+
+    # Update
+    result = project_update.update()
     if result is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 

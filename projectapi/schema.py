@@ -58,7 +58,17 @@ class Project(BaseModel):
             skilltags=db_proj.skilltags,
         )
 
-    def update(self) -> Optional[Any]:
+
+class ProjectUpdate(BaseModel):
+    id: int
+    title: str
+    subtitle: Optional[str]
+    bg_image: Optional[str]
+    description: str
+    sns: Sns
+    skilltags: List[int]
+
+    def update(self) -> Optional[Project]:
         with db.session_scope() as s:
             p = db.Project.get(s, self.id)
             if p is None:
@@ -69,7 +79,6 @@ class Project(BaseModel):
             p.bg_image = self.bg_image
             p.description = self.description
             p.skilltags = self.skilltags
-            p.members = self.members
             p.twitter = self.sns.twitter
             p.instagram = self.sns.instagram
             p.github = self.sns.github
@@ -82,7 +91,7 @@ class Project(BaseModel):
             p.url = self.sns.url
 
             s.commit()
-            return self.from_db(p)
+            return Project.from_db(p)
 
 
 class ProjectCreate(BaseModel):
