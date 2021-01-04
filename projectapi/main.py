@@ -389,3 +389,24 @@ async def projects_of_user(username: str):
             for pu in proj_list
             if pu.project.is_active
         ]
+
+
+# Search
+@app.get(
+    '/projectapi/project/search/',
+    description='Search Project',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.ProjectSearchResult,
+            'description':
+                'Successful Response (sorted by levenshtein distance)',
+        },
+    },
+)
+async def search_project(
+    title: str,
+    limit: Optional[int] = None,
+    offset: Optional[int] = None,
+):
+    return schema.ProjectSearchResult.search(title, limit, offset)

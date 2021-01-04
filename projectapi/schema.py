@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 import db
+from utils.func import levenshtein_distance
+from sqlalchemy import func
 from typing import Optional, List
 import enum
 
@@ -164,3 +166,57 @@ class Likes(BaseModel):
         return cls(
             users=[like.username for like in p.likes]
         )
+
+
+class ProjectSearchResult(BaseModel):
+    """Project search result
+
+    Parameters
+    ----------
+    projects: List[Project]
+        List of search result
+    limit, offset: Optional[int]
+        index slice
+    next_exist: bool
+        Search results still exist after index slice
+    """
+    projects: List[Project]
+    limit: Optional[int]
+    offset: Optional[int]
+    next_exist: bool
+
+    @classmethod
+    def search(
+        cls,
+        title: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        with db.session_scope() as s:
+            q = s.query(db.Project).filter(
+                func.upper(db.Project.title).like(
+                    f"%{title.upper()}%"
+                )
+            )
+            length = q.count()
+            db_projects = q.all()
+            db_projects.sort(
+                key=lambda x: levenshtein_distance(x.title, title)
+            )
+            if offset is not None:
+                db_projects = db_projects[offset:]
+            if limit is not None:
+                db_projects = db_projects[:limit]
+
+            projects = [
+                Project.from_db(p)
+                for p in db_projects
+            ]
+            next_exist = len(projects) + (offset if offset else 0) < length
+
+            return cls(
+                projects=projects,
+                limit=limit,
+                offset=offset,
+                next_exist=next_exist,
+            )
