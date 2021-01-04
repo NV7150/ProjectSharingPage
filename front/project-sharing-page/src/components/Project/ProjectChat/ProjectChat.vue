@@ -67,7 +67,7 @@
 
 <script>
 import ChatRoomList from "./ChatRoomList";
-import ChatSettings from "../../../assets/scripts/ProjectPageSettings";
+import ChatSettings from "../../../assets/scripts/ProjectPageConstants";
 import ChatWindow from "./ChatWindow";
 import ChatInput from "./ChatInput";
 

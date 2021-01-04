@@ -46,7 +46,7 @@
 
 <script>
 import axios from "axios";
-import ProjectPageSettings from "@/assets/scripts/ProjectPageSettings";
+import ProjectPageSettings from "@/assets/scripts/ProjectPageConstants";
 
 export default {
   name: "ProjectCard",

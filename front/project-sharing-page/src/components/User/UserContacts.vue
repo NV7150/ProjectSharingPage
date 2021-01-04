@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import SnsSettings from "@/assets/scripts/SnsSettings";
+import SnsSettings from "@/assets/scripts/SnsConstants";
 
 export default {
   name: "UserContacts",
