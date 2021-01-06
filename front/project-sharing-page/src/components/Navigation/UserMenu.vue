@@ -25,8 +25,8 @@
           </div>
 
           <div
-            v-for="item in menuItems"
-            :key="item"
+            v-for="(item, i) in menuItems"
+            :key="i"
           >
             <v-divider class="my-3"></v-divider>
             <v-btn
