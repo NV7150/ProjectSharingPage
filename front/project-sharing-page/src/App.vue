@@ -8,14 +8,9 @@
 
 export default {
   name: 'App',
-
-  components: {
-  },
-
-  data: () => ({
-    //
-  }),
-  methods: {
+  beforeCreate() {
+    //ログインを行う
+    this.$store.dispatch("checkLogin");
   }
 };
 </script>

@@ -22,6 +22,16 @@
       <v-card-title class="white--text"> {{project.title}} </v-card-title>
     </v-img>
 
+    <v-card-actions>
+      <v-btn
+        icon
+        :disabled="liked"
+        @click="like"
+      >
+        <v-icon :color="heartColor">mdi-heart</v-icon>
+      </v-btn>
+    </v-card-actions>
+
     <v-expand-transition>
       <v-card
           v-if="hovered"
@@ -59,6 +69,10 @@ export default {
       type: String,
       require: false,
       "default": () => ('30vh')
+    },
+    user: {
+      type: Object,
+      require: true
     }
   },
   data() {
@@ -67,12 +81,37 @@ export default {
       project : ProjectPageSettings.defaultProject,
       loading : true,
       hovered : false,
-      failed : false
+      failed : false,
+      liked : true
+    }
+  },
+  methods:{
+    toProjectPage() {
+      this.$router.push({
+        name:'Project',
+        params: { projectId: this.project.id }
+      })
+    },
+    like(){
+      axios
+          .patch("/projectapi/project/" + this.projectId + "/like")
+          .then(() => {
+            this.liked = true;
+          })
+          .catch(() => {
+            //TODO:エラー処理
+          });
+    }
+  },
+  computed: {
+    heartColor(){
+      return (this.liked) ? "pink" : "grey";
     }
   },
   created() {
+    //GET projects
     axios
-        .get("projectapi/project/" + this.projectId)
+        .get("/projectapi/project/" + this.projectId)
         .then((response) => {
           this.project = response.data;
           this.loading = false;
@@ -82,15 +121,18 @@ export default {
           this.loading = false;
           this.failed = true;
         });
-  },
-  methods:{
-    toProjectPage() {
-      this.$router.push({
-        name:'Project',
-        params: { projectId: this.project.id }
-      })
+
+    if(this.$store.getters["getIsLoggedIn"]) {
+      //GET isLiked
+      axios
+          .get("/projectapi/project/" + this.projectId)
+          .then((response) => {
+            if (!(this.$store.getters["getUser"].username in response.data["users"])) {
+              this.liked = false;
+            }
+          });
     }
-  }
+  },
 }
 </script>
 

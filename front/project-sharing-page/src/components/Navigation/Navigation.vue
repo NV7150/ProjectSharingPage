@@ -47,22 +47,10 @@ export default {
   components: {UserMenu},
   data(){
     return{
-      logined: false,
-      user: null,
       navPages: [
         {name: "Home", link: "Home"}
       ]
     }
-  },
-  created() {
-    axios.get('/userapi/user')
-    .then((response)=> {
-      this.user = response.data;
-      this.logined = true;
-    })
-    .catch(() => {
-      this.logined = false;
-    });
   },
   methods: {
     moveTo(pageName){
@@ -70,9 +58,25 @@ export default {
     },
     logout(){
       axios.post("userapi/logout");
-      this.logined = false;
+      this.$store.commit('removeUser');
+      this.$router.push({path: this.$router.currentRoute.path, force: true});
     }
-  }
+  },
+  computed: {
+    user(){
+      return this.$store.getters['getUser'];
+    },
+    logined(){
+      return this.$store.getters['getIsLoggedIn'];
+    }
+  },
+  // watch: {
+  //   loginUser (){
+  //     this.user = this.$store.getters['getUser'];
+  //     console.log(this.user);
+  //     this.logined = true;
+  //   }
+  // }
 }
 </script>
 
