@@ -69,14 +69,7 @@ export default {
     logined(){
       return this.$store.getters['getIsLoggedIn'];
     }
-  },
-  // watch: {
-  //   loginUser (){
-  //     this.user = this.$store.getters['getUser'];
-  //     console.log(this.user);
-  //     this.logined = true;
-  //   }
-  // }
+  }
 }
 </script>
 

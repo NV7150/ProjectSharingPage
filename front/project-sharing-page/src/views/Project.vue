@@ -51,7 +51,6 @@ export default {
         .get('/projectapi/project/' + this.$route.params.projectId)
         .then((response) => {
           this.project = response.data;
-          console.log(this.project);
         })
         .catch(() => {
           //TODO:エラーページへ飛ばす

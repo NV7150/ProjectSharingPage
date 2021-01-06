@@ -2,7 +2,7 @@
   <v-main>
     <Navigation></Navigation>
 
-    <v-container>
+    <v-container v-if="hasContact">
       <v-row>
         <v-col md="10" cols="12">
           <UserProfile :user="user" />
@@ -17,6 +17,13 @@
       <v-row class="d-md-none">
         <v-col cols="12">
           <UserContacts :user="user" />
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-container v-else>
+      <v-row>
+        <v-col cols="12">
+          <UserProfile :user="user" />
         </v-col>
       </v-row>
     </v-container>
@@ -44,10 +51,22 @@ export default {
   data(){
     return {
       window: 0,
-      user: {
-      }
+      user: {}
     }
   },
+  computed :{
+    hasContact(){
+      if(typeof this.user.sns === "undefined")
+        return false;
+
+      let _this = this;
+      let activeSns = Object.keys(this.user.sns).filter(function (name){
+        return _this.user.sns[name];
+      });
+      return activeSns.length > 0;
+    }
+  },
+
   created() {
     axios
       .get('/userapi/user/' + this.$route.params.userName)
