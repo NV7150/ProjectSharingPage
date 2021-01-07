@@ -15,7 +15,7 @@
     </template>
 
     <v-img
-        height="100%"
+        height="85%"
         :src="project.bg_image"
         class="align-end"
     >
@@ -23,13 +23,8 @@
     </v-img>
 
     <v-card-actions>
-      <v-btn
-        icon
-        :disabled="liked"
-        @click="like"
-      >
-        <v-icon :color="heartColor">mdi-heart</v-icon>
-      </v-btn>
+      <v-icon color="pink">mdi-heart</v-icon>
+      <div class="font-weight-light ml-1">{{project.likes}}</div>
     </v-card-actions>
 
     <v-expand-transition>
@@ -81,8 +76,7 @@ export default {
       project : ProjectPageSettings.defaultProject,
       loading : true,
       hovered : false,
-      failed : false,
-      liked : true
+      failed : false
     }
   },
   methods:{
@@ -91,21 +85,6 @@ export default {
         name:'Project',
         params: { projectId: this.project.id }
       })
-    },
-    like(){
-      axios
-          .patch("/projectapi/project/" + this.projectId + "/like")
-          .then(() => {
-            this.liked = true;
-          })
-          .catch(() => {
-            //TODO:エラー処理
-          });
-    }
-  },
-  computed: {
-    heartColor(){
-      return (this.liked) ? "pink" : "grey";
     }
   },
   created() {
@@ -121,17 +100,6 @@ export default {
           this.loading = false;
           this.failed = true;
         });
-
-    if(this.$store.getters["getIsLoggedIn"]) {
-      //GET isLiked
-      axios
-          .get("/projectapi/project/" + this.projectId)
-          .then((response) => {
-            if (!(this.$store.getters["getUser"].username in response.data["users"])) {
-              this.liked = false;
-            }
-          });
-    }
   },
 }
 </script>

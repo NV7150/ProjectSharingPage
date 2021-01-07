@@ -17,12 +17,14 @@ export default {
         title: "Loading...",
         projectId: -1,
         bg_image: PlaceHolder,
-        subtitle: ""
+        subtitle: "",
+        likes: 0
     },
     failedProject : {
         title: "404 Not Found",
         projectId: -1,
         bg_image: PlaceHolder,
-        subtitle: "Something went wrong..."
+        subtitle: "Something went wrong...",
+        likes: 0
     }
 }
