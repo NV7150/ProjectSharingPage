@@ -16,6 +16,10 @@ route /projectapi/* {
     reverse_proxy projectapi:8000
 }
 
+route /chatapi/* {
+    reverse_proxy chatapi:8000
+}
+
 route /* {
     reverse_proxy front:8080
 }

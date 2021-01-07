@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
 import db
 import schema
@@ -31,7 +31,7 @@ async def index():
             'model': schema.Project,
             'description': 'Successful Response',
         },
-        status.HTTP_400_BAD_REQUEST: {
+        status.HTTP_404_NOT_FOUND: {
             'description': 'Project not found',
         },
     },
@@ -54,10 +54,23 @@ async def get_project(id: int):
             'model': schema.Project,
             'description': 'Successful response (created)',
         },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Login failed (token is wrong)',
+        },
     }
 )
-async def create_project(project: schema.ProjectCreate):
-    return project.create()
+async def create_project(
+    project: schema.ProjectCreate,
+    token: Optional[str] = Cookie(None),
+):
+    # auth
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    username = auth.auth(token)
+    if username is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    return project.create(username)
 
 
 @app.patch(
@@ -215,3 +228,29 @@ def unlike(id: int, token: Optional[str] = Cookie(None)):
         s.commit()
 
     return
+
+
+# User
+@app.get(
+    '/projectapi/project/{username:str}',
+    description='Projects in which the user joins',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': List[schema.Project],
+            'description': 'Successful response',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'User not found',
+        },
+    },
+)
+async def projects_of_user(username: str):
+    with db.session_scope() as s:
+        proj_list = s.query(db.ProjectUser).filter(
+            db.ProjectUser.username == username
+        )
+        return [
+            schema.Project.from_db(pu.project)
+            for pu in proj_list
+        ]

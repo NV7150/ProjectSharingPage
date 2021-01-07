@@ -59,6 +59,39 @@ class Like(Base):
     project_id = Column('project_id', ForeignKey('project.id'))
 
 
+class ProjectUser(Base):
+    """Association object
+    """
+    __tablename__ = 'project_user'
+    project_id = Column(
+        Integer, ForeignKey('project.id'),
+        primary_key=True, nullable=False,
+    )
+    username = Column('username', String, nullable=False)
+
+
+class ProjectAnnounceUser(Base):
+    """Association object
+    """
+    __tablename__ = 'project_announce_user'
+    project_id = Column(
+        Integer, ForeignKey('project.id'),
+        primary_key=True, nullable=False,
+    )
+    username = Column('username', String, nullable=False)
+
+
+class ProjectAdminUser(Base):
+    """Association object
+    """
+    __tablename__ = 'project_admin_user'
+    project_id = Column(
+        Integer, ForeignKey('project.id'),
+        primary_key=True, nullable=False,
+    )
+    username = Column('username', String, nullable=False)
+
+
 class Project(Base):
     """[DB] Project Class
 
@@ -96,7 +129,9 @@ class Project(Base):
     subtitle = Column('subtitle', String, nullable=True)
     bg_image = Column('bg_image', String, nullable=True)
     description = Column('description', String, nullable=False)
-    __members = Column('members', String, nullable=False)
+    members = relationship('ProjectUser', backref='project')
+    announce_users = relationship('ProjectAnnounceUser', backref='project')
+    admin_users = relationship('ProjectAdminUser', backref='project')
     likes = relationship('Like', backref='project')
 
     # SNS
@@ -127,18 +162,6 @@ class Project(Base):
     def skilltags(self, tagid_list: List[int]):
         s = ','.join([str(t) for t in tagid_list])
         self.__skilltags = s
-
-    @property
-    def members(self) -> List[str]:
-        return [
-            member.replace(' ', '')
-            for member in self.__members.split(',')
-            if member not in ['', ' ']
-        ]
-
-    @members.setter
-    def members(self, members: List[str]):
-        self.__members = ','.join(members)
 
     @classmethod
     def get(cls, s: scoped_session, id: int) -> Optional[Any]:

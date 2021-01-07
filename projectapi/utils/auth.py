@@ -3,6 +3,20 @@ from typing import Optional
 
 
 def auth(token: str) -> Optional[str]:
+    """Auth
+    Parameters
+    ----------
+    token: str
+        User token
+
+    Returns
+    -------
+    username: Optional[str]
+        if success:
+            return username
+        else:
+            None
+    """
     cookies = {'token': token}
     resp = requests.get(
         'http://userapi:8000/userapi/user',
