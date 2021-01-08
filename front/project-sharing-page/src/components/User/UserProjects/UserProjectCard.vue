@@ -12,7 +12,14 @@
         :src="project.bg_image"
         class="align-center"
     >
-      <v-card-title class="white--text"> {{project.title}} </v-card-title>
+      <v-card-title class="white--text">
+        <div class="bg-title-text rounded">
+          <div class="mr-1 ml-1">
+            {{project.title}}
+          </div>
+        </div>
+        <v-spacer />
+      </v-card-title>
     </v-img>
 
     <v-expand-transition>
@@ -104,5 +111,9 @@ export default {
   opacity: 0.8 !important;
   position: absolute;
   width: 100%;
+}
+
+.bg-title-text{
+  background-color: rgba(0,0,0,0.3);
 }
 </style>

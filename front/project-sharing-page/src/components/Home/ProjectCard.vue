@@ -19,7 +19,10 @@
         :src="project.bg_image"
         class="align-end"
     >
-      <v-card-title class="white--text"> {{project.title}} </v-card-title>
+      <v-card-title>
+        <div class="white--text bg-title-text rounded pl-1 pr-1">{{project.title}}</div>
+        <v-spacer />
+      </v-card-title>
     </v-img>
 
     <v-card-actions>
@@ -111,5 +114,9 @@ export default {
     opacity: 0.8 !important;
     position: absolute;
     width: 100%;
+  }
+
+  .bg-title-text{
+    background-color: rgba(0, 0, 0, 0.3);
   }
 </style>
