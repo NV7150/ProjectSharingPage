@@ -90,21 +90,7 @@ export default {
         name: 'UserPage',
         params: {userName: user.username}
       });
-    },
-    //returns: SNS names(object key)
-    // activeSns(){
-    //   let _this = this;
-    //
-    //   console.log("entered");
-    //   console.log(this.project.sns);
-    //
-    //   if(!_this.project.sns)
-    //     return [];
-    //
-    //   return Object.keys(_this.project.sns).filter(function (name){
-    //     return _this.project.sns[name];
-    //   });
-    // }
+    }
   },
   computed: {
     snsSettings(){

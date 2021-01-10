@@ -16,7 +16,7 @@
       <v-card-text>
         <v-tabs-items v-model="tabs">
           <v-tab-item>
-            <ProjectProfileTab :project="project" :members="project.members"></ProjectProfileTab>
+            <ProjectProfileTab :project="project" :members="members"></ProjectProfileTab>
           </v-tab-item>
 
           <v-tab-item>
@@ -43,7 +43,8 @@ export default {
   data(){
     return {
       tabs: 0,
-      project: {}
+      project: {},
+      members: []
     }
   },
   created() {
@@ -51,6 +52,20 @@ export default {
         .get('/projectapi/project/' + this.$route.params.projectId)
         .then((response) => {
           this.project = response.data;
+          let tasks = [];
+          for(let i = 0; i < this.project.members.length; i++){
+            tasks.push(axios.get('/userapi/user/' + this.project.members[i]));
+          }
+          Promise
+              .all(tasks)
+              .then((values) => {
+                for(let i = 0; i < values.length; i++){
+                  this.members.push(values[i].data);
+                }
+              })
+              .catch(() => {
+                //TODO:エラー処理
+              })
         })
         .catch(() => {
           //TODO:エラーページへ飛ばす
