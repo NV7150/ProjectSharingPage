@@ -9,9 +9,9 @@ export default {
         "solved" : {icon: "mdi-alert-circle-check", color: "#43A047"}
     },
     channels: [
-        {name: "OpenChat", status: "open-chat"},
-        {name: "Announce", status: "announce"},
-        {name: "Problems", status: "problems"}
+        {name: "OpenChat", status: "open-chat", send: "THREADTYPE_OPENCHAT"},
+        {name: "Announce", status: "announce",  send: "THREADTYPE_ANNOUNCE"},
+        {name: "Problems", status: "problems",  send: "THREADTYPE_PROBLEMS"}
     ],
     defaultProject : {
         title: "Loading...",
