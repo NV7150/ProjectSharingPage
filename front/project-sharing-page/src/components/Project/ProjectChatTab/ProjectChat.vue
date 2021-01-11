@@ -104,7 +104,7 @@ export default {
 
       this.isLoadingRooms = true;
       axios
-          .get('/chatapi/thread/project/' + this.project.id + '/{project_type:db.Threadtype}?thread_type=' + this.selectingChannel.send)
+          .get('/chatapi/thread/project/' + this.project.id + '/' + this.selectingChannel.send)
           .then((response) => {
             this.isLoadingRooms = false;
             this.rooms = response.data;
