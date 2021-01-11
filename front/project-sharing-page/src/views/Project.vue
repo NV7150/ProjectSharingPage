@@ -15,12 +15,17 @@
 
       <v-card-text>
         <v-tabs-items v-model="tabs">
+
           <v-tab-item>
-            <ProjectProfileTab :project="project" :members="members"></ProjectProfileTab>
+            <v-responsive min-height="100vh">
+              <ProjectProfileTab :project="project" :members="members"></ProjectProfileTab>
+            </v-responsive>
           </v-tab-item>
 
           <v-tab-item>
-            <ProjectChatTab :project="project"></ProjectChatTab>
+            <v-responsive min-height="100vh">
+              <ProjectChatTab :project="project"></ProjectChatTab>
+            </v-responsive>
           </v-tab-item>
 
         </v-tabs-items>

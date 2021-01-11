@@ -15,7 +15,7 @@
     </template>
 
     <v-img
-        height="85%"
+        height="80%"
         :src="project.bg_image"
         class="align-end"
     >
@@ -25,10 +25,12 @@
       </v-card-title>
     </v-img>
 
-    <v-card-actions>
-      <v-icon color="pink">mdi-heart</v-icon>
-      <div class="font-weight-light ml-1">{{project.likes}}</div>
-    </v-card-actions>
+    <v-responsive height="20%" class="align-center">
+      <v-card-actions>
+        <v-icon color="pink" class="mr-1">mdi-heart</v-icon>
+        {{project.likes}}
+      </v-card-actions>
+    </v-responsive>
 
     <v-expand-transition>
       <v-card
@@ -66,7 +68,7 @@ export default {
     height: {
       type: String,
       require: false,
-      "default": () => ('30vh')
+      "default": () => ('40vh')
     },
     user: {
       type: Object,
