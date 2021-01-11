@@ -41,7 +41,8 @@
 
           <v-window-item>
             <v-card
-                :loading="isLoadingRooms"
+              :loading="isLoadingRooms"
+              v-if="roomObjects.length > 0"
             >
               <template slot="progress">
                 <v-progress-linear
@@ -54,7 +55,13 @@
               <ChatRoomList
                 :rooms="roomObjects"
                 :selected-callback="selectRoom"
-              ></ChatRoomList>
+              />
+            </v-card>
+
+            <v-card v-else>
+              <v-card-text>
+                No thread included in this channel.
+              </v-card-text>
             </v-card>
           </v-window-item>
 
