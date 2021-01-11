@@ -89,7 +89,7 @@ async def create_thread(
 
 
 @app.get(
-    '/chatapi/thread/project/{project_id:int}/{project_type:db.Threadtype}',
+    '/chatapi/thread/project/{project_id:int}/{thread_type:str}',
     description='Get threads by project',
     responses={
         status.HTTP_200_OK: {
