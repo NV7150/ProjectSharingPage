@@ -18,9 +18,10 @@
         height="80%"
         :src="project.bg_image"
         class="align-end"
+        gradient="to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)"
     >
       <v-card-title>
-        <div class="white--text bg-title-text rounded pl-1 pr-1">{{project.title}}</div>
+        <div class="white--text rounded pl-1 pr-1">{{project.title}}</div>
         <v-spacer />
       </v-card-title>
     </v-img>

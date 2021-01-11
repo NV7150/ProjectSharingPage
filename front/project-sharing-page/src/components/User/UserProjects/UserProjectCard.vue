@@ -11,9 +11,10 @@
         height="100%"
         :src="project.bg_image"
         class="align-center"
+        gradient="to right, rgba(0,0,0,0.5), rgba(0,0,0,0.1)"
     >
       <v-card-title class="white--text">
-        <div class="bg-title-text rounded">
+        <div class="rounded">
           <div class="mr-1 ml-1">
             {{project.title}}
           </div>
