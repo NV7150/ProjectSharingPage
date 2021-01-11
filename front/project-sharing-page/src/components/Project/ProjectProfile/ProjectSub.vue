@@ -1,23 +1,26 @@
 <template>
-  <v-card>
+  <v-card width="100%">
     <v-list>
-      <!--Tags-->
-      <v-list-item class="mb-3">
-        <v-list-item-content>
-          <v-list-item-title class="mb-2">Tags</v-list-item-title>
-          <v-list-item-subtitle class="d-flex flex-row flex-wrap">
-            <v-card
-                outlined
-                class="ma-2 pa-2 rounded-pill"
-                v-for="(item, i) in project.skilltags"
-                :key="i"
-            >
-              {{item}}
-            </v-card>
-          </v-list-item-subtitle>
-          <v-divider class="my-3"></v-divider>
-        </v-list-item-content>
-      </v-list-item>
+      <span v-if="hasTags">
+        <!--Tags-->
+        <v-list-item class="mb-3">
+          <v-list-item-content>
+            <v-list-item-title class="mb-2">Tags</v-list-item-title>
+            <v-list-item-subtitle class="d-flex flex-row flex-wrap">
+              <v-card
+                  outlined
+                  class="ma-2 pa-2 rounded-pill"
+                  v-for="(item, i) in project.skilltags"
+                  :key="i"
+              >
+                {{item}}
+              </v-card>
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-divider class="my-3"></v-divider>
+      </span>
 
       <!--Members-->
       <v-list-item class="mb-3">
@@ -43,11 +46,12 @@
               <span>{{member.display_name}}</span>
             </v-tooltip>
           </v-list-item-subtitle>
-          <v-divider class="my-3"></v-divider>
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item>
+      <v-divider class="my-3" v-if="activeSns.length > 0" />
+
+      <v-list-item v-if="activeSns.length > 0">
         <v-list-item-content>
           <v-list-item-title>Contact</v-list-item-title>
           <v-list-item-subtitle class="d-flex flex-row flex-wrap">
@@ -78,7 +82,12 @@ import SnsSettings from "../../../assets/scripts/SnsConstants";
 
 export default {
   name: "ProjectSub",
-  props: ['project', 'members'],
+  props: {
+    project : {
+      type: Object
+    },
+    members : {type: Array}
+  },
   data(){
     return{
       activeSns: []
@@ -95,6 +104,11 @@ export default {
   computed: {
     snsSettings(){
       return SnsSettings.sns;
+    },
+    hasTags(){
+      return this.project
+          && Object.prototype.hasOwnProperty.call(this.project, "skillTags")
+          && this.project.skillTags.length > 0;
     }
   },
   watch: {
