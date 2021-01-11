@@ -5,6 +5,7 @@ import Project from "../views/Project";
 import Login from "../views/Login";
 import User from "../views/User";
 import Chat from "../views/Chat";
+import NotFound from "@/views/NotFound";
 
 Vue.use(VueRouter)
 
@@ -33,6 +34,11 @@ const routes = [
     path: '/user/:userName',
     name: 'UserPage',
     component: User
+  },
+  {
+    path: '/404',
+    name: '404',
+    component: NotFound
   }
 ]
 

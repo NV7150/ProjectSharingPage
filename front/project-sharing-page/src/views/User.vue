@@ -74,7 +74,7 @@ export default {
         this.user = response.data;
       })
       .catch(() =>{
-        //TODO:404ページへ
+        this.$router.push({name: '404'});
       });
   }
 }

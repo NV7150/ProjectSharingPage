@@ -73,7 +73,7 @@ export default {
               })
         })
         .catch(() => {
-          //TODO:エラーページへ飛ばす
+          this.$router.push({name: '404'});
         });
   },
   methods: {

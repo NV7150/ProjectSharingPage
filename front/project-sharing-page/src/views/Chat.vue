@@ -62,7 +62,7 @@ export default {
               this.project = response.data;
             })
             .catch(() => {
-              //TODO:エラーページへ飛ばす
+              this.$router.push({name: '404'});
             });
 
     //TODO:チャンネルとルームを取得
