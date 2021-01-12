@@ -108,4 +108,4 @@ class MessageSearchResult(BaseModel):
             for m in query.all():
                 msgs.append(Message.from_db(m))
 
-        return msgs
+        return cls(messages=msgs)
