@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, status, Cookie
+from starlette.status import HTTP_404_NOT_FOUND
 import schema
 import db
 from utils import project, user
@@ -89,7 +90,7 @@ async def create_thread(
 
 
 @app.get(
-    '/chatapi/thread/project/{project_id:int}/{project_type:db.Threadtype}',
+    '/chatapi/thread/project/{project_id:int}/{thread_type:str}',
     description='Get threads by project',
     responses={
         status.HTTP_200_OK: {
@@ -189,3 +190,59 @@ async def create_message(
         return msg.create(username)
     except schema.ForeignKeyError:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+
+@app.get(
+    '/chatapi/thread/{thread_id:int}/messages/',
+    description='Get messages on thread',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.MessageSearchResult,
+            'description': 'Successful response.',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Thread not found',
+        },
+    },
+)
+async def get_messages_by_thread(
+    thread_id: int,
+    limit: int,
+    offset: int,
+):
+    with db.session_scope() as s:
+        t = s.query(db.Thread).get(thread_id)
+        if t is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                'Thread not found'
+            )
+
+    return schema.MessageSearchResult.search(thread_id, limit, offset)
+
+
+@app.get(
+    '/chatapi/thread/{thread_id:int}/messages/count/',
+    description='Get length of messages on thread',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': int,
+            'description': 'Successful response.',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Thread not found.',
+        },
+    },
+)
+async def get_messages_length(thread_id: int):
+    with db.session_scope() as s:
+        t = s.query(db.Thread).get(thread_id)
+        if t is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                'Thread not found'
+            )
+
+        return len(t.messages)

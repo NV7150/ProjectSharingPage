@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 import db
 from datetime import datetime
+from typing import List
+from sqlalchemy import desc
 
 
 class ForeignKeyError(Exception):
@@ -88,3 +90,22 @@ class MessageCreate(BaseModel):
             s.add(m)
             s.commit()
             return Message.from_db(m)
+
+
+class MessageSearchResult(BaseModel):
+    messages: List[Message]
+
+    @classmethod
+    def search(cls, thread_id, limit: int, offset: int):
+        msgs = []
+        with db.session_scope() as s:
+            query = s.query(db.Message).filter(
+                db.Message.thread_id == thread_id
+            ).order_by(
+                desc(db.Message.created_at)
+            ).offset(offset).limit(limit)
+
+            for m in query.all():
+                msgs.append(Message.from_db(m))
+
+        return cls(messages=msgs)

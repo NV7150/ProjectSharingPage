@@ -2,7 +2,7 @@
   <v-card
     rounded
     outlined
-    height="500"
+    height="70vh"
   >
     <v-card-title>
       <v-row align="center">
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import PlaceHolder from "../../assets/PlaceHolder.png";
+import PlaceHolder from "../../assets/img/PlaceHolder.png";
 
 export default {
   name: "UserProfile",

@@ -21,12 +21,12 @@
             <v-avatar>
               <img :src="user.icon">
             </v-avatar>
-            <v-card-title>{{user.name}}</v-card-title>
+            <v-card-title>{{user.display_name}}</v-card-title>
           </div>
 
           <div
-            v-for="item in menuItems"
-            :key="item"
+            v-for="(item, i) in menuItems"
+            :key="i"
           >
             <v-divider class="my-3"></v-divider>
             <v-btn
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import PlaceHolder from "../../assets/PlaceHolder.png";
+import PlaceHolder from "../../assets/img/PlaceHolder.png";
 
 export default {
   name: "UserMenu",
@@ -56,7 +56,7 @@ export default {
       default:function(){
         return {
           username: '',
-          name: 'Loading...',
+          display_name: 'Loading...',
           icon: PlaceHolder
         };
       }

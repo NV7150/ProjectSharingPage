@@ -15,12 +15,17 @@
 
       <v-card-text>
         <v-tabs-items v-model="tabs">
+
           <v-tab-item>
-            <ProjectProfileTab :project="project" :members="project.members"></ProjectProfileTab>
+            <v-responsive min-height="100vh">
+              <ProjectProfileTab :project="project" :members="members"></ProjectProfileTab>
+            </v-responsive>
           </v-tab-item>
 
           <v-tab-item>
-            <ProjectChatTab :project="project"></ProjectChatTab>
+            <v-responsive min-height="100vh">
+              <ProjectChatTab :project="project"></ProjectChatTab>
+            </v-responsive>
           </v-tab-item>
 
         </v-tabs-items>
@@ -31,10 +36,11 @@
 </template>
 
 <script>
+import axios from "axios";
 import Navigation from "../components/Navigation/Navigation";
 import ProjectProfileTab from "../components/Project/ProjectProfileTab";
 import ProjectChatTab from "../components/Project/ProjectChatTab";
-import ProjectTop from "../components/Project/ProjectChat/ProjectTop";
+import ProjectTop from "../components/Project/ProjectTop";
 
 export default {
   name: "Project",
@@ -42,28 +48,39 @@ export default {
   data(){
     return {
       tabs: 0,
-      project: {}
+      project: {},
+      members: []
     }
   },
   created() {
-    //TODO:プロジェクトをAPIから取得
-    this.project = {
-      title: "Test",
-        titleColor: "#1E88E5",
-      keyImage: "https://gochiusa.com/bloom/core_sys/images/main/home/main_img2_4.jpg",
-      about: "これはテストです",
-      description:"これはテストですこれはテストですこれはテストですこれはテストですこれはテストですこれはテストですこれはテストですYpaaaaaaaこれはテストですこれはテストですこれはテストですこれはテストですこれはテストですこれはテストですこれはテストです",
-      members: [
-        {display_name: 'テスト1', icon: "https://gochiusa.com/core_sys/images/contents/00000022/base/l1.png"},
-        {display_name: 'テスト2', icon: "https://gochiusa.com/core_sys/images/contents/00000021/base/l1.png"}
-      ],
-      tags: ['Python', 'Web', 'Society', 'Design', 'Software', 'Ypaaaaaaaaaaaaaaa'],
-      sns: [
-        {name: "twitter", link: "https://twitter.com/publicClassMain"},
-        {name: "facebook", link: ""},
-        {name: "tiktok", link:""}
-      ]
-    };
+    axios
+        .get('/projectapi/project/' + this.$route.params.projectId)
+        .then((response) => {
+          this.project = response.data;
+          let tasks = [];
+          for(let i = 0; i < this.project.members.length; i++){
+            tasks.push(axios.get('/userapi/user/' + this.project.members[i]));
+          }
+          Promise
+              .all(tasks)
+              .then((values) => {
+                for(let i = 0; i < values.length; i++){
+                  this.members.push(values[i].data);
+                }
+              })
+              .catch(() => {
+                //TODO:エラー処理
+              })
+        })
+        .catch(() => {
+          //TODO:エラーページへ飛ばす
+        });
+  },
+  methods: {
+    getMembers(){
+      //TODO:メンバーの一覧を取得
+      return []
+    }
   }
 }
 </script>

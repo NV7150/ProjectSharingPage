@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import ProjectChat from "./ProjectChat/ProjectChat";
+import ProjectChat from "./ProjectChatTab/ProjectChat";
 export default {
   name: "ProjectChatTab",
   components: {ProjectChat},

@@ -29,7 +29,7 @@ export default {
   mounted() {
     //TODO:APIからリコメンドのIDを取得
     //仮置き
-    this.recommends = [0, 1, 2, 3]
+    this.recommends = [1, 2, 3]
     //仮置きここまで
   }
 }

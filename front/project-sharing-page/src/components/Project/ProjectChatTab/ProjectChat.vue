@@ -40,11 +40,28 @@
           </v-window-item>
 
           <v-window-item>
-            <v-card>
+            <v-card
+              :loading="isLoadingRooms"
+              v-if="roomObjects.length > 0"
+            >
+              <template slot="progress">
+                <v-progress-linear
+                    color="deep-purple"
+                    height="10"
+                    indeterminate
+                />
+              </template>
+
               <ChatRoomList
-                :rooms="getRooms()"
+                :rooms="roomObjects"
                 :selected-callback="selectRoom"
-              ></ChatRoomList>
+              />
+            </v-card>
+
+            <v-card v-else>
+              <v-card-text>
+                No thread included in this channel.
+              </v-card-text>
             </v-card>
           </v-window-item>
 
@@ -66,10 +83,11 @@
 </template>
 
 <script>
-import ChatRoomList from "./ChatRoomList";
-import ChatSettings from "../../../assets/scripts/ProjectPageSettings";
-import ChatWindow from "./ChatWindow";
-import ChatInput from "./ChatInput";
+import axios from "axios";
+import ChatRoomList from "./ProjectChat/ChatRoomList";
+import ChatSettings from "../../../assets/scripts/ProjectPageConstants";
+import ChatWindow from "./ProjectChat/ChatWindow";
+import ChatInput from "./ProjectChat/ChatInput";
 
 export default {
   name: "ProjectChat",
@@ -80,6 +98,9 @@ export default {
       window: 0,
       channels: ChatSettings.channels,
       selectingChannel: {},
+      isLoadingRooms: false,
+      rooms: [],
+      roomObjects : [],
       selectingRoom: {}
     }
   },
@@ -87,19 +108,23 @@ export default {
     selectChannel(channel){
       this.selectingChannel = channel;
       this.window = 1;
+
+      this.isLoadingRooms = true;
+      axios
+          .get('/chatapi/thread/project/' + this.project.id + '/' + this.selectingChannel.send)
+          .then((response) => {
+            this.isLoadingRooms = false;
+            this.rooms = response.data;
+            this.roomObjects = this.getRooms();
+          })
+          .catch(() => {
+            this.isLoadingRooms = false;
+            this.rooms = [];
+          });
     },
     selectRoom(room){
       this.selectingRoom = room;
       this.window = 2;
-    },
-    getRooms(){
-      //TODO:サーバからチャットルームを取得
-      //仮置き
-      return [
-        {name: "Test1", status: "open"},
-        {name: "Test2", status: "solved"},
-        {name: "Test3", status: "open"}
-      ];
     },
     back(){
       this.window--;
@@ -116,6 +141,18 @@ export default {
           room: this.selectingRoom.name
         }
       });
+    },
+    getRooms(){
+      let roomObjects = [];
+      for(let i = 0; i < this.rooms.length; i++){
+        let room = this.rooms[i];
+        roomObjects.push({
+          name: room.title,
+          //THREADSTATUS_****なので文字列処理
+          status: room.status.replace('THREADSTATUS_', '').toLowerCase()
+        });
+      }
+      return roomObjects;
     }
   },
   computed: {

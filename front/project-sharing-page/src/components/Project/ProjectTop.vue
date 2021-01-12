@@ -1,10 +1,9 @@
 <template>
   <v-parallax
-      :src="project.keyImage"
+      :src="project.bg_image"
   >
     <v-container
         justify="center"
-
     >
       <v-row justify="center">
         <v-col cols="12" md="6" class="project-about rounded-xl">
@@ -33,10 +32,8 @@
                 cols="8"
                 class="rounded"
             >
-              <p
-                  class="font-weight-light"
-              >
-                {{project.about}}
+              <p class="font-weight-light">
+                {{project.subtitle}}
               </p>
             </v-col>
           </v-row>
