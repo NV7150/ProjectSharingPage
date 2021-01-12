@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Project from "../views/Project";
 import Login from "../views/Login";
 import User from "../views/User";
+import Chat from "../views/Chat";
 
 Vue.use(VueRouter)
 
@@ -17,6 +18,11 @@ const routes = [
     path: '/project/:projectId',
     name: 'Project',
     component: Project
+  },
+  {
+    path: '/project/:projectId/:channel/:room',
+    name: "Chat",
+    component: Chat
   },
   {
     path: '/login',

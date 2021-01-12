@@ -85,10 +85,11 @@ export default {
             "remember_password": _this.user.remember_password
           })
           .then(() => {
+            _this.$store.dispatch('checkLogin');
             _this.$router.push({
               name: 'UserPage',
               params: { userName: _this.user.username }
-            })
+            });
           })
           .catch((error) => {
             let code = error.response.status;
@@ -98,6 +99,11 @@ export default {
               //TODO:エラーページへのリダイレクト
             }
           });
+    },
+
+    mounted() {
+      if(this.$store.getters.getIsLoggedIn)
+        this.$router.push({name: 'UserPage', params: {userName : this.$store.state.user.username}});
     }
   }
 }
