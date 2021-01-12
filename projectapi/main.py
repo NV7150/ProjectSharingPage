@@ -1,5 +1,6 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
+from starlette.status import HTTP_404_NOT_FOUND
 import db
 import schema
 from utils import user
@@ -57,6 +58,9 @@ async def get_project(id: int):
         status.HTTP_401_UNAUTHORIZED: {
             'description': 'Login failed (token is wrong)',
         },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'SkillTag not found.'
+        }
     }
 )
 async def create_project(
@@ -69,6 +73,13 @@ async def create_project(
     username = user.auth(token)
     if username is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    # tag check
+    if False in [user.tag_exist(t) for t in project.skilltags]:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            'SkillTag not found',
+        )
 
     return project.create(username)
 
@@ -83,7 +94,7 @@ async def create_project(
             'description': 'Successful response (updated)',
         },
         status.HTTP_404_NOT_FOUND: {
-            'description': 'Project is not found (id is wrong)'
+            'description': 'Resource not found.'
         },
         status.HTTP_401_UNAUTHORIZED: {
             'description': 'not logged in',
@@ -104,9 +115,19 @@ async def update_project(
     with db.session_scope() as s:
         p = db.Project.get(s, project_update.id)
         if p is None:
-            raise HTTPException(status.HTTP_404_NOT_FOUND)
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                'Project is not found (id is wrong)',
+            )
         if username not in [au.username for au in p.admin_users]:
             raise HTTPException(status.HTTP_403_FORBIDDEN)
+    
+    # tag check
+    if False in [user.tag_exist(t) for t in project_update.skilltags]:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            'SkillTag not found',
+        )
 
     # Update
     result = project_update.update()

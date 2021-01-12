@@ -56,3 +56,15 @@ def exist(username: str) -> bool:
         return False
 
     return True
+
+
+def tag_exist(tag_id: int) -> bool:
+    resp = requests.get(
+        f'http://userapi:8000/userapi/skilltag/{tag_id}'
+    )
+    if resp.status_code not in [200, 404]:
+        raise UserAPIError
+    if resp.status_code != 200:
+        return False
+
+    return True
