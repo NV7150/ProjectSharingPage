@@ -59,7 +59,6 @@ export default {
     logout(){
       axios.post("userapi/logout");
       this.$store.commit('removeUser');
-      this.$router.push({path: this.$router.currentRoute.path, force: true});
     }
   },
   computed: {

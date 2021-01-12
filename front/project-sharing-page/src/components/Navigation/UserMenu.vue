@@ -75,6 +75,7 @@ export default {
                 userName: _this.user.username
               }
             });
+            this.$router.go({path: this.$router.currentRoute.path, force: true});
           }
         },
         {
