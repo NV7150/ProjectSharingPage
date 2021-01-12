@@ -427,7 +427,7 @@ async def projects_of_user(username: str):
 )
 async def search_project(
     title: str,
-    limit: Optional[int] = None,
-    offset: Optional[int] = None,
+    limit: int,
+    offset: int,
 ):
     return schema.ProjectSearchResult.search(title, limit, offset)
