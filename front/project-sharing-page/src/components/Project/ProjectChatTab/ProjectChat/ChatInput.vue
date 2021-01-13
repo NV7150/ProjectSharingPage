@@ -2,13 +2,13 @@
   <v-card>
     <v-card-text>
       <v-row>
-        <v-col cols="11">
+        <v-col cols="9" sm="10" lg="11">
           <v-text-field
             label="Message"
             v-model="message"
           ></v-text-field>
         </v-col>
-        <v-col cols="1">
+        <v-col cols="3" sm="2" lg="1" class="justify-center">
           <v-btn
             color="primary"
             @click="send"
