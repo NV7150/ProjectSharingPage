@@ -194,6 +194,19 @@ async def delete_user(
 
 
 @app.get(
+    '/userapi/user/search',
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.UserSearchResult,
+            'description': 'Successful Response',
+        }
+    }
+)
+async def search_user(keyword: str, limit: int, offset: int):
+    return schema.UserSearchResult.search(keyword, limit, offset)
+
+
+@app.get(
     '/userapi/user/{username:str}',
     responses={
         status.HTTP_200_OK: {

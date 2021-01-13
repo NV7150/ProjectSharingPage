@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 import db
+from utils.func import levenshtein_distance
+from sqlalchemy import func
 from typing import Any, Optional, List
+import enum
 
 
 class Sns(BaseModel):
@@ -30,8 +33,8 @@ class Project(BaseModel):
     sns: Sns
     skilltags: List[int]
 
-    @staticmethod
-    def from_db(db_proj: db.Project):
+    @classmethod
+    def from_db(cls, db_proj: db.Project):
         sns = Sns(
             twitter=db_proj.twitter,
             instagram=db_proj.instagram,
@@ -44,7 +47,7 @@ class Project(BaseModel):
             wantedly=db_proj.wantedly,
             url=db_proj.url,
         )
-        return Project(
+        return cls(
             id=db_proj.id,
             title=db_proj.title,
             subtitle=db_proj.subtitle,
@@ -57,6 +60,11 @@ class Project(BaseModel):
             sns=sns,
             skilltags=db_proj.skilltags,
         )
+    
+    @staticmethod
+    def recommend(taglist: List[int]) -> List[Any]:  # List[Project]
+        with db.session_scope() as s:
+            
 
     def update(self) -> Optional[Any]:
         with db.session_scope() as s:
