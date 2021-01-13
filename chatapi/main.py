@@ -193,7 +193,7 @@ async def create_message(
 
 
 @app.get(
-    '/chatapi/thread/{thread_id:int}/messages/',
+    '/chatapi/thread/{thread_id:int}/messages',
     description='Get messages on thread',
     status_code=status.HTTP_200_OK,
     responses={
@@ -223,7 +223,7 @@ async def get_messages_by_thread(
 
 
 @app.get(
-    '/chatapi/thread/{thread_id:int}/messages/count/',
+    '/chatapi/thread/{thread_id:int}/messages/count',
     description='Get length of messages on thread',
     status_code=status.HTTP_200_OK,
     responses={
