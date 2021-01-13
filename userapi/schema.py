@@ -9,8 +9,8 @@ class SkillTag(BaseModel):
     name: str
     parents: List  # List[SkillTag]
 
-    @staticmethod
-    def from_db(db_skilltag: db.SkillTag):
+    @classmethod
+    def from_db(cls, db_skilltag: db.SkillTag):
         # Tracing back the family tree
         print('DB_SKILLTAG', db_skilltag)
         db_parents: List[db.SkillTag] = []
@@ -31,11 +31,20 @@ class SkillTag(BaseModel):
         ]
         parents.reverse()
 
-        return SkillTag(
+        return cls(
             id=db_skilltag.id,
             name=db_skilltag.name,
             parents=parents
         )
+
+    @staticmethod
+    def get(id: int) -> Optional[Any]:  # Optional[SkillTag]
+        with db.session_scope() as s:
+            t = s.query(db.SkillTag).get(id)
+            if t is None:
+                return None
+
+            return SkillTag.from_db(t)
 
 
 class SkillTagCreate(BaseModel):

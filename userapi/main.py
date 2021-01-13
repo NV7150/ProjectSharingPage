@@ -242,3 +242,25 @@ async def create_skilltag(tag: schema.SkillTagCreate):
     if result is None:
         HTTPException(status.HTTP_400_BAD_REQUEST)
     return result
+
+
+@app.get(
+    '/userapi/skilltag/{id:int}',
+    description='Get skilltag',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.SkillTag,
+            'description': 'Successful response',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'skilltag not found.',
+        },
+    },
+)
+async def get_skilltag(id: int):
+    t = schema.SkillTag.get(id)
+    if t is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return t
