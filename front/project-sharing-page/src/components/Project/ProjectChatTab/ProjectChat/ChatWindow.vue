@@ -55,7 +55,7 @@ export default {
     getCount(){
       return new Promise((resolve, reject) => {
         axios
-          .get("/chatapi/thread/" + this.thread.id + "/messages/count/")
+          .get("/chatapi/thread/" + this.thread.id + "/messages/count")
           .then((response) => {
             this.chatCount = response.data
             resolve();
@@ -69,7 +69,7 @@ export default {
     getMessages(){
       return new Promise((resolve, reject) => {
         axios
-          .get("/chatapi/thread/" + this.thread.id + "/messages/", {
+          .get("/chatapi/thread/" + this.thread.id + "/messages", {
             params: {
               limit: this.getLimit(),
               offset: this.getOffset()
@@ -124,7 +124,7 @@ export default {
     },
 
     chatDates(message){
-      return new Date(message.created_at + "Z").toLocaleString({timeZone: "Asia/Tokyo"});
+      return new Date(message.created_at).toLocaleString({timeZone: "Asia/Tokyo"});
     },
 
     getLimit(){
