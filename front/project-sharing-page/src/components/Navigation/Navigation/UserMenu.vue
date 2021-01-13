@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import PlaceHolder from "../../assets/img/PlaceHolder.png";
+import PlaceHolder from "../../../assets/img/PlaceHolder.png";
 
 export default {
   name: "UserMenu",

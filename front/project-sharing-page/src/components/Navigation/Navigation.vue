@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import UserMenu from "./UserMenu";
+import UserMenu from "./Navigation/UserMenu";
 import axios from "axios";
 
 export default {
