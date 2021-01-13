@@ -2,7 +2,7 @@ from pydantic import BaseModel
 import db
 from utils.func import levenshtein_distance
 from sqlalchemy import func
-from typing import Any, Optional, List
+from typing import Optional, List
 import enum
 
 
@@ -60,13 +60,18 @@ class Project(BaseModel):
             sns=sns,
             skilltags=db_proj.skilltags,
         )
-    
-    @staticmethod
-    def recommend(taglist: List[int]) -> List[Any]:  # List[Project]
-        with db.session_scope() as s:
-            
 
-    def update(self) -> Optional[Any]:
+
+class ProjectUpdate(BaseModel):
+    id: int
+    title: str
+    subtitle: Optional[str]
+    bg_image: Optional[str]
+    description: str
+    sns: Sns
+    skilltags: List[int]
+
+    def update(self) -> Optional[Project]:
         with db.session_scope() as s:
             p = db.Project.get(s, self.id)
             if p is None:
@@ -77,7 +82,6 @@ class Project(BaseModel):
             p.bg_image = self.bg_image
             p.description = self.description
             p.skilltags = self.skilltags
-            p.members = self.members
             p.twitter = self.sns.twitter
             p.instagram = self.sns.instagram
             p.github = self.sns.github
@@ -90,7 +94,7 @@ class Project(BaseModel):
             p.url = self.sns.url
 
             s.commit()
-            return self.from_db(p)
+            return Project.from_db(p)
 
 
 class ProjectCreate(BaseModel):
@@ -143,6 +147,17 @@ class ProjectCreate(BaseModel):
             return Project.from_db(p)
 
 
+class MemberType(str, enum.Enum):
+    MEMBER = 'MEMBERTYPE_MEMBER'
+    ANNOUNCE = 'MEMBERTYPE_ANNOUNCE'
+    ADMIN = 'MEMBERTYPE_ADMIN'
+
+
+class ProjectJoin(BaseModel):
+    username: str
+    type: MemberType
+
+
 class Likes(BaseModel):
     users: List[str]
 
@@ -151,3 +166,57 @@ class Likes(BaseModel):
         return cls(
             users=[like.username for like in p.likes]
         )
+
+
+class ProjectSearchResult(BaseModel):
+    """Project search result
+
+    Parameters
+    ----------
+    projects: List[Project]
+        List of search result
+    limit, offset: Optional[int]
+        index slice
+    next_exist: bool
+        Search results still exist after index slice
+    """
+    projects: List[Project]
+    limit: Optional[int]
+    offset: Optional[int]
+    next_exist: bool
+
+    @classmethod
+    def search(
+        cls,
+        title: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ):
+        with db.session_scope() as s:
+            q = s.query(db.Project).filter(
+                func.upper(db.Project.title).like(
+                    f"%{title.upper()}%"
+                )
+            )
+            length = q.count()
+            db_projects = q.all()
+            db_projects.sort(
+                key=lambda x: levenshtein_distance(x.title, title)
+            )
+            if offset is not None:
+                db_projects = db_projects[offset:]
+            if limit is not None:
+                db_projects = db_projects[:limit]
+
+            projects = [
+                Project.from_db(p)
+                for p in db_projects
+            ]
+            next_exist = len(projects) + (offset if offset else 0) < length
+
+            return cls(
+                projects=projects,
+                limit=limit,
+                offset=offset,
+                next_exist=next_exist,
+            )
