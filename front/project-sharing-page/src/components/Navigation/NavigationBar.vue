@@ -39,11 +39,11 @@
 </template>
 
 <script>
-import UserMenu from "./Navigation/UserMenu";
+import UserMenu from "./NavigationBar/UserMenu";
 import axios from "axios";
 
 export default {
-  name: "Navigation",
+  name: "NavigationBar",
   components: {UserMenu},
   data(){
     return{

@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <Navigation></Navigation>
+    <NavigationBar></NavigationBar>
 
     <v-container v-if="hasContact">
       <v-row>
@@ -40,14 +40,14 @@
 
 <script>
 import axios from "axios";
-import Navigation from "../components/Navigation/Navigation";
+import NavigationBar from "../components/Navigation/NavigationBar";
 import UserProfile from "../components/User/UserProfile";
 import UserProjects from "../components/User/UserProjects";
 import UserContacts from "../components/User/UserContacts";
 
 export default {
   name: "User",
-  components: {UserContacts, UserProjects, UserProfile, Navigation},
+  components: {UserContacts, UserProjects, UserProfile, NavigationBar},
   data(){
     return {
       window: 0,

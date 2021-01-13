@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <Navigation></Navigation>
+    <NavigationBar></NavigationBar>
 
     <ProjectTop :project="project"></ProjectTop>
 
@@ -37,14 +37,14 @@
 
 <script>
 import axios from "axios";
-import Navigation from "../components/Navigation/Navigation";
+import NavigationBar from "../components/Navigation/NavigationBar";
 import ProjectProfileTab from "../components/Project/ProjectProfileTab";
 import ProjectChatTab from "../components/Project/ProjectChatTab";
 import ProjectTop from "../components/Project/ProjectTop";
 
 export default {
   name: "Project",
-  components: {ProjectTop, ProjectChatTab, ProjectProfileTab, Navigation},
+  components: {ProjectTop, ProjectChatTab, ProjectProfileTab, NavigationBar},
   data(){
     return {
       tabs: 0,

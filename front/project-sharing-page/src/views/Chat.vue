@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <Navigation />
+    <NavigationBar />
 
     <v-container>
       <v-row>
@@ -31,13 +31,13 @@
 <script>
 import axios from "axios";
 
-import Navigation from "../components/Navigation/Navigation";
+import NavigationBar from "../components/Navigation/NavigationBar";
 import ChatWindow from "../components/Project/ProjectChatTab/ProjectChat/ChatWindow";
 import ChatInput from "../components/Project/ProjectChatTab/ProjectChat/ChatInput";
 
 export default {
   name: "Chat",
-  components: {ChatInput, ChatWindow, Navigation},
+  components: {ChatInput, ChatWindow, NavigationBar},
   data(){
     return {
       project: {},

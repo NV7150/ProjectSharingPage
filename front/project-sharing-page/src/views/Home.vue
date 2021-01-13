@@ -1,18 +1,18 @@
 <template>
   <v-main>
-    <Navigation></Navigation>
+    <NavigationBar></NavigationBar>
     <Projects></Projects>
   </v-main>
 </template>
 
 <script>
 import Projects from "../components/Home/Projects";
-import Navigation from "../components/Navigation/Navigation";
+import NavigationBar from "../components/Navigation/NavigationBar";
 
 export default {
   name: 'Home',
   components: {
-    Navigation,
+    NavigationBar,
     Projects
   }
 }
