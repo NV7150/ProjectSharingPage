@@ -2,6 +2,24 @@ import enum
 from pydantic import BaseModel
 from typing import Optional, List, Any
 import db
+from functools import lru_cache
+
+
+@lru_cache(maxsize=4096)
+def levenshtein_distance(s: str, t: str) -> int:
+    s = s.upper()
+    t = t.upper()
+    if not s:
+        return len(t)
+    if not t:
+        return len(s)
+    if s[0] == t[0]:
+        return levenshtein_distance(s[1:], t[1:])
+
+    l1 = levenshtein_distance(s, t[1:])
+    l2 = levenshtein_distance(s[1:], t)
+    l3 = levenshtein_distance(s[1:], t[1:])
+    return 1 + min(l1, l2, l3)
 
 
 class SkillTag(BaseModel):
@@ -9,8 +27,8 @@ class SkillTag(BaseModel):
     name: str
     parents: List  # List[SkillTag]
 
-    @staticmethod
-    def from_db(db_skilltag: db.SkillTag):
+    @classmethod
+    def from_db(cls, db_skilltag: db.SkillTag):
         # Tracing back the family tree
         print('DB_SKILLTAG', db_skilltag)
         db_parents: List[db.SkillTag] = []
@@ -31,11 +49,20 @@ class SkillTag(BaseModel):
         ]
         parents.reverse()
 
-        return SkillTag(
+        return cls(
             id=db_skilltag.id,
             name=db_skilltag.name,
             parents=parents
         )
+
+    @staticmethod
+    def get(id: int) -> Optional[Any]:  # Optional[SkillTag]
+        with db.session_scope() as s:
+            t = s.query(db.SkillTag).get(id)
+            if t is None:
+                return None
+
+            return SkillTag.from_db(t)
 
 
 class SkillTagCreate(BaseModel):
@@ -108,6 +135,106 @@ class User(BaseModel):
             sns=sns,
             skilltags=skilltags
         )
+
+
+class UserSearchResult(BaseModel):
+    all_result: List[User]
+    username: List[User]
+    display_name: List[User]
+    all_result_total: int
+    username_total: int
+    display_name_total: int
+
+    @classmethod
+    def search(cls, keyword, limit: int, offset: int):
+        with db.session_scope() as s:
+            username_list = s.query(db.User).filter(
+                db.User.username.like(f'%{keyword}%')
+            ).all()
+            displayname_list = s.query(db.User).filter(
+                db.User.display_name.like(f'%{keyword}%')
+            ).all()
+
+            # get levenshtein
+            username_lsd = [
+                levenshtein_distance(keyword, u.username)
+                for u in username_list
+            ]
+            displayname_lsd = [
+                levenshtein_distance(keyword, u.display_name)
+                for u in displayname_list
+            ]
+
+            # get sorted index
+            username_sort_index = sorted(
+                range(len(username_lsd)),
+                key=lambda i: username_lsd[i]
+            )
+            displayname_sort_index = sorted(
+                range(len(displayname_lsd)),
+                key=lambda i: displayname_lsd[i]
+            )
+
+            u_sort_idx = 0  # current sorted_username index
+            d_sort_idx = 0  # current sorted_displayname index
+            u_idx = 0
+            d_idx = 0
+            all_sorted = []
+            while True:
+                try:
+                    u_idx = username_sort_index[u_sort_idx]
+                except IndexError:
+                    # finish
+                    for d_idx in displayname_sort_index[d_sort_idx:]:
+                        d = displayname_list[d_idx]
+                        if d not in all_sorted:
+                            all_sorted.append(d)
+                    break
+                try:
+                    d_idx = displayname_sort_index[d_sort_idx]
+                except IndexError:
+                    # finish
+                    for u_idx in username_sort_index[u_sort_idx:]:
+                        u = username_list[u_idx]
+                        if u not in all_sorted:
+                            all_sorted.append(u)
+                    break
+
+                u_lsd = username_lsd[u_idx]
+                d_lsd = displayname_lsd[d_idx]
+                if u_lsd < d_lsd:
+                    u = username_list[u_idx]
+                    if u not in all_sorted:
+                        all_sorted.append(u)
+                    u_sort_idx += 1
+                    continue
+
+                d = displayname_list[d_idx]
+                if d not in all_sorted:
+                    all_sorted.append(d)
+                d_sort_idx += 1
+
+            all_sorted = [
+                User.from_db(u)
+                for u in all_sorted
+            ]
+            username_sorted = [
+                User.from_db(username_list[i])
+                for i in username_sort_index
+            ]
+            displayname_sorted = [
+                User.from_db(displayname_list[i])
+                for i in displayname_sort_index
+            ]
+
+            return cls(
+                all_result=all_sorted[offset:offset+limit],
+                username=username_sorted[offset:offset+limit],
+                display_name=displayname_sorted[offset:offset+limit],
+                all_result_total=len(all_sorted),
+                username_total=len(username_sorted),
+                display_name_total=len(displayname_sorted),
+            )
 
 
 class LoginUser(User):
