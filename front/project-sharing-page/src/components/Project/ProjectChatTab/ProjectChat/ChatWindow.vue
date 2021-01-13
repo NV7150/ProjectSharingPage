@@ -1,6 +1,7 @@
 <template>
   <v-timeline
     dense
+    v-if="!isLoadingMessages"
   >
     <v-timeline-item
       small
@@ -21,7 +22,7 @@
             rounded
           >
             <v-card-text>
-              {{item.message}}
+              {{item.content}}
             </v-card-text>
 
             <v-footer class="pa-2">
@@ -37,28 +38,100 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "ChatWindow",
-  props: ["project", "channel", "thread"],
+  props: ["project", "channel", "thread", "onLoadingChanged"],
   data(){
     return{
-      chatMessages : []
+      isLoadingMessages : true,
+      chatCount : 0,
+      chatMessages : [],
     }
   },
 
   methods: {
-    updateMessage(){
-      //TODO:チャットを取得
-      //仮置き
-      this.chatMessages = [
-        {message: "これはテストです", date: 23, month: 'Dec', year:2020, user: {display_name: "テスト", icon: "https://gochiusa.com/core_sys/images/contents/00000022/base/l1.png"}},
-        {message: "これはテストです2", date: 23, month: 'Dec', year:2020, user: {display_name: "テスト", icon: "https://gochiusa.com/core_sys/images/contents/00000021/base/l1.png"}},
-        {message: "project:" + this.project.title + " channel:" + this.channel.name + " thread:" + this.thread.name, date: 23, month: 'Dec', year:2020, user: {display_name: "テスト", icon: "https://gochiusa.com/core_sys/images/contents/00000022/base/l1.png"}}
-      ];
+    getCount(){
+      return new Promise((resolve, reject) => {
+        axios
+          .get("/chatapi/thread/" + this.thread.id + "/messages/count/")
+          .then((response) => {
+            this.chatCount = response.data
+            resolve();
+          })
+          .catch(() => {
+            reject();
+          });
+      });
+    },
+
+    getMessages(){
+      return new Promise((resolve, reject) => {
+        axios
+          .get("/chatapi/thread/" + this.thread.id + "/messages/", {
+            params: {
+              limit: this.getLimit(),
+              offset: this.getOffset()
+            }
+          })
+          .then((response) => {
+            this.chatMessages = response.data.messages.reverse();
+            resolve();
+          })
+          .catch(() => {
+            reject();
+          });
+      });
+    },
+
+    getUsers(){
+      return new Promise((resolve, reject) => {
+          let tasks = [];
+          for(let i = 0; i < this.chatMessages.length; i++){
+            tasks.push(
+                axios.get('/userapi/user/' + this.chatMessages[i].username)
+            );
+          }
+          Promise
+              .all(tasks)
+              .then((values) => {
+                for(let i = 0; i < values.length; i++){
+                  this.chatMessages[i].user = values[i].data;
+                }
+                resolve();
+              })
+              .catch(() => {
+                reject();
+              });
+        }
+      )
+    },
+
+    updateMessage() {
+      this.isLoadingMessages = true;
+
+      Promise.resolve()
+          .then(this.getCount)
+          .then(this.getMessages)
+          .then(this.getUsers)
+          .then(() => {
+            this.isLoadingMessages = false;
+          })
+          .catch(() => {
+            //TODO:エラー処理
+          });
     },
 
     chatDates(message){
-      return message.date + ", " + message.month + ", " + message.year;
+      return new Date(message.created_at + "Z").toLocaleString({timeZone: "Asia/Tokyo"});
+    },
+
+    getLimit(){
+      return this.chatCount;
+    },
+    getOffset(){
+      return 0;
     }
   },
 
@@ -69,7 +142,10 @@ export default {
   watch : {
     project: function (){this.updateMessage();},
     channel: function (){this.updateMessage();},
-    thread: function (){this.updateMessage();}
+    thread: function (){this.updateMessage();},
+    isLoadingMessages: function (){
+      this.onLoadingChanged(this.isLoadingMessages);
+    }
   }
 }
 </script>

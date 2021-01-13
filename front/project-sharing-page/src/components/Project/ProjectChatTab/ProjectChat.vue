@@ -66,12 +66,22 @@
           </v-window-item>
 
           <v-window-item>
-            <v-card>
+            <v-card
+              :loading="isLoadingMessages"
+            >
+              <template slot="progress">
+                <v-progress-linear
+                    color="deep-purple"
+                    height="10"
+                    indeterminate
+                />
+              </template>
               <ChatWindow
                   :project="project"
                   :channel="selectingChannel"
                   :thread="selectingThread"
-              ></ChatWindow>
+                  :on-loading-changed="changeLoadingMessage"
+              />
               <v-spacer></v-spacer>
               <ChatInput></ChatInput>
             </v-card>
@@ -99,6 +109,7 @@ export default {
       channels: ChatSettings.channels,
       selectingChannel: {},
       isLoadingThreads: false,
+      isLoadingMessages: true,
       threads: [],
       threadObjects : [],
       selectingThread: {}
@@ -147,12 +158,16 @@ export default {
       for(let i = 0; i < this.threads.length; i++){
         let thread = this.threads[i];
         threadObjects.push({
+          id: thread.id,
           name: thread.title,
           //THREADSTATUS_****なので文字列処理
           status: thread.status.replace('THREADSTATUS_', '').toLowerCase()
         });
       }
       return threadObjects;
+    },
+    changeLoadingMessage(next){
+      this.isLoadingMessages = next;
     }
   },
   computed: {
