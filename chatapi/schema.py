@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 import db
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 from sqlalchemy import desc
 
@@ -60,12 +60,16 @@ class Message(BaseModel):
 
     @classmethod
     def from_db(cls, db_msg: db.Message):
+        created_at = db_msg.created_at
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
+
         return cls(
             id=db_msg.id,
             thread_id=db_msg.thread_id,
             username=db_msg.username,
             content=db_msg.content,
-            created_at=db_msg.created_at,
+            created_at=created_at,
         )
 
 
