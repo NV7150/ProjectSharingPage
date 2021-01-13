@@ -1,6 +1,5 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
-from starlette.status import HTTP_404_NOT_FOUND
 import db
 import schema
 from utils import user
@@ -121,7 +120,7 @@ async def update_project(
             )
         if username not in [au.username for au in p.admin_users]:
             raise HTTPException(status.HTTP_403_FORBIDDEN)
-    
+
     # tag check
     if False in [user.tag_exist(t) for t in project_update.skilltags]:
         raise HTTPException(

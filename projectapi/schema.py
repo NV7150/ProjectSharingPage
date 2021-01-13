@@ -2,7 +2,7 @@ from pydantic import BaseModel
 import db
 from utils.func import levenshtein_distance
 from sqlalchemy import func
-from typing import Any, Optional, List
+from typing import Optional, List
 import enum
 
 
@@ -60,11 +60,6 @@ class Project(BaseModel):
             sns=sns,
             skilltags=db_proj.skilltags,
         )
-    
-    @staticmethod
-    def recommend(taglist: List[int]) -> List[Any]:  # List[Project]
-        with db.session_scope() as s:
-            
 
 
 class ProjectUpdate(BaseModel):
