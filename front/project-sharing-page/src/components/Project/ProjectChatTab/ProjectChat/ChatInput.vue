@@ -24,7 +24,7 @@
 <script>
 export default {
   name: "ChatInput",
-  props: ["project", "channel", "room"],
+  props: ["project", "channel", "thread"],
   data(){
     return {
       message : ""

@@ -21,7 +21,7 @@ const routes = [
     component: Project
   },
   {
-    path: '/project/:projectId/:channel/:room',
+    path: '/project/:projectId/:channel/:thread',
     name: "Chat",
     component: Chat
   },

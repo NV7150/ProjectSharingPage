@@ -39,7 +39,7 @@
 <script>
 export default {
   name: "ChatWindow",
-  props: ["project", "channel", "room"],
+  props: ["project", "channel", "thread"],
   data(){
     return{
       chatMessages : []
@@ -53,7 +53,7 @@ export default {
       this.chatMessages = [
         {message: "これはテストです", date: 23, month: 'Dec', year:2020, user: {display_name: "テスト", icon: "https://gochiusa.com/core_sys/images/contents/00000022/base/l1.png"}},
         {message: "これはテストです2", date: 23, month: 'Dec', year:2020, user: {display_name: "テスト", icon: "https://gochiusa.com/core_sys/images/contents/00000021/base/l1.png"}},
-        {message: "project:" + this.project.title + " channel:" + this.channel.name + " room:" + this.room.name, date: 23, month: 'Dec', year:2020, user: {display_name: "テスト", icon: "https://gochiusa.com/core_sys/images/contents/00000022/base/l1.png"}}
+        {message: "project:" + this.project.title + " channel:" + this.channel.name + " thread:" + this.thread.name, date: 23, month: 'Dec', year:2020, user: {display_name: "テスト", icon: "https://gochiusa.com/core_sys/images/contents/00000022/base/l1.png"}}
       ];
     },
 
@@ -69,7 +69,7 @@ export default {
   watch : {
     project: function (){this.updateMessage();},
     channel: function (){this.updateMessage();},
-    room: function (){this.updateMessage();}
+    thread: function (){this.updateMessage();}
   }
 }
 </script>

@@ -32,17 +32,17 @@
         >
           <v-window-item>
             <v-card>
-              <ChatRoomList
-                :rooms="channels"
+              <ChatDestList
+                :destinations="channels"
                 :selected-callback="selectChannel"
-              ></ChatRoomList>
+              ></ChatDestList>
             </v-card>
           </v-window-item>
 
           <v-window-item>
             <v-card
-              :loading="isLoadingRooms"
-              v-if="roomObjects.length > 0"
+              :loading="isLoadingThreads"
+              v-if="threadObjects.length > 0"
             >
               <template slot="progress">
                 <v-progress-linear
@@ -52,9 +52,9 @@
                 />
               </template>
 
-              <ChatRoomList
-                :rooms="roomObjects"
-                :selected-callback="selectRoom"
+              <ChatDestList
+                :destinations="threadObjects"
+                :selected-callback="selectThread"
               />
             </v-card>
 
@@ -70,7 +70,7 @@
               <ChatWindow
                   :project="project"
                   :channel="selectingChannel"
-                  :room="selectingRoom"
+                  :thread="selectingThread"
               ></ChatWindow>
               <v-spacer></v-spacer>
               <ChatInput></ChatInput>
@@ -84,7 +84,7 @@
 
 <script>
 import axios from "axios";
-import ChatRoomList from "./ProjectChat/ChatRoomList";
+import ChatDestList from "./ProjectChat/ChatDestList";
 import ChatSettings from "../../../assets/scripts/ProjectPageConstants";
 import ChatWindow from "./ProjectChat/ChatWindow";
 import ChatInput from "./ProjectChat/ChatInput";
@@ -92,16 +92,16 @@ import ChatInput from "./ProjectChat/ChatInput";
 export default {
   name: "ProjectChat",
   props:["project"],
-  components: {ChatWindow, ChatRoomList, ChatInput},
+  components: {ChatWindow, ChatDestList, ChatInput},
   data(){
     return{
       window: 0,
       channels: ChatSettings.channels,
       selectingChannel: {},
-      isLoadingRooms: false,
-      rooms: [],
-      roomObjects : [],
-      selectingRoom: {}
+      isLoadingThreads: false,
+      threads: [],
+      threadObjects : [],
+      selectingThread: {}
     }
   },
   methods: {
@@ -109,21 +109,21 @@ export default {
       this.selectingChannel = channel;
       this.window = 1;
 
-      this.isLoadingRooms = true;
+      this.isLoadingThreads = true;
       axios
           .get('/chatapi/thread/project/' + this.project.id + '/' + this.selectingChannel.send)
           .then((response) => {
-            this.isLoadingRooms = false;
-            this.rooms = response.data;
-            this.roomObjects = this.getRooms();
+            this.isLoadingThreads = false;
+            this.threads = response.data;
+            this.threadObjects = this.getThreads();
           })
           .catch(() => {
-            this.isLoadingRooms = false;
-            this.rooms = [];
+            this.isLoadingThreads = false;
+            this.threads = [];
           });
     },
-    selectRoom(room){
-      this.selectingRoom = room;
+    selectThread(thread){
+      this.selectingThread = thread;
       this.window = 2;
     },
     back(){
@@ -138,21 +138,21 @@ export default {
         params: {
           projectId: this.$route.params.projectId,
           channel: this.selectingChannel.name,
-          room: this.selectingRoom.name
+          thread: this.selectingThread.name
         }
       });
     },
-    getRooms(){
-      let roomObjects = [];
-      for(let i = 0; i < this.rooms.length; i++){
-        let room = this.rooms[i];
-        roomObjects.push({
-          name: room.title,
+    getThreads(){
+      let threadObjects = [];
+      for(let i = 0; i < this.threads.length; i++){
+        let thread = this.threads[i];
+        threadObjects.push({
+          name: thread.title,
           //THREADSTATUS_****なので文字列処理
-          status: room.status.replace('THREADSTATUS_', '').toLowerCase()
+          status: thread.status.replace('THREADSTATUS_', '').toLowerCase()
         });
       }
-      return roomObjects;
+      return threadObjects;
     }
   },
   computed: {
@@ -161,7 +161,7 @@ export default {
         case 1:
           return this.selectingChannel.name;
         case 2:
-          return this.selectingRoom.name;
+          return this.selectingThread.name;
       }
       return "";
     }
