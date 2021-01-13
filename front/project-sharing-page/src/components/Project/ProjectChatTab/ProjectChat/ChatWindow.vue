@@ -42,7 +42,7 @@ import axios from "axios";
 
 export default {
   name: "ChatWindow",
-  props: ["project", "channel", "thread", "onLoadingChanged"],
+  props: ["thread", "onLoadingChanged"],
   data(){
     return{
       isLoadingMessages : true,
@@ -140,8 +140,6 @@ export default {
   },
 
   watch : {
-    project: function (){this.updateMessage();},
-    channel: function (){this.updateMessage();},
     thread: function (){this.updateMessage();},
     isLoadingMessages: function (){
       this.onLoadingChanged(this.isLoadingMessages);

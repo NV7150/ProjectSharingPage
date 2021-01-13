@@ -7,19 +7,39 @@
         <v-col
           cols="12"
         >
-          <v-card>
+          <v-card
+            :loading="isThreadLoading || isMessageLoading"
+          >
+            <template slot="progress">
+              <v-progress-linear
+                  color="deep-purple"
+                  height="10"
+                  indeterminate
+              />
+            </template>
+
             <v-toolbar>
               <v-btn
                   icon
-                  :disabled="window <= 0"
                   @click="back"
               >
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
-              <v-toolbar-title>{{$route.params.thread}}</v-toolbar-title>
+              <v-toolbar-title
+                  v-if="!isThreadLoading"
+              >
+                {{this.thread.title}}
+              </v-toolbar-title>
             </v-toolbar>
-            <ChatWindow :project="project" :channel="channel" :thread="thread" />
-            <ChatInput />
+            <ChatWindow
+              v-if="!isThreadLoading"
+              :thread="thread"
+              :on-loading-changed="changeMessageLoadState"
+            />
+            <ChatInput
+              v-if="!isThreadLoading"
+              :thread="thread"
+            />
           </v-card>
         </v-col>
       </v-row>
@@ -40,8 +60,8 @@ export default {
   components: {ChatInput, ChatWindow, NavigationBar},
   data(){
     return {
-      project: {},
-      channel: {},
+      isThreadLoading: true,
+      isMessageLoading: true,
       thread: {}
     }
   },
@@ -51,23 +71,23 @@ export default {
         name:'Project',
         params: { projectId: this.$route.params.projectId }
       });
+    },
+    changeMessageLoadState(state){
+      this.isMessageLoading = state;
     }
   },
 
   created() {
-    this.project =
-        axios
-            .get('/projectapi/project/' + this.$route.params.userId)
-            .then((response) => {
-              this.project = response.data;
-            })
-            .catch(() => {
-              this.$router.push({name: '404'});
-            });
-
-    //TODO:チャンネルとルームを取得
-    this.channel = {name: this.$route.params.channel};
-    this.thread = {name: this.$route.params.thread};
+    this.isThreadLoading = true;
+    axios
+      .get('/chatapi/thread/' + this.$route.params.threadId)
+      .then((response) => {
+        this.thread = response.data;
+        this.isThreadLoading = false;
+      })
+      .catch(() => {
+        this.$router.push({name: '404'});
+      });
   },
 }
 </script>

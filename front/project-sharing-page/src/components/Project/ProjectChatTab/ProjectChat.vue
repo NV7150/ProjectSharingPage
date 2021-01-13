@@ -77,8 +77,6 @@
                 />
               </template>
               <ChatWindow
-                  :project="project"
-                  :channel="selectingChannel"
                   :thread="selectingThread"
                   :on-loading-changed="changeLoadingMessage"
               />
@@ -150,8 +148,7 @@ export default {
         name: "Chat",
         params: {
           projectId: this.$route.params.projectId,
-          channel: this.selectingChannel.name,
-          thread: this.selectingThread.name
+          threadId: this.selectingThread.id
         }
       });
     },
