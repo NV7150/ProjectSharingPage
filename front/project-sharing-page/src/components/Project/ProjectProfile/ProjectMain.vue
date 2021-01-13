@@ -69,8 +69,7 @@ export default {
       return (this.liked) ? 'pink' : 'gray';
     },
     checkLiked(){
-      let hasUser = (Boolean)(this.$store.getters['getUser']);
-      if(hasUser){
+      if(this.$store.getters['getUser'] && this.project && this.project["id"] !== undefined){
         axios
             .get('/projectapi/project/' + this.project["id"] + '/like')
             .then((response) => {

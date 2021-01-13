@@ -13,12 +13,12 @@
       <v-tooltip bottom>
         <template v-slot:activator="{on}">
           <v-btn
+              v-show="window === 2"
               icon
               @click="goToPage"
               v-on="on"
-              :disabled="window < 2"
           >
-            <v-icon>mdi-application</v-icon>
+            <v-icon color="primary">mdi-application</v-icon>
           </v-btn>
         </template>
         <span>Go to chat page</span>
