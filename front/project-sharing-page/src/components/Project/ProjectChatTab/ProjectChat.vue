@@ -83,7 +83,9 @@
                   :on-loading-changed="changeLoadingMessage"
               />
               <v-spacer></v-spacer>
-              <ChatInput></ChatInput>
+              <ChatInput
+                  :thread="selectingThread"
+              />
             </v-card>
           </v-window-item>
         </v-window>

@@ -16,9 +16,9 @@
               >
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
-              <v-toolbar-title>{{$route.params.room}}</v-toolbar-title>
+              <v-toolbar-title>{{$route.params.thread}}</v-toolbar-title>
             </v-toolbar>
-            <ChatWindow :project="project" :channel="channel" :room="thread" />
+            <ChatWindow :project="project" :channel="channel" :thread="thread" />
             <ChatInput />
           </v-card>
         </v-col>
@@ -67,7 +67,7 @@ export default {
 
     //TODO:チャンネルとルームを取得
     this.channel = {name: this.$route.params.channel};
-    this.thread = {name: this.$route.params.room};
+    this.thread = {name: this.$route.params.thread};
   },
 }
 </script>

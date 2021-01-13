@@ -22,9 +22,11 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "ChatInput",
-  props: ["project", "channel", "thread"],
+  props: ["thread"],
   data(){
     return {
       message : ""
@@ -32,8 +34,14 @@ export default {
   },
   methods : {
     send(){
-      //TODO:メッセージを送る
-      alert(this.message);
+      axios
+          .post("/chatapi/message", {
+            "thread_id" : this.thread.id,
+            "content" : this.message
+          })
+          .then(() => {
+            this.$router.go({path: this.$router.currentRoute.path, force: true});
+          });
     }
   }
 }
