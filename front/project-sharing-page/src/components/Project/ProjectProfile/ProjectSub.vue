@@ -10,10 +10,10 @@
               <v-card
                   outlined
                   class="ma-2 pa-2 rounded-pill"
-                  v-for="(item, i) in project.skilltags"
+                  v-for="(item, i) in project.skillTag"
                   :key="i"
               >
-                {{item}}
+                {{item.name}}
               </v-card>
             </v-list-item-subtitle>
           </v-list-item-content>
@@ -107,17 +107,16 @@ export default {
     },
     hasTags(){
       return this.project
-          && Object.prototype.hasOwnProperty.call(this.project, "skillTags")
-          && this.project.skillTags.length > 0;
+          && Object.prototype.hasOwnProperty.call(this.project, "skillTag")
+          && this.project.skillTag.length > 0;
     }
   },
-  watch: {
-    project: function (){
-      let _this = this;
-      this.activeSns = Object.keys(this.project.sns).filter(function (name){
-        return _this.project.sns[name];
-      });
-    }
+
+  created() {
+    let _this = this;
+    this.activeSns = Object.keys(this.project.sns).filter(function (name){
+      return _this.project.sns[name];
+    });
   }
 }
 </script>
