@@ -12,6 +12,7 @@
         >
           <v-tab>General</v-tab>
           <v-tab>Chat</v-tab>
+          <v-tab>Edit</v-tab>
         </v-tabs>
 
         <v-card-text>
@@ -29,6 +30,12 @@
               </v-responsive>
             </v-tab-item>
 
+            <v-tab-item>
+              <v-responsive min-height="100vh">
+                <ProjectEditTab :project="project" />
+              </v-responsive>
+            </v-tab-item>
+
           </v-tabs-items>
         </v-card-text>
       </v-card>
@@ -42,10 +49,11 @@ import NavigationBar from "../components/Navigation/NavigationBar";
 import ProjectProfileTab from "../components/Project/ProjectProfileTab";
 import ProjectChatTab from "../components/Project/ProjectChatTab";
 import ProjectTop from "../components/Project/ProjectTop";
+import ProjectEditTab from "@/components/Project/ProjectEditTab";
 
 export default {
   name: "Project",
-  components: {ProjectTop, ProjectChatTab, ProjectProfileTab, NavigationBar},
+  components: {ProjectEditTab, ProjectTop, ProjectChatTab, ProjectProfileTab, NavigationBar},
   data(){
     return {
       tabs: 0,
@@ -135,7 +143,8 @@ export default {
           this.isProjectLoading = false;
         })
         .catch(() => {
-          this.$router.push({name: "404"});
+          // this.$router.push({name: "404"});
+          this.isProjectLoading = false;
         });
   },
 
