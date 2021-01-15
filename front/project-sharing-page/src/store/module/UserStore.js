@@ -16,16 +16,19 @@ export default {
         }
     },
     actions: {
-        async checkLogin(context){
-            await axios
-                .get('/userapi/user')
-                .then((response) => {
-                    context.commit('setUser', response.data);
-                })
-                .catch(() => {
-                    context.commit('removeUser');
-                });
-
+        checkLogin(context){
+            return new Promise((resolve) => {
+                axios
+                    .get('/userapi/user')
+                    .then((response) => {
+                        context.commit('setUser', response.data);
+                        resolve();
+                    })
+                    .catch(() => {
+                        context.commit('removeUser');
+                        resolve();
+                    });
+            });
         }
     },
     getters: {

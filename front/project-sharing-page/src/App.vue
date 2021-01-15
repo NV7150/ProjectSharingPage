@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app v-if="isLoaded">
     <router-view />
   </v-app>
 </template>
@@ -8,9 +8,18 @@
 
 export default {
   name: 'App',
-  beforeCreate() {
+  data() {
+    return {
+      isLoaded : false
+    };
+  },
+  created() {
+    this.isLoaded = false;
     //ログインを行う
-    this.$store.dispatch("checkLogin");
+    this.$store.dispatch("checkLogin")
+        .then(() => {
+          this.isLoaded = true;
+        });
   }
 };
 </script>

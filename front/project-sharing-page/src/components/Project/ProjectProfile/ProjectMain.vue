@@ -97,15 +97,6 @@ export default {
     }
   },
 
-  watch: {
-    project : function(){
-      this.checkLiked();
-    },
-    loginUser : function (){
-      this.checkLiked();
-    }
-  },
-
   created() {
     this.checkLiked();
   }
