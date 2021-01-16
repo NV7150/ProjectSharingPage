@@ -12,7 +12,7 @@
         >
           <v-tab>General</v-tab>
           <v-tab>Chat</v-tab>
-          <v-tab>Edit</v-tab>
+          <v-tab v-if="getIsMember">Edit</v-tab>
         </v-tabs>
 
         <v-card-text>
@@ -30,7 +30,7 @@
               </v-responsive>
             </v-tab-item>
 
-            <v-tab-item>
+            <v-tab-item v-if="getIsMember">
               <v-responsive min-height="100vh">
                 <ProjectEditTab :project="project" />
               </v-responsive>
@@ -117,6 +117,19 @@ export default {
           });
 
       });
+    }
+  },
+
+  computed : {
+    getIsMember(){
+      if(!this.$store.getters["getUser"] || !this.$store.getters["getUser"].username)
+        return;
+
+      for(let i = 0; i < this.project.members.length; i++){
+        if(this.$store.getters["getUser"].username === this.project.members[i])
+          return true;
+      }
+      return false;
     }
   },
 
