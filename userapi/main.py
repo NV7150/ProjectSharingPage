@@ -1,9 +1,11 @@
 from typing import Optional
 from fastapi import FastAPI, HTTPException, status, Response
+from fastapi.responses import FileResponse
 from fastapi import File, UploadFile
 from fastapi import Cookie
 import uuid
 import os
+
 import db
 import schema
 
@@ -284,6 +286,28 @@ async def get_skilltag(id: int):
 
 # User Icon
 
+@app.get(
+    '/userapi/usericon/{filename:str}',
+    description='Get User-icon',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Image',
+            'content': {'image/*': {}},
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Not found'
+        }
+    }
+)
+async def get_usericon(filename: str):
+    full_filepath = f'/usericon/{filename}'
+    if not os.path.exists(full_filepath):
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return FileResponse(f'/usericon/{filename}')
+
+
 @app.post(
     '/userapi/usericon',
     description='Upload User-icon',
@@ -349,7 +373,7 @@ async def upload_usericon(
         s.commit()
 
     old_icon_full = f'/usericon/{old_icon}' if old_icon is not None else None
-    if old_icon_full:
+    if old_icon_full and os.path.exists(old_icon_full):
         os.remove(old_icon_full)
 
     return url
