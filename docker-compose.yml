@@ -13,6 +13,8 @@ services:
             POSTGRES_USER: "postgres"
             POSTGRES_PASSWORD: "pg_password"
             DB_ECHO: "False"
+        volumes:
+            - useiconmedia:/usericon
     
     projectapi:
         build: projectapi
@@ -80,6 +82,8 @@ services:
         
 volumes: 
     userpgdata:
+        driver: "local"
+    usericonmedia:
         driver: "local"
     projectpgdata:
         driver: "local"

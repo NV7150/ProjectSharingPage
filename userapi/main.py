@@ -1,6 +1,9 @@
 from typing import Optional
 from fastapi import FastAPI, HTTPException, status, Response
+from fastapi import File, UploadFile
 from fastapi import Cookie
+import uuid
+import os
 import db
 import schema
 
@@ -277,3 +280,70 @@ async def get_skilltag(id: int):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     return t
+
+
+# User Icon
+
+@app.post(
+    '/userapi/usericon',
+    description='Upload User-icon',
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_201_CREATED: {
+            'model': str,
+            'description': 'Successful response (Icon URL)',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'token is required',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'description': 'Wrong Request'
+        }
+    },
+)
+async def upload_usericon(
+    file: Optional[UploadFile] = File(None),
+    token: Optional[str] = Cookie(None)
+):
+    # auth
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if schema.LoginUser.from_token(token) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if file is None:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST)
+
+    # mime check
+    if file.content_type not in ['image/jpeg', 'image/png']:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            'File should be image/jpeg or image/png',
+        )
+
+    data: bytes = file.file.read()
+    ext = file.filename.split('.')[-1]
+    filename = str(uuid.uuid4())
+    file.file.close()
+
+    # while filename exists, re-generate filename
+    while os.path.exists(f'/usericon/{filename}.{ext}'):
+        filename = str(uuid.uuid4())
+
+    # save icon
+    full_filename = f'/usericon/{filename}.{ext}'
+    with open(full_filename, 'wb') as f:
+        f.write(data)
+
+    # save icon url to database
+    url = f'/userapi/usericon/{filename}.{ext}'
+    user_id = db.Token.get_userid(token)
+    with db.session_scope() as s:
+        u: Optional[db.User] = s.query(db.User).get(user_id)
+        if u is None:
+            # user is missing
+            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        u.icon = url
+        s.commit()
+
+    return url
