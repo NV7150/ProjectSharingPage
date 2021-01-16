@@ -1,6 +1,7 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
 from fastapi import File, UploadFile
+from fastapi.responses import FileResponse
 import uuid
 import os
 
@@ -178,6 +179,27 @@ async def delete_project(id: int, token: Optional[str] = Cookie(None)):
 
 
 # Project Background Image
+
+@app.get(
+    '/projectapi/projectimage/{filename:str}',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful response.',
+            'content': {'image/*': {}},
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Not found',
+        },
+    },
+)
+async def get_projectimage(filename: str):
+    fullpath = f'/projectimage/{filename}'
+    if not os.path.exists(fullpath):
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return FileResponse(fullpath)
+
 
 @app.post(
     '/projectapi/projectimage/{id:int}',
