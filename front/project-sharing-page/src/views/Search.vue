@@ -1,6 +1,15 @@
 <template>
   <v-main>
     <NavigationBar />
+
+    <v-container>
+      <v-row>
+        <v-col>
+          <UserSearch :keyword="$route.params.keyword" />
+        </v-col>
+      </v-row>
+    </v-container>
+
     <v-container>
       <v-row>
         <v-col>
@@ -14,9 +23,10 @@
 <script>
 import ProjectSearch from "@/components/Search/ProjectSearch";
 import NavigationBar from "@/components/Navigation/NavigationBar";
+import UserSearch from "@/components/Search/UserSearch";
 export default {
   name: "Search",
-  components: {NavigationBar, ProjectSearch}
+  components: {UserSearch, NavigationBar, ProjectSearch}
 }
 </script>
 

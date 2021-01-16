@@ -15,7 +15,7 @@
       </v-toolbar-title>
     </v-toolbar>
 
-    <v-container v-if="!isSearchLoading">
+    <v-container v-if="!isSearchLoading" class="pa-3">
       <v-row>
         <v-col
           cols="12"
@@ -60,7 +60,6 @@ export default {
           }
         })
         .then((response) => {
-          console.log(response);
           this.searchResult = response.data.projects;
           this.isSearchLoading = false;
         })
