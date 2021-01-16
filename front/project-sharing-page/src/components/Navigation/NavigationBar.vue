@@ -62,7 +62,7 @@ export default {
       this.$router.push({name: pageName});
     },
     logout(){
-      axios.post("userapi/logout");
+      axios.post("/userapi/logout");
       this.$store.commit('removeUser');
     }
   },
