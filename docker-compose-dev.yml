@@ -47,6 +47,19 @@ services:
             DB_ECHO: "True"
         volumes: 
             - ./chatapi:/code
+
+    recommendapi:
+        build: recommendapi
+        links:
+            - recommenddb
+        depends_on:
+            - recommenddb
+        environment:
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"
+            DB_ECHO: "False"
+        volumes: 
+            - ./recommendapi:/code
     
     caddy:
         image: caddy
@@ -94,6 +107,16 @@ services:
             - "chatpgdata:/var/lib/postgresql/data"
         ports:
           - 5434:5432  # Debug
+    
+    recommenddb:
+        image: postgres
+        environment: 
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
+        volumes:
+            - "recommendpgdata:/var/lib/postgresql/data"
+        ports:
+            - 5435:5432  # debug
 
 volumes: 
     userpgdata:
@@ -101,4 +124,6 @@ volumes:
     projectpgdata:
         driver: "local"
     chatpgdata:
+        driver: "local"
+    recommendpgdata:
         driver: "local"

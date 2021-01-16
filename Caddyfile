@@ -20,6 +20,10 @@ route /chatapi/* {
     reverse_proxy chatapi:8000
 }
 
+route /recommendapi/* {
+    reverse_proxy recommendapi:8000
+}
+
 route /* {
     reverse_proxy front:8080
 }
