@@ -9,7 +9,7 @@
         icon
       >
         <v-avatar>
-          <img :src="user.icon">
+          <v-img :src="user.icon" />
         </v-avatar>
       </v-btn>
     </template>
@@ -19,7 +19,7 @@
         <v-card-text>
           <div class="mx-auto text-center">
             <v-avatar>
-              <img :src="user.icon">
+              <v-img :src="user.icon" />
             </v-avatar>
             <v-card-title>{{user.display_name}}</v-card-title>
           </div>

@@ -4,7 +4,7 @@
       color="primary"
       dark
   >
-    <v-toolbar-title>
+    <v-toolbar-title @click="moveTo('Home')">
       SFC21 Project Sharing Port
     </v-toolbar-title>
 
@@ -15,7 +15,7 @@
     <template
       v-if="logined"
     >
-      <UserMenu v-on:logout="logout" :user="user" class="mr-5 mt-4" />
+      <UserMenu v-on:logout="logout" :user="user" class="mr-10 mt-4" />
     </template>
     <template
       v-else
@@ -26,18 +26,6 @@
       >
         Login
       </v-btn>
-    </template>
-
-    <template v-slot:extension>
-      <v-tabs>
-        <v-tab
-          v-for="(page, i) in navPages"
-          @click="moveTo(page.link)"
-          :key="i"
-        >
-          {{page.name}}
-        </v-tab>
-      </v-tabs>
     </template>
   </v-app-bar>
 </template>
@@ -50,13 +38,6 @@ import SearchBar from "@/components/Navigation/NavigationBar/SearchBar";
 export default {
   name: "NavigationBar",
   components: {SearchBar, UserMenu},
-  data(){
-    return{
-      navPages: [
-        {name: "Home", link: "Home"}
-      ]
-    }
-  },
   methods: {
     moveTo(pageName){
       this.$router.push({name: pageName});
