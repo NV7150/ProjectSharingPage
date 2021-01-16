@@ -6,6 +6,7 @@ import Login from "../views/Login";
 import User from "../views/User";
 import Chat from "../views/Chat";
 import NotFound from "@/views/NotFound";
+import Search from "@/views/Search";
 
 Vue.use(VueRouter)
 
@@ -39,6 +40,11 @@ const routes = [
     path: '/404',
     name: '404',
     component: NotFound
+  },
+  {
+    path: '/search/:keyword',
+    name: 'Search',
+    component: Search
   }
 ]
 

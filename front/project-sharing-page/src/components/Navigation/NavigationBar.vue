@@ -7,11 +7,15 @@
     <v-toolbar-title>
       SFC21 Project Sharing Port
     </v-toolbar-title>
+
+    <SearchBar class="mt-7 ml-4" />
+
     <v-spacer></v-spacer>
+
     <template
       v-if="logined"
     >
-      <UserMenu v-on:logout="logout" :user="user"></UserMenu>
+      <UserMenu v-on:logout="logout" :user="user" class="mr-5 mt-4" />
     </template>
     <template
       v-else
@@ -41,10 +45,11 @@
 <script>
 import UserMenu from "./NavigationBar/UserMenu";
 import axios from "axios";
+import SearchBar from "@/components/Navigation/NavigationBar/SearchBar";
 
 export default {
   name: "NavigationBar",
-  components: {UserMenu},
+  components: {SearchBar, UserMenu},
   data(){
     return{
       navPages: [
