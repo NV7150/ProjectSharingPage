@@ -338,12 +338,18 @@ async def upload_usericon(
     # save icon url to database
     url = f'/userapi/usericon/{filename}.{ext}'
     user_id = db.Token.get_userid(token)
+    old_icon: Optional[str] = None
     with db.session_scope() as s:
         u: Optional[db.User] = s.query(db.User).get(user_id)
         if u is None:
             # user is missing
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        old_icon = u.icon.split('/')[-1]
         u.icon = url
         s.commit()
+
+    old_icon_full = f'/usericon/{old_icon}' if old_icon is not None else None
+    if old_icon_full:
+        os.remove(old_icon_full)
 
     return url
