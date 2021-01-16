@@ -1,5 +1,9 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
+from fastapi import File, UploadFile
+import uuid
+import os
+
 import db
 import schema
 from utils import user
@@ -171,6 +175,77 @@ async def delete_project(id: int, token: Optional[str] = Cookie(None)):
 
         p.is_active = False
         s.commit()
+
+
+# Project Background Image
+
+@app.post(
+    '/projectapi/projectimage/{id:int}',
+    status_code=status.HTTP_201_CREATED,
+    description='Upload project image',
+    responses={
+        status.HTTP_201_CREATED: {
+            'description': 'Uploaded',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'description': 'Wrong filetype',
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Token required',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'Admin required',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Project not found.'
+        },
+    },
+)
+async def upload_image(
+    id: int,
+    file: UploadFile = File(...),
+    token: Optional[str] = Cookie(None),
+):
+    # auth
+    if None in [token, username := user.auth(token)]:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    # check userlevel
+    with db.session_scope() as s:
+        p: Optional[db.Project] = s.query(db.Project).get(id)
+        if p is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+        # check userlevel
+        if username not in [adu.username for adu in p.admin_users]:
+            raise HTTPException(status.HTTP_403_FORBIDDEN)
+
+        content_type = file.content_type
+        if content_type not in ['image/png', 'image/jpeg']:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                'file should be image/png or image/jpeg',
+            )
+
+        data = file.file.read()
+        file.file.close()
+        ext = file.filename.split('.')[-1]
+        filename = str(uuid.uuid4())
+        while os.path.exists(f'/projectimage/{filename}.{ext}'):
+            filename = str(uuid.uuid4())
+        full_filename = f'/projectimage/{filename}.{ext}'
+
+        with open(full_filename, 'wb') as f:
+            f.write(data)
+
+        # delete previous image
+        if os.path.exists(p.bg_image):
+            os.remove(p.bg_image)
+
+        p.bg_image = f'/projectapi/projectimage/{filename}.{ext}'
+        s.commit()
+
+        return p.bg_image
 
 
 # Like

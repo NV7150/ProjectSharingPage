@@ -33,6 +33,7 @@ services:
             DB_ECHO: "True"
         volumes: 
             - ./projectapi:/code
+            - projectimagemedia:/projectimage
     
     chatapi:
         build:
@@ -102,6 +103,8 @@ volumes:
     usericonmedia:
         driver: "local"
     projectpgdata:
+        driver: "local"
+    projectimagemedia:
         driver: "local"
     chatpgdata:
         driver: "local"
