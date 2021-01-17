@@ -3,7 +3,7 @@
     <v-row>
       <v-col>
         <v-card class="pa-3">
-          <InfoEdit :project="project" />
+          <ProjectInfoEdit :project="project" />
         </v-card>
       </v-col>
     </v-row>

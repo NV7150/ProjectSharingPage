@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import PlaceHolder from "../../../assets/img/PlaceHolder.png";
+import PlaceHolder from "@/assets/img/PlaceHolder.png";
 
 export default {
   name: "UserMenu",
@@ -63,28 +63,35 @@ export default {
     }
   },
   data(){
-    let _this = this;
     return{
       menuItems: [
         {
           name: "Profile",
           func: () => {
-            _this.$router.push({
+            this.$router.push({
               name:'UserPage',
               params: {
-                userName: _this.user.username
+                userName: this.user.username
               }
             });
             this.$router.go({path: this.$router.currentRoute.path, force: true});
           }
         },
         {
+          name: "Edit",
+          func: () =>{
+            this.$router.push({
+              name: "UserEdit"
+            });
+          }
+        },
+        {
           name: "Logout",
           func: () => {
-            _this.$emit('logout');
+            this.$emit('logout');
           }
         }
-      ]
+      ],
     }
   }
 }

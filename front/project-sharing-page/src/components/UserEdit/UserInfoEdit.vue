@@ -7,10 +7,10 @@
           :rules="{required: true, max:10}"
       >
         <v-text-field
-            v-model="newProject.title"
+            v-model="newUser.display_name"
             :counter="10"
             :error-messages="errors"
-            label="タイトル"
+            label="表示名"
             required
             class="mb-3"
         />
@@ -18,30 +18,14 @@
 
       <validation-provider
           v-slot="{ errors }"
-          name="about"
-          :rules="{required: true, max:60}"
-      >
-        <v-text-field
-            name="about"
-            v-model="newProject.subtitle"
-            :counter="60"
-            :error-messages="errors"
-            label="概要"
-            required
-            class="mb-3"
-        />
-      </validation-provider>
-
-      <validation-provider
-          v-slot="{ errors }"
-          name="description"
+          name="bio"
           :rules="{required: true, max:500}"
       >
         <v-textarea
-            v-model="newProject.description"
+            v-model="newUser.bio"
             :counter="500"
             :error-messages="errors"
-            label="説明"
+            label="プロフィール"
             required
             class="mb-3"
         />
@@ -56,8 +40,8 @@
 </template>
 
 <script>
-import _ from "lodash"
 
+import _ from "lodash"
 import { required, max, regex  } from 'vee-validate/dist/rules'
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate'
 
@@ -67,28 +51,28 @@ extend("required", {...required, message: '必須項目です'});
 extend("regex", {...regex, message: '不正な入力内容です'});
 extend("max", {...max, message: '文字数は{length}までです'});
 
+
 export default {
-  name: "InfoEdit",
-  components : {ValidationObserver, ValidationProvider},
+  name: "UserInfoEdit",
+  components: {ValidationObserver, ValidationProvider},
+
   props: {
-    project : {type:Object}
+    user : {type: Object}
+  },
+  data(){
+    return{
+      newUser : {}
+    }
   },
 
-  data() {
-    return {
-      newProject: {}
-    };
-  },
-
-  methods: {
+  methods : {
     submit(){
       this.$refs.observer.validate();
     }
   },
 
   created() {
-    this.newProject = _.cloneDeep(this.project);
-
+    this.newUser = _.cloneDeep(this.user);
   }
 }
 </script>

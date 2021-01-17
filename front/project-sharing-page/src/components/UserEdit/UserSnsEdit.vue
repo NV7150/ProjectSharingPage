@@ -36,12 +36,12 @@
 
     <div class="d-flex flex-row flex-wrap pa-3">
       <div
-          v-for="(name, i) in Object.keys(newProject.sns)"
+          v-for="(name, i) in Object.keys(newUser.sns)"
           :key="i"
       >
         <v-chip
             close
-            v-if="newProject.sns[name]"
+            v-if="newUser.sns[name]"
             @click:close="remove(name)"
             class="mr-2 mb-4"
         >
@@ -54,44 +54,42 @@
 
 <script>
 import _ from "lodash"
-
-import { required, max, regex} from 'vee-validate/dist/rules'
-import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
+import { required, max, regex  } from 'vee-validate/dist/rules'
+import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate'
 import SnsConstants from "@/assets/scripts/SnsConstants";
 
-setInteractionMode('eager')
+setInteractionMode('eager');
 
-extend("required", required);
-extend("regex", regex);
-extend("max", max);
+extend("required", {...required, message: '必須項目です'});
+extend("regex", {...regex, message: '不正な入力内容です'});
+extend("max", {...max, message: '文字数は{length}までです'});
 
 export default {
-  name: "SnsEdit",
-  components : {ValidationProvider, ValidationObserver},
+  name: "UserSnsEdit",
+  components: {ValidationObserver, ValidationProvider},
 
-  props : {
-    project: {type:Object}
+  props: {
+    user : {type: Object}
   },
-
   data(){
     return {
+      newUser : {},
+      keysDict : [],
       selectingSns : "Twitter",
-      selectingLink : "",
-      keysDict : {},
-      newProject: {}
+      selectingLink : ""
     }
   },
 
   methods : {
     send(){
-      this.newProject.sns[this.keysDict[this.selectingSns]] = this.selectingLink;
+      this.newUser.sns[this.keysDict[this.selectingSns]] = this.selectingLink;
       //TODO:送信
     },
     submit(){
       this.$refs.observer.validate();
     },
     remove(name){
-      this.newProject.sns[name] = "";
+      this.newUser.sns[name] = "";
     }
   },
 
@@ -118,7 +116,7 @@ export default {
     for(let i = 0; i < keys.length; i++){
       this.keysDict[SnsConstants.sns[keys[i]].display] = keys[i];
     }
-    this.newProject = _.cloneDeep(this.project);
+    this.newUser = _.cloneDeep(this.user);
   }
 }
 </script>

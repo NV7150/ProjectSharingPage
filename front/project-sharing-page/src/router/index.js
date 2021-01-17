@@ -7,6 +7,7 @@ import User from "../views/User";
 import Chat from "../views/Chat";
 import NotFound from "@/views/NotFound";
 import Search from "@/views/Search";
+import UserEdit from "@/views/UserEdit";
 
 Vue.use(VueRouter)
 
@@ -35,6 +36,11 @@ const routes = [
     path: '/user/:userName',
     name: 'UserPage',
     component: User
+  },
+  {
+    path: '/user/edit',
+    name: 'UserEdit',
+    component: UserEdit
   },
   {
     path: '/404',
