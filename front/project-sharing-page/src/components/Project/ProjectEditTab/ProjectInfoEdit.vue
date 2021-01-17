@@ -57,7 +57,6 @@
 
 <script>
 import _ from "lodash"
-
 import { required, max, regex  } from 'vee-validate/dist/rules'
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate'
 
@@ -88,7 +87,6 @@ export default {
 
   created() {
     this.newProject = _.cloneDeep(this.project);
-
   }
 }
 </script>

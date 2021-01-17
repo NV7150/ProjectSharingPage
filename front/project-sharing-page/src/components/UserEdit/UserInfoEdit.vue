@@ -31,7 +31,7 @@
         />
       </validation-provider>
 
-      <v-btn type="submit" :disabled="invalid">
+      <v-btn type="submit" :disabled="invalid" @click="send">
         Send
       </v-btn>
 
@@ -40,10 +40,9 @@
 </template>
 
 <script>
-
-import _ from "lodash"
-import { required, max, regex  } from 'vee-validate/dist/rules'
-import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate'
+import axios from "axios";
+import { required, max, regex  } from 'vee-validate/dist/rules';
+import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate';
 
 setInteractionMode('eager');
 
@@ -57,22 +56,46 @@ export default {
   components: {ValidationObserver, ValidationProvider},
 
   props: {
-    user : {type: Object}
+    user : {type: Object},
+    loadingStateUpdated : {type: Function}
   },
   data(){
     return{
-      newUser : {}
+      newUser : {},
+      isLoading : false
     }
   },
 
   methods : {
     submit(){
       this.$refs.observer.validate();
+    },
+    send(){
+      axios.interceptors.request.use(request => {
+        console.log('Starting Request: ', request)
+        return request
+      });
+      this.isLoading = true;
+      console.log(JSON.stringify(this.newUser));
+      axios
+          .patch("/userapi/user?json_data=" + JSON.stringify(this.newUser))
+          .then(() => {
+            this.isLoading = false;
+          });
+    }
+  },
+
+  watch: {
+    isLoading : function() {
+      this.loadingStateUpdated(this.isLoading);
     }
   },
 
   created() {
-    this.newUser = _.cloneDeep(this.user);
+    this.newUser =  {
+      "display_name" : this.user.display_name,
+      "bio" : this.user.bio
+    }
   }
 }
 </script>

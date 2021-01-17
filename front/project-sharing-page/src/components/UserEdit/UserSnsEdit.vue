@@ -53,10 +53,11 @@
 </template>
 
 <script>
-import _ from "lodash"
-import { required, max, regex  } from 'vee-validate/dist/rules'
-import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate'
+import axios from "axios";
+import { required, max, regex  } from 'vee-validate/dist/rules';
+import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate';
 import SnsConstants from "@/assets/scripts/SnsConstants";
+
 
 setInteractionMode('eager');
 
@@ -69,27 +70,42 @@ export default {
   components: {ValidationObserver, ValidationProvider},
 
   props: {
-    user : {type: Object}
+    user : {type: Object},
+    loadingStateUpdated: {type: Function}
   },
   data(){
     return {
       newUser : {},
       keysDict : [],
       selectingSns : "Twitter",
-      selectingLink : ""
+      selectingLink : "",
+      isLoading : false
     }
   },
 
   methods : {
     send(){
       this.newUser.sns[this.keysDict[this.selectingSns]] = this.selectingLink;
-      //TODO:送信
+
+      this.isLoading = true;
+      axios
+          .patch("/userapi/user", {"json_data" : JSON.stringify(this.newUser)})
+          .then(() => {
+            this.isLoading = false;
+          });
     },
     submit(){
       this.$refs.observer.validate();
     },
     remove(name){
       this.newUser.sns[name] = "";
+
+      this.isLoading = true;
+      axios
+          .patch("/userapi/user", {"json_data" : JSON.stringify(this.newUser)})
+          .then(() => {
+            this.isLoading = false;
+          });
     }
   },
 
@@ -111,12 +127,20 @@ export default {
     }
   },
 
+  watch: {
+    isLoading : function() {
+      this.loadingStateUpdated(this.isLoading);
+    }
+  },
+
   created() {
     let keys = Object.keys(SnsConstants.sns);
     for(let i = 0; i < keys.length; i++){
       this.keysDict[SnsConstants.sns[keys[i]].display] = keys[i];
     }
-    this.newUser = _.cloneDeep(this.user);
+    this.newUser = {
+      "sns" : this.user.sns
+    }
   }
 }
 </script>

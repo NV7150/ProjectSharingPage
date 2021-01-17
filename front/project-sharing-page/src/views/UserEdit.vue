@@ -4,16 +4,40 @@
     <v-container v-if="$store.getters['getUser']">
       <v-row>
         <v-col>
-          <v-card class="pa-3">
-            <UserInfoEdit :user="$store.getters['getUser']" />
+          <v-card class="pa-3" :loading="isLoadingInfo">
+            <template slot="progress">
+              <v-progress-linear
+                  color="deep-purple"
+                  height="10"
+                  indeterminate
+              >
+              </v-progress-linear>
+            </template>
+
+            <UserInfoEdit
+                :user="$store.getters['getUser']"
+                :loading-state-updated="updateInfo"
+            />
           </v-card>
         </v-col>
       </v-row>
 
       <v-row>
         <v-col>
-          <v-card class="pa-3">
-            <UserSnsEdit :user="$store.getters['getUser']" />
+          <v-card class="pa-3" :loading="isLoadingSns">
+            <template slot="progress">
+              <v-progress-linear
+                  color="deep-purple"
+                  height="10"
+                  indeterminate
+              >
+              </v-progress-linear>
+            </template>
+
+            <UserSnsEdit
+                :user="$store.getters['getUser']"
+                :loading-state-updated="updateSns"
+            />
           </v-card>
         </v-col>
       </v-row>
@@ -29,9 +53,23 @@ import UserSnsEdit from "@/components/UserEdit/UserSnsEdit";
 export default {
   name: "UserEdit",
   components: {UserSnsEdit, UserInfoEdit, NavigationBar},
+  data(){
+    return {
+      isLoadingInfo: false,
+      isLoadingSns : false
+    };
+  },
   created() {
     if(!this.$store.getters["getUser"])
       this.$router.push({name: "404"});
+  },
+  methods: {
+    updateInfo(status){
+      this.isLoadingInfo = status;
+    },
+    updateSns(status){
+      this.isLoadingSns = status;
+    }
   }
 }
 </script>
