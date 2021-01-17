@@ -82,8 +82,16 @@ async def create_user(c_user: schema.UserCreate):
 
 @app.patch(
     '/userapi/user',
-    description='Update User',
+    summary='Update User',
     status_code=status.HTTP_200_OK,
+    description="""
+    changable_fields = ['display_name', 'bio', 'email', 'sns', 'skilltags']
+    changable_sns_fields = [
+        'twitter', 'instagram', 'github', 'youtube',
+        'vimeo', 'facebook', 'tiktok', 'linkedin',
+        'wantedly', 'url',
+    ]
+    """,
     responses={
         status.HTTP_200_OK: {
             'model': schema.User,
