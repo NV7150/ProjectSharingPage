@@ -11,7 +11,7 @@
     <v-row>
       <v-col>
         <v-card class="pa-3">
-          <SnsEdit :project="project" />
+          <ProjectSnsEdit :project="project" />
         </v-card>
       </v-col>
     </v-row>
@@ -20,12 +20,12 @@
 </template>
 
 <script>
-import SnsEdit from "@/components/Project/ProjectEditTab/SnsEdit";
-import InfoEdit from "@/components/Project/ProjectEditTab/InfoEdit";
+import ProjectSnsEdit from "@/components/Project/ProjectEditTab/ProjectSnsEdit";
+import ProjectInfoEdit from "@/components/Project/ProjectEditTab/ProjectInfoEdit";
 
 export default {
   name: "ProjectEditTab",
-  components: {InfoEdit, SnsEdit},
+  components: {ProjectInfoEdit, ProjectSnsEdit},
   props: {
     project : {type: Object}
   },
