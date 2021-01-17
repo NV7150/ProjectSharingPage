@@ -138,24 +138,27 @@ class User(BaseModel):
 
 
 class UserUpdate():
+    changable_fields = ['display_name', 'bio', 'email', 'sns', 'skilltags']
+    changable_sns_fields = [
+        'twitter', 'instagram', 'github', 'youtube',
+        'vimeo', 'facebook', 'tiktok', 'linkedin',
+        'wantedly', 'url',
+    ]
+
     def __init__(self, userid: int, json):
         parsed_json: Dict = dict(json)
         # field check
-        field_list = ['display_name', 'bio', 'email', 'sns', 'skilltags']
-        if len([x for x in parsed_json.keys() if x not in field_list]) > 0:
+        cf = self.changable_fields
+        if len([x for x in parsed_json.keys() if x not in cf]) > 0:
             raise ValueError('Unnecessary filed(s) included')
 
         # sns field check
         if 'sns' in parsed_json.keys():
-            field_list = [
-                'twitter', 'instagram', 'github', 'youtube',
-                'vimeo', 'facebook', 'tiktok', 'linkedin',
-                'wantedly', 'url',
-            ]
             if (sns := parsed_json['sns']) is not None:
                 if type(sns) != dict:
                     raise ValueError('"sns" should be object')
-                if len([x for x in sns.keys() if x not in field_list]) > 0:
+                cf = self.changable_sns_fields
+                if len([x for x in sns.keys() if x not in cf]) > 0:
                     raise ValueError(
                         'Unnecessary filed(s) included at sns field'
                     )
