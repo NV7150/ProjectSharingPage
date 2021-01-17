@@ -1,5 +1,10 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
+from fastapi import File, UploadFile
+from fastapi.responses import FileResponse
+import uuid
+import os
+
 import db
 import schema
 from utils import user
@@ -171,6 +176,98 @@ async def delete_project(id: int, token: Optional[str] = Cookie(None)):
 
         p.is_active = False
         s.commit()
+
+
+# Project Background Image
+
+@app.get(
+    '/projectapi/projectimage/{filename:str}',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful response.',
+            'content': {'image/*': {}},
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Not found',
+        },
+    },
+)
+async def get_projectimage(filename: str):
+    fullpath = f'/projectimage/{filename}'
+    if not os.path.exists(fullpath):
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return FileResponse(fullpath)
+
+
+@app.post(
+    '/projectapi/projectimage/{id:int}',
+    status_code=status.HTTP_201_CREATED,
+    description='Upload project image',
+    responses={
+        status.HTTP_201_CREATED: {
+            'description': 'Uploaded',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'description': 'Wrong filetype',
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Token required',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'Admin required',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Project not found.'
+        },
+    },
+)
+async def upload_image(
+    id: int,
+    file: UploadFile = File(...),
+    token: Optional[str] = Cookie(None),
+):
+    # auth
+    if None in [token, username := user.auth(token)]:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    # check userlevel
+    with db.session_scope() as s:
+        p: Optional[db.Project] = s.query(db.Project).get(id)
+        if p is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+        # check userlevel
+        if username not in [adu.username for adu in p.admin_users]:
+            raise HTTPException(status.HTTP_403_FORBIDDEN)
+
+        content_type = file.content_type
+        if content_type not in ['image/png', 'image/jpeg']:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                'file should be image/png or image/jpeg',
+            )
+
+        data = file.file.read()
+        file.file.close()
+        ext = file.filename.split('.')[-1]
+        filename = str(uuid.uuid4())
+        while os.path.exists(f'/projectimage/{filename}.{ext}'):
+            filename = str(uuid.uuid4())
+        full_filename = f'/projectimage/{filename}.{ext}'
+
+        with open(full_filename, 'wb') as f:
+            f.write(data)
+
+        # delete previous image
+        if os.path.exists(p.bg_image):
+            os.remove(p.bg_image)
+
+        p.bg_image = f'/projectapi/projectimage/{filename}.{ext}'
+        s.commit()
+
+        return p.bg_image
 
 
 # Like
@@ -384,6 +481,27 @@ async def join_member(
         s.commit()
 
 
+# Search
+@app.get(
+    '/projectapi/project/search',
+    description='Search Project',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.ProjectSearchResult,
+            'description':
+                'Successful Response (sorted by levenshtein distance)',
+        },
+    },
+)
+async def search_project(
+    title: str,
+    limit: int,
+    offset: int,
+):
+    return schema.ProjectSearchResult.search(title, limit, offset)
+
+
 # User
 @app.get(
     '/projectapi/project/{username:str}',
@@ -409,24 +527,3 @@ async def projects_of_user(username: str):
             for pu in proj_list
             if pu.project.is_active
         ]
-
-
-# Search
-@app.get(
-    '/projectapi/project/search/',
-    description='Search Project',
-    status_code=status.HTTP_200_OK,
-    responses={
-        status.HTTP_200_OK: {
-            'model': schema.ProjectSearchResult,
-            'description':
-                'Successful Response (sorted by levenshtein distance)',
-        },
-    },
-)
-async def search_project(
-    title: str,
-    limit: int,
-    offset: int,
-):
-    return schema.ProjectSearchResult.search(title, limit, offset)
