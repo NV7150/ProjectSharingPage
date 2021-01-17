@@ -89,7 +89,7 @@ export default {
 
       this.isLoading = true;
       axios
-          .patch("/userapi/user", {"json_data" : JSON.stringify(this.newUser)})
+          .patch("/userapi/user?json_data=" + JSON.stringify(this.newUser))
           .then(() => {
             this.isLoading = false;
           });
@@ -102,7 +102,7 @@ export default {
 
       this.isLoading = true;
       axios
-          .patch("/userapi/user", {"json_data" : JSON.stringify(this.newUser)})
+          .patch("/userapi/user?json_data=" + JSON.stringify(this.newUser))
           .then(() => {
             this.isLoading = false;
           });

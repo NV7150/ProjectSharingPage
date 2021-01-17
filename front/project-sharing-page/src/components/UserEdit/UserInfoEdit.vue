@@ -76,7 +76,7 @@ export default {
         return request
       });
       this.isLoading = true;
-      console.log(JSON.stringify(this.newUser));
+
       axios
           .patch("/userapi/user?json_data=" + JSON.stringify(this.newUser))
           .then(() => {
