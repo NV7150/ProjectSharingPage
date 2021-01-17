@@ -5,6 +5,9 @@ from fastapi import File, UploadFile
 from fastapi import Cookie
 import uuid
 import os
+import traceback
+
+from pydantic.types import Json
 
 import db
 import schema
@@ -75,6 +78,53 @@ async def create_user(c_user: schema.UserCreate):
         raise HTTPException(status.HTTP_400_BAD_REQUEST)
 
     return user
+
+
+@app.patch(
+    '/userapi/user',
+    description='Update User',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.User,
+            'description': 'Updated user info',
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Token was broken.'
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'User not found.'
+        },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            'description': 'Wrong request (Unprocessable entity)',
+        },
+    },
+)
+async def update_user(json_data: Json, token: Optional[str] = Cookie(None)):
+    # auth
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if db.Token.get_token(token) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    userid = db.Token.get_userid(token)
+    if userid is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        userupdate = schema.UserUpdate(userid, json_data)
+    except ValueError as e:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            traceback.format_exception_only(type(e), e)  # ValueError Message
+        )
+
+    result = userupdate.update()
+    if result is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return result
 
 
 @app.post(
