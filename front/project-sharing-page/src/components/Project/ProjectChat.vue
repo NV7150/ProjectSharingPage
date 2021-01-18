@@ -95,7 +95,7 @@
 <script>
 import axios from "axios";
 import ChatDestList from "./ProjectChat/ChatDestList";
-import ChatSettings from "../../../assets/scripts/ProjectPageConstants";
+import ChatSettings from "../../assets/scripts/ProjectPageConstants";
 import ChatWindow from "./ProjectChat/ChatWindow";
 import ChatInput from "./ProjectChat/ChatInput";
 

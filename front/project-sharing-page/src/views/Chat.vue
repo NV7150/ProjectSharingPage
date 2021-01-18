@@ -52,8 +52,8 @@
 import axios from "axios";
 
 import NavigationBar from "../components/Navigation/NavigationBar";
-import ChatWindow from "../components/Project/ProjectChatTab/ProjectChat/ChatWindow";
-import ChatInput from "../components/Project/ProjectChatTab/ProjectChat/ChatInput";
+import ChatWindow from "../components/Project/ProjectChat/ChatWindow";
+import ChatInput from "../components/Project/ProjectChat/ChatInput";
 
 export default {
   name: "Chat",

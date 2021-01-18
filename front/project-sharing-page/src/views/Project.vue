@@ -63,7 +63,7 @@
 import axios from "axios";
 import NavigationBar from "../components/Navigation/NavigationBar";
 import ProjectProfileTab from "../components/Project/ProjectProfileTab";
-import ProjectChat from "../components/Project/ProjectChatTab/ProjectChat";
+import ProjectChat from "../components/Project/ProjectChat";
 import ProjectTop from "../components/Project/ProjectTop";
 import ProjectEditTab from "@/components/Project/ProjectEditTab";
 
