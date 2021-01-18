@@ -20,7 +20,17 @@ const routes = [
   {
     path: '/project/:projectId',
     name: 'Project',
-    component: Project
+    component: Project,
+    props: (route) => {
+      let tab = (Number)((!isNaN(route.query.tab)) ? route.query.tab : 0);
+      let channel = (Number)((!isNaN(route.query.channel)) ? route.query.channel : -1);
+      let thread = (Number)((!isNaN(route.query.thread)) ? route.query.thread : -1);
+      return{
+        initTab: tab ,
+        initChannel : channel,
+        initThread : thread
+      }
+    }
   },
   {
     path: '/project/:projectId/chat/:threadId',

@@ -89,7 +89,7 @@ export default {
     toProjectPage() {
       this.$router.push({
         name:'Project',
-        params: { projectId: this.project.id }
+        params: { projectId: this.project.id, tab: 0 }
       })
     }
   },

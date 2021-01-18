@@ -101,7 +101,14 @@ import ChatInput from "./ProjectChat/ChatInput";
 
 export default {
   name: "ProjectChat",
-  props:["project"],
+  props:{
+    project : {Type: Object, required : true},
+    channelSelected : {Type: Function},
+    channelId : {Type: Number, default: -1},
+    threadSelected: {Type:Function},
+    threadId : {Type: Number, default: -1},
+    selectReset: {Type:Function}
+  },
   components: {ChatWindow, ChatDestList, ChatInput},
   data(){
     return{
@@ -119,28 +126,51 @@ export default {
     selectChannel(channel){
       this.selectingChannel = channel;
       this.window = 1;
+      this.loadThread();
 
-      this.isLoadingThreads = true;
-      axios
-          .get('/chatapi/thread/project/' + this.project.id + '/' + this.selectingChannel.send)
-          .then((response) => {
-            this.isLoadingThreads = false;
-            this.threads = response.data;
-            this.threadObjects = this.getThreads();
-          })
-          .catch(() => {
-            this.isLoadingThreads = false;
-            this.threads = [];
-          });
+      this.channelSelected(this.selectingChannel.id);
     },
+
+    loadThread(){
+      return new Promise((resolve, reject) => {
+        this.isLoadingThreads = true;
+        axios
+            .get('/chatapi/thread/project/' + this.project.id + '/' + this.selectingChannel.send)
+            .then((response) => {
+              this.isLoadingThreads = false;
+              this.threads = response.data;
+              this.threadObjects = this.getThreads();
+              resolve();
+            })
+            .catch(() => {
+              this.isLoadingThreads = false;
+              this.threads = [];
+              reject();
+            });
+      });
+    },
+
     selectThread(thread){
       this.selectingThread = thread;
       this.window = 2;
+
+      this.threadSelected(this.selectingChannel.id, this.selectingThread.id);
     },
     back(){
       this.window--;
       if(this.window < 0){
         this.window = 0;
+      }
+      switch (this.window){
+        case 0:
+          this.selectReset();
+          break;
+        case 1:
+          this.channelSelected(this.selectingChannel.id);
+          break;
+        default:
+          this.selectReset();
+          break;
       }
     },
     goToPage(){
@@ -165,10 +195,46 @@ export default {
       }
       return threadObjects;
     },
+
     changeLoadingMessage(next){
       this.isLoadingMessages = next;
+    },
+
+    checkThread(){
+      if(this.threadId !== -1){
+        let threads = this.getThreads();
+        for(let threadKey in threads){
+          if(!Object.prototype.hasOwnProperty.call(threads, threadKey))
+            continue;
+
+          let thread = threads[threadKey];
+          if(thread.id === this.threadId){
+            this.selectingThread = thread;
+            this.window = 2;
+            break;
+          }
+        }
+      }
+    },
+
+    checkInit(){
+      if(this.channelId !== -1){
+        for(let channelKey in this.channels){
+          if(!Object.prototype.hasOwnProperty.call(this.channels, channelKey))
+            continue;
+
+          let channel = this.channels[channelKey];
+          if(channel.id === this.channelId){
+            this.selectingChannel = channel;
+            this.loadThread().then(() => {this.checkThread();});
+            this.window = 1;
+            break;
+          }
+        }
+      }
     }
   },
+
   computed: {
     toolbarText(){
       switch (this.window){
@@ -179,6 +245,10 @@ export default {
       }
       return "";
     }
+  },
+
+  created() {
+    this.checkInit();
   }
 }
 </script>
