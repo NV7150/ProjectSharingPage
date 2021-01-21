@@ -41,6 +41,24 @@
           </v-card>
         </v-col>
       </v-row>
+
+      <v-row>
+        <v-col>
+          <v-card :loading="isLoadingIcon" class="pa-3">
+            <template slot="progress">
+              <v-progress-linear
+                  color="deep-purple"
+                  height="10"
+                  indeterminate
+              >
+              </v-progress-linear>
+            </template>
+            <UserIconEdit
+                :on-load-state-changed="updateIcon"
+            />
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
   </v-main>
 </template>
@@ -49,14 +67,16 @@
 import NavigationBar from "@/components/Navigation/NavigationBar";
 import UserInfoEdit from "@/components/UserEdit/UserInfoEdit";
 import UserSnsEdit from "@/components/UserEdit/UserSnsEdit";
+import UserIconEdit from "@/components/UserEdit/UserIconEdit";
 
 export default {
   name: "UserEdit",
-  components: {UserSnsEdit, UserInfoEdit, NavigationBar},
+  components: {UserIconEdit, UserSnsEdit, UserInfoEdit, NavigationBar},
   data(){
     return {
       isLoadingInfo: false,
-      isLoadingSns : false
+      isLoadingSns : false,
+      isLoadingIcon : false
     };
   },
   created() {
@@ -69,6 +89,9 @@ export default {
     },
     updateSns(status){
       this.isLoadingSns = status;
+    },
+    updateIcon(status){
+      this.isLoadingIcon = status;
     }
   }
 }
