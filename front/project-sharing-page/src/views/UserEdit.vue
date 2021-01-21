@@ -81,7 +81,7 @@ export default {
   },
   created() {
     if(!this.$store.getters["getUser"])
-      this.$router.push({name: "404"});
+      this.$router.push({name: "Home"});
   },
   methods: {
     updateInfo(status){

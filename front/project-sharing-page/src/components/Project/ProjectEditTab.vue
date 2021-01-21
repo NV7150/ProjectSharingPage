@@ -16,32 +16,46 @@
       </v-col>
     </v-row>
 
+    <v-row>
+      <v-col>
+        <v-card class="pa-3" :loading="isImgLoading">
+          <template slot="progress">
+            <v-progress-linear
+                color="deep-purple"
+                height="10"
+                indeterminate
+            >
+            </v-progress-linear>
+          </template>
+          <ProjectImgEdit :project="project" :on-load-state-changed="updateLoadState" />
+        </v-card>
+      </v-col>
+    </v-row>
+
   </v-container>
 </template>
 
 <script>
 import ProjectSnsEdit from "@/components/Project/ProjectEditTab/ProjectSnsEdit";
 import ProjectInfoEdit from "@/components/Project/ProjectEditTab/ProjectInfoEdit";
+import ProjectImgEdit from "@/components/Project/ProjectEditTab/ProjectImgEdit";
 
 export default {
   name: "ProjectEditTab",
-  components: {ProjectInfoEdit, ProjectSnsEdit},
+  components: {ProjectImgEdit, ProjectInfoEdit, ProjectSnsEdit},
   props: {
     project : {type: Object}
   },
-  // data() {
-  //   return {
-  //     project: {
-  //       title: "",
-  //       subtitle: "",
-  //       description: "",
-  //       sns: {
-  //         twitter: "",
-  //         facebook: ""
-  //       }
-  //     }
-  //   }
-  // }
+  data(){
+    return{
+      isImgLoading : false
+    };
+  },
+  methods: {
+    updateLoadState(state){
+      this.isImgLoading = state;
+    }
+  }
 }
 </script>
 
