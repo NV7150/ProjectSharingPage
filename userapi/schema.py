@@ -64,6 +64,18 @@ class SkillTag(BaseModel):
 
             return SkillTag.from_db(t)
 
+    @staticmethod
+    def get_list(limit: Optional[int], offset: Optional[int]) -> List:
+        with db.session_scope() as s:
+            q = s.query(db.SkillTag)
+            if offset is not None:
+                q = q.offset(offset)
+            if limit is not None:
+                q = q.limit(limit)
+            q = q.all()
+
+            return list(map(SkillTag.from_db, q))
+
 
 class SkillTagCreate(BaseModel):
     name: str
