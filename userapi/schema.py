@@ -65,6 +65,61 @@ class SkillTag(BaseModel):
             return SkillTag.from_db(t)
 
 
+class SkillTagLookup(BaseModel):
+    result: List[SkillTag]
+    is_next: bool
+
+    @classmethod
+    def get_list(
+        cls, limit: Optional[int], offset: Optional[int]
+    ):
+        with db.session_scope() as s:
+            q = s.query(db.SkillTag)
+            count = q.count()
+            if offset is not None:
+                q = q.offset(offset)
+            if limit is not None:
+                q = q.limit(limit)
+
+            s_count = q.count()
+            if offset is not None:
+                s_count += offset
+
+            print(f'COUNT: {count}, S_COUNT: {s_count}, {count > s_count }')
+            q = q.all()
+
+            ins = cls(
+                result=list(map(SkillTag.from_db, q)),
+                is_next=count > s_count
+            )
+            return ins
+
+    @classmethod
+    def search(
+        cls, keyword: str, limit: Optional[int], offset: Optional[int]
+    ):
+        with db.session_scope() as s:
+            q = s.query(db.SkillTag).filter(
+                db.SkillTag.name.like(f'%{keyword}%')
+            )
+            count = q.count()
+            if offset is not None:
+                q = q.offset(offset)
+            if limit is not None:
+                q = q.limit(limit)
+            s_count = q.count()
+            if offset is not None:
+                s_count += offset
+
+            q = q.all()
+
+            ins = cls(
+                result=list(map(SkillTag.from_db, q)),
+                is_next=count > s_count
+            )
+            return ins
+
+
 class SkillTagCreate(BaseModel):
     name: str
     parent_id: Optional[int]

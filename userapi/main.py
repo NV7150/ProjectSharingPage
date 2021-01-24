@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from fastapi import FastAPI, HTTPException, status, Response
 from fastapi.responses import FileResponse
 from fastapi import File, UploadFile
@@ -340,6 +340,45 @@ async def get_skilltag(id: int):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     return t
+
+
+@app.get(
+    '/userapi/skilltag/list',
+    description='Skilltag list',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.SkillTagLookup
+        }
+    }
+)
+async def skilltag_list(
+    limit: Optional[int] = None, offset: Optional[int] = None
+):
+    return schema.SkillTagLookup.get_list(limit, offset)
+
+
+@app.get(
+    '/userapi/skilltag/search',
+    description='Search Skilltag',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful response',
+            'model': List[schema.SkillTag],
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Not found',
+        },
+    },
+)
+async def search_skilltag(
+    keyword: str,
+    limit: Optional[int] = None, offset: Optional[int] = None,
+):
+    return schema.SkillTagLookup.search(
+        keyword, limit, offset
+    )
 
 
 # User Icon
