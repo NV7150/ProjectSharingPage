@@ -59,6 +59,15 @@
           </v-card>
         </v-col>
       </v-row>
+
+      <v-row>
+        <v-col>
+          <v-card class="pa-3">
+            <UserTagEdit />
+          </v-card>
+        </v-col>
+      </v-row>
+
     </v-container>
   </v-main>
 </template>
@@ -68,10 +77,11 @@ import NavigationBar from "@/components/Navigation/NavigationBar";
 import UserInfoEdit from "@/components/UserEdit/UserInfoEdit";
 import UserSnsEdit from "@/components/UserEdit/UserSnsEdit";
 import UserIconEdit from "@/components/UserEdit/UserIconEdit";
+import UserTagEdit from "@/components/UserEdit/UserTagEdit";
 
 export default {
   name: "UserEdit",
-  components: {UserIconEdit, UserSnsEdit, UserInfoEdit, NavigationBar},
+  components: {UserTagEdit, UserIconEdit, UserSnsEdit, UserInfoEdit, NavigationBar},
   data(){
     return {
       isLoadingInfo: false,
