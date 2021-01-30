@@ -12,7 +12,7 @@
           v-on="on"
       />
     </template>
-    <v-card :loading="isSearching || isSending">
+    <v-card :loading="isSearching || isSending" v-show="searchResult.length > 0">
       <v-list>
         <v-list-item
             v-for="(item, i) in searchResult"
@@ -28,6 +28,8 @@
 
 <script>
 import axios from "axios";
+
+const CREATE_NEW = 0;
 
 export default {
   name: "UserTagEdit",
@@ -52,7 +54,15 @@ export default {
         .get("/userapi/skilltag/search", {params: {"keyword" : this.tagName}})
         .then((response) => {
           this.searchResult = response.data.result;
-          console.log(this.searchResult);
+          let isFounded = false;
+          for(let i = 0; i < this.searchResult.length; i++){
+            if(this.searchResult[i].name === this.tagName){
+              isFounded = true;
+              break;
+            }
+          }
+          if(!isFounded)
+            this.searchResult.push({name: this.tagName, id: CREATE_NEW});
           this.isSearching = false;
         })
         .catch(() => {
@@ -60,20 +70,62 @@ export default {
           alert("ERROR!");
         })
     },
+
     selectTag(tagIndex){
-      this.nowTags.push(this.searchResult[tagIndex].id);
-      let newUser = {
-        "skilltags" : this.nowTags
-      };
-      this.isSending = true;
-      axios
-          .patch("/userapi/user?json_data=" + JSON.stringify(newUser))
+      if(this.isSending || this.isSearching)
+        return;
+
+      if(tagIndex === CREATE_NEW){
+        this.newTag();
+      }else{
+        this.editTag(this.searchResult[tagIndex].id);
+      }
+    },
+    editTag(tagId){
+      return new Promise( (resolve, reject) => {
+        this.nowTags.push(tagId);
+        let newUser = {
+          "skilltags" : this.nowTags
+        };
+        this.isSending = true;
+        axios
+            .patch("/userapi/user?json_data=" + JSON.stringify(newUser))
+            .then(() => {
+              this.isSending = false;
+              resolve();
+            })
+            .catch(() => {
+              reject();
+            });
+      });
+
+    },
+    newTag(){
+      let newId = 0;
+      let createTagDel = () => {
+        return new Promise((resolve, reject) => {
+          axios
+              .post("/userapi/skilltag", {"name": this.tagName})
+              .then((response) => {
+                newId = response.data.id;
+                resolve();
+              })
+              .catch(() => {
+                reject();
+              });
+        });
+      }
+      Promise
+          .resolve()
+          .then(createTagDel)
           .then(() => {
-            this.isSending = false;
+            return new Promise((resolve, reject) => {
+              this.editTag(newId).then(() => {resolve();}).catch(() => {reject();});
+            });
           })
           .catch(() => {
             //TODO:エラー処理
-            alert("ERROR");
+            alert("ERROR!")
           })
     }
   },
