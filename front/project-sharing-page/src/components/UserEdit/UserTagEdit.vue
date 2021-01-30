@@ -31,12 +31,17 @@ import axios from "axios";
 
 export default {
   name: "UserTagEdit",
+  props: {
+    user : {type: Object}
+  },
+
   data(){
     return{
       tagName : "",
       searchResult : [],
       isSearching : false,
-      isSending : false
+      isSending : false,
+      nowTags : []
     };
   },
   methods: {
@@ -55,12 +60,14 @@ export default {
           alert("ERROR!");
         })
     },
-    selectTag(tag){
-      let data = new FormData();
-      data.append("skilltags", [tag]);
+    selectTag(tagIndex){
+      this.nowTags.push(this.searchResult[tagIndex].id);
+      let newUser = {
+        "skilltags" : this.nowTags
+      };
       this.isSending = true;
       axios
-          .patch("/userapi/user", data)
+          .patch("/userapi/user?json_data=" + JSON.stringify(newUser))
           .then(() => {
             this.isSending = false;
           })
@@ -69,8 +76,15 @@ export default {
             alert("ERROR");
           })
     }
-  }
+  },
 
+  created() {
+   this.nowTags = [];
+   let tags = this.user.skilltags;
+   for(let i = 0; i < tags.length; i++){
+     this.nowTags.push(tags[i].id);
+   }
+  }
 }
 </script>
 

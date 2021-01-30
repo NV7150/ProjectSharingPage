@@ -63,7 +63,7 @@
       <v-row>
         <v-col>
           <v-card class="pa-3">
-            <UserTagEdit />
+            <UserTagEdit :user="$store.getters['getUser']" />
           </v-card>
         </v-col>
       </v-row>
