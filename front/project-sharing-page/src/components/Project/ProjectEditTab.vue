@@ -32,6 +32,14 @@
       </v-col>
     </v-row>
 
+    <v-row>
+      <v-col>
+        <v-card class="pa-3">
+          <ProjectTagEdit :project="project" />
+        </v-card>
+      </v-col>
+    </v-row>
+
   </v-container>
 </template>
 
@@ -39,10 +47,11 @@
 import ProjectSnsEdit from "@/components/Project/ProjectEditTab/ProjectSnsEdit";
 import ProjectInfoEdit from "@/components/Project/ProjectEditTab/ProjectInfoEdit";
 import ProjectImgEdit from "@/components/Project/ProjectEditTab/ProjectImgEdit";
+import ProjectTagEdit from "@/components/Project/ProjectEditTab/ProjectTagEdit";
 
 export default {
   name: "ProjectEditTab",
-  components: {ProjectImgEdit, ProjectInfoEdit, ProjectSnsEdit},
+  components: {ProjectTagEdit, ProjectImgEdit, ProjectInfoEdit, ProjectSnsEdit},
   props: {
     project : {type: Object}
   },

@@ -81,11 +81,9 @@ export default {
       }
     },
     newTag(){
-      let newId = 0;
       axios
           .post("/userapi/skilltag", {"name": this.tagName})
           .then((response) => {
-            newId = response.data.id;
             this.tagSelected(response.data.id);
           })
           .catch(() => {
