@@ -6,7 +6,7 @@
 
 <script>
 import TagRegister from "@/components/Bases/Edit/TagRegister";
-import axios from "axios";
+// import axios from "axios";
 
 export default {
   name: "ProjectTagEdit",
@@ -23,12 +23,13 @@ export default {
 
   methods: {
     editProject(tagId){
-      if(this.nowTags.indexOf(tagId) !== -1)
-        return;
-      this.nowTags.push(tagId);
-      let newProject = {
-        "skilltags": this.nowTags
-      };
+      console.log(tagId);
+      // if(this.nowTags.indexOf(tagId) !== -1)
+      //   return;
+      // this.nowTags.push(tagId);
+      // let newProject = {
+      //   "skilltags": this.nowTags
+      // };
 
       // this.isLoading = true;
       // axios
