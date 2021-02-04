@@ -63,43 +63,7 @@ class Project(BaseModel):
         )
 
 
-# class ProjectUpdate(BaseModel):
-#     id: int
-#     title: str
-#     subtitle: Optional[str]
-#     bg_image: Optional[str]
-#     description: str
-#     sns: Sns
-#     skilltags: List[int]
-
-#     def update(self) -> Optional[Project]:
-#         with db.session_scope() as s:
-#             p = db.Project.get(s, self.id)
-#             if p is None:
-#                 return None
-
-#             p.title = self.title
-#             p.subtitle = self.subtitle
-#             p.bg_image = self.bg_image
-#             p.description = self.description
-#             p.skilltags = self.skilltags
-#             p.twitter = self.sns.twitter
-#             p.instagram = self.sns.instagram
-#             p.github = self.sns.github
-#             p.youtube = self.sns.youtube
-#             p.vimeo = self.sns.vimeo
-#             p.facebook = self.sns.facebook
-#             p.tiktok = self.sns.tiktok
-#             p.linkedin = self.sns.linkedin
-#             p.wantedly = self.sns.wantedly
-#             p.url = self.sns.url
-
-#             s.commit()
-#             return Project.from_db(p)
-
-
 class ProjectUpdate():
-    # TODO: memberもupdate(join)できるように
     changable_fields = ['title', 'subtitle', 'bg_image', 'description',
                         'sns', 'skilltags']
     changable_sns_fields = [
