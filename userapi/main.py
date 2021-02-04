@@ -1,6 +1,14 @@
-from typing import Optional
+from typing import Optional, List
 from fastapi import FastAPI, HTTPException, status, Response
+from fastapi.responses import FileResponse
+from fastapi import File, UploadFile
 from fastapi import Cookie
+import uuid
+import os
+import traceback
+
+from pydantic.types import Json
+
 import db
 import schema
 
@@ -70,6 +78,57 @@ async def create_user(c_user: schema.UserCreate):
         raise HTTPException(status.HTTP_400_BAD_REQUEST)
 
     return user
+
+
+@app.patch(
+    '/userapi/user',
+    summary='Update User',
+    status_code=status.HTTP_200_OK,
+    description=f"""Update user\n
+    changable_fields = {schema.UserUpdate.changable_fields}\n
+    changable_sns_fields = {schema.UserUpdate.changable_sns_fields}\n
+    """,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.User,
+            'description': 'Updated user info',
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Token was broken.'
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'User not found.'
+        },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            'description': 'Wrong request (Unprocessable entity)',
+        },
+    },
+)
+async def update_user(json_data: Json, token: Optional[str] = Cookie(None)):
+    # auth
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if db.Token.get_token(token) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    userid = db.Token.get_userid(token)
+    if userid is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        userupdate = schema.UserUpdate(userid, json_data)
+    except ValueError as e:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            traceback.format_exception_only(type(e), e)  # ValueError Message
+        )
+
+    result = userupdate.update()
+    if result is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return result
 
 
 @app.post(
@@ -277,3 +336,137 @@ async def get_skilltag(id: int):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     return t
+
+
+@app.get(
+    '/userapi/skilltag/list',
+    description='Skilltag list',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': schema.SkillTagLookup
+        }
+    }
+)
+async def skilltag_list(
+    limit: Optional[int] = None, offset: Optional[int] = None
+):
+    return schema.SkillTagLookup.get_list(limit, offset)
+
+
+@app.get(
+    '/userapi/skilltag/search',
+    description='Search Skilltag',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful response',
+            'model': List[schema.SkillTag],
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Not found',
+        },
+    },
+)
+async def search_skilltag(
+    keyword: str,
+    limit: Optional[int] = None, offset: Optional[int] = None,
+):
+    return schema.SkillTagLookup.search(
+        keyword, limit, offset
+    )
+
+
+# User Icon
+
+@app.get(
+    '/userapi/usericon/{filename:str}',
+    description='Get User-icon',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Image',
+            'content': {'image/*': {}},
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Not found'
+        }
+    }
+)
+async def get_usericon(filename: str):
+    full_filepath = f'/usericon/{filename}'
+    if not os.path.exists(full_filepath):
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return FileResponse(f'/usericon/{filename}')
+
+
+@app.post(
+    '/userapi/usericon',
+    description='Upload User-icon',
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_201_CREATED: {
+            'model': str,
+            'description': 'Successful response (Icon URL)',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'token is required',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'description': 'Wrong Request'
+        }
+    },
+)
+async def upload_usericon(
+    file: Optional[UploadFile] = File(None),
+    token: Optional[str] = Cookie(None)
+):
+    # auth
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if schema.LoginUser.from_token(token) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if file is None:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST)
+
+    # mime check
+    if file.content_type not in ['image/jpeg', 'image/png']:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            'File should be image/jpeg or image/png',
+        )
+
+    data: bytes = file.file.read()
+    ext = file.filename.split('.')[-1]
+    filename = str(uuid.uuid4())
+    file.file.close()
+
+    # while filename exists, re-generate filename
+    while os.path.exists(f'/usericon/{filename}.{ext}'):
+        filename = str(uuid.uuid4())
+
+    # save icon
+    full_filename = f'/usericon/{filename}.{ext}'
+    with open(full_filename, 'wb') as f:
+        f.write(data)
+
+    # save icon url to database
+    url = f'/userapi/usericon/{filename}.{ext}'
+    user_id = db.Token.get_userid(token)
+    old_icon: Optional[str] = None
+    with db.session_scope() as s:
+        u: Optional[db.User] = s.query(db.User).get(user_id)
+        if u is None:
+            # user is missing
+            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        old_icon = u.icon.split('/')[-1]
+        u.icon = url
+        s.commit()
+
+    old_icon_full = f'/usericon/{old_icon}' if old_icon is not None else None
+    if old_icon_full and os.path.exists(old_icon_full):
+        os.remove(old_icon_full)
+
+    return url

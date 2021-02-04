@@ -1,6 +1,6 @@
 import enum
 from pydantic import BaseModel
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict
 import db
 from functools import lru_cache
 
@@ -63,6 +63,61 @@ class SkillTag(BaseModel):
                 return None
 
             return SkillTag.from_db(t)
+
+
+class SkillTagLookup(BaseModel):
+    result: List[SkillTag]
+    is_next: bool
+
+    @classmethod
+    def get_list(
+        cls, limit: Optional[int], offset: Optional[int]
+    ):
+        with db.session_scope() as s:
+            q = s.query(db.SkillTag)
+            count = q.count()
+            if offset is not None:
+                q = q.offset(offset)
+            if limit is not None:
+                q = q.limit(limit)
+
+            s_count = q.count()
+            if offset is not None:
+                s_count += offset
+
+            print(f'COUNT: {count}, S_COUNT: {s_count}, {count > s_count }')
+            q = q.all()
+
+            ins = cls(
+                result=list(map(SkillTag.from_db, q)),
+                is_next=count > s_count
+            )
+            return ins
+
+    @classmethod
+    def search(
+        cls, keyword: str, limit: Optional[int], offset: Optional[int]
+    ):
+        with db.session_scope() as s:
+            q = s.query(db.SkillTag).filter(
+                db.SkillTag.name.like(f'%{keyword}%')
+            )
+            count = q.count()
+            if offset is not None:
+                q = q.offset(offset)
+            if limit is not None:
+                q = q.limit(limit)
+            s_count = q.count()
+            if offset is not None:
+                s_count += offset
+
+            q = q.all()
+
+            ins = cls(
+                result=list(map(SkillTag.from_db, q)),
+                is_next=count > s_count
+            )
+            return ins
 
 
 class SkillTagCreate(BaseModel):
@@ -135,6 +190,100 @@ class User(BaseModel):
             sns=sns,
             skilltags=skilltags
         )
+
+
+class UserUpdate():
+    changable_fields = ['display_name', 'bio', 'email', 'sns', 'skilltags']
+    changable_sns_fields = [
+        'twitter', 'instagram', 'github', 'youtube',
+        'vimeo', 'facebook', 'tiktok', 'linkedin',
+        'wantedly', 'url',
+    ]
+
+    def __init__(self, userid: int, json):
+        parsed_json: Dict = dict(json)
+        # field check
+        cf = self.changable_fields
+        if len([x for x in parsed_json.keys() if x not in cf]) > 0:
+            raise ValueError('Unnecessary filed(s) included')
+
+        # sns field check
+        if 'sns' in parsed_json.keys():
+            if (sns := parsed_json['sns']) is not None:
+                if type(sns) != dict:
+                    raise ValueError('"sns" should be object')
+                cf = self.changable_sns_fields
+                if len([x for x in sns.keys() if x not in cf]) > 0:
+                    raise ValueError(
+                        'Unnecessary filed(s) included at sns field'
+                    )
+
+        # skilltags field check
+        if 'skilltags' in parsed_json.keys():
+            if (skilltags := parsed_json['skilltags']) is not None:
+                if type(skilltags) != list:
+                    raise ValueError('"skilltags" should be list')
+                if len([x for x in skilltags if type(x) != int]) > 0:
+                    raise ValueError('"skilltags" should be int list')
+
+        self.userid = userid
+        self.parsed_json = parsed_json
+
+    def update(self) -> Optional[User]:
+        with db.session_scope() as s:
+            u: Optional[db.User] = s.query(db.User).get(self.userid)
+            if u is None:
+                return None
+
+            update_ = {
+                'display_name': 'u.display_name = v',
+                'email': 'u.email = v',
+                'bio': 'u.bio = v',
+            }
+            sns_ = {
+                'twitter': 'u.twitter = sv',
+                'instagram': 'u.instagram = sv',
+                'github': 'u.github = sv',
+                'youtube': 'u.youtube = sv',
+                'vimeo': 'u.vimeo = sv',
+                'facebook': 'u.facebook = sv',
+                'tiktok': 'u.tiktok = sv',
+                'linkedin': 'u.linkedin = sv',
+                'wantedly': 'u.wantedly = sv',
+                'url': 'u.url = sv',
+            }
+            for k, v in self.parsed_json.items():
+                if k == 'sns':
+                    if v is None:
+                        u.twitter = None
+                        u.instagram = None
+                        u.github = None
+                        u.youtube = None
+                        u.vimeo = None
+                        u.facebook = None
+                        u.tiktok = None
+                        u.linkedin = None
+                        u.wantedly = None
+                        u.url = None
+                    else:
+                        for sk, sv in v.items():
+                            exec(sns_[sk])
+                elif k == 'skilltags':
+                    if v is None:
+                        u.skilltags = []
+                    else:
+                        u.skilltags = []
+                        for i in map(int, v):
+                            t = s.query(db.SkillTag).get(i)
+                            if t is None:
+                                return None
+                            u.skilltags.append(t)
+                else:
+                    exec(update_[k])
+
+            s.commit()
+
+            return User.from_db(u)
 
 
 class UserSearchResult(BaseModel):

@@ -1,2 +1,4 @@
 env/
+lenv/
+
 __pycache__/
