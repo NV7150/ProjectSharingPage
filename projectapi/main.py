@@ -1,5 +1,6 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
+from pydantic.types import Json
 from fastapi import File, UploadFile
 from fastapi.responses import FileResponse
 import uuid
@@ -89,8 +90,11 @@ async def create_project(
 
 
 @app.patch(
-    '/projectapi/project',
-    description='Update project',
+    '/projectapi/project/{id:int}',
+    description=f"""Update project\n
+    changable_fields = {schema.ProjectUpdate.changable_fields}\n
+    changable_sns_fields = {schema.ProjectUpdate.changable_sns_fields}\n
+    """,
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_200_OK: {
@@ -103,10 +107,14 @@ async def create_project(
         status.HTTP_401_UNAUTHORIZED: {
             'description': 'not logged in',
         },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            'description': 'Value error'
+        }
     },
 )
 async def update_project(
-    project_update: schema.ProjectUpdate,
+    id: int,
+    update_fields: Json,
     token: Optional[str] = Cookie(None),
 ):
     # Permission (admin only)
@@ -117,7 +125,7 @@ async def update_project(
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     with db.session_scope() as s:
-        p = db.Project.get(s, project_update.id)
+        p = db.Project.get(s, id)
         if p is None:
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND,
@@ -126,17 +134,15 @@ async def update_project(
         if username not in [au.username for au in p.admin_users]:
             raise HTTPException(status.HTTP_403_FORBIDDEN)
 
-    # tag check
-    if False in [user.tag_exist(t) for t in project_update.skilltags]:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            'SkillTag not found',
-        )
-
     # Update
-    result = project_update.update()
-    if result is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    try:
+        project_update = schema.ProjectUpdate(id, update_fields)
+        result = project_update.update()
+    except ValueError as e:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            str(e),
+        )
 
     return result
 

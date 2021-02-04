@@ -84,13 +84,9 @@ async def create_user(c_user: schema.UserCreate):
     '/userapi/user',
     summary='Update User',
     status_code=status.HTTP_200_OK,
-    description="""
-    changable_fields = ['display_name', 'bio', 'email', 'sns', 'skilltags']
-    changable_sns_fields = [
-        'twitter', 'instagram', 'github', 'youtube',
-        'vimeo', 'facebook', 'tiktok', 'linkedin',
-        'wantedly', 'url',
-    ]
+    description=f"""Update user\n
+    changable_fields = {schema.UserUpdate.changable_fields}\n
+    changable_sns_fields = {schema.UserUpdate.changable_sns_fields}\n
     """,
     responses={
         status.HTTP_200_OK: {
