@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 import db
 from utils.func import levenshtein_distance
+from utils import user
 from sqlalchemy import func
-from typing import Optional, List
+from typing import Optional, List, Dict
 import enum
 
 
@@ -62,36 +63,136 @@ class Project(BaseModel):
         )
 
 
-class ProjectUpdate(BaseModel):
-    id: int
-    title: str
-    subtitle: Optional[str]
-    bg_image: Optional[str]
-    description: str
-    sns: Sns
-    skilltags: List[int]
+# class ProjectUpdate(BaseModel):
+#     id: int
+#     title: str
+#     subtitle: Optional[str]
+#     bg_image: Optional[str]
+#     description: str
+#     sns: Sns
+#     skilltags: List[int]
 
-    def update(self) -> Optional[Project]:
+#     def update(self) -> Optional[Project]:
+#         with db.session_scope() as s:
+#             p = db.Project.get(s, self.id)
+#             if p is None:
+#                 return None
+
+#             p.title = self.title
+#             p.subtitle = self.subtitle
+#             p.bg_image = self.bg_image
+#             p.description = self.description
+#             p.skilltags = self.skilltags
+#             p.twitter = self.sns.twitter
+#             p.instagram = self.sns.instagram
+#             p.github = self.sns.github
+#             p.youtube = self.sns.youtube
+#             p.vimeo = self.sns.vimeo
+#             p.facebook = self.sns.facebook
+#             p.tiktok = self.sns.tiktok
+#             p.linkedin = self.sns.linkedin
+#             p.wantedly = self.sns.wantedly
+#             p.url = self.sns.url
+
+#             s.commit()
+#             return Project.from_db(p)
+
+
+class ProjectUpdate():
+    # TODO: memberもupdate(join)できるように
+    changable_fields = ['title', 'subtitle', 'bg_image', 'description',
+                        'sns', 'skilltags']
+    changable_sns_fields = [
+        'twitter', 'instagram', 'github', 'youtube',
+        'vimeo', 'facebook', 'tiktok', 'linkedin',
+        'wantedly', 'url',
+    ]
+
+    def __init__(self, projectid: int, json) -> None:
+        parsed_json: Dict = dict(json)
+
+        # field check
+        cf = self.changable_fields
+        if len([x for x in parsed_json.keys() if x not in cf]) > 0:
+            raise ValueError('Unnecessary field(s) included')
+
+        # sns field check
+        if 'sns' in parsed_json.keys():
+            if (sns := parsed_json['sns']) is not None:
+                if type(sns) != dict:
+                    raise ValueError('\'sns\' should be object')
+                csf = self.changable_sns_fields
+                if len([x for x in sns.keys() if x not in csf]) > 0:
+                    raise ValueError(
+                        'Unnecessary field(s) included at sns field'
+                    )
+
+        # skilltag field check
+        if 'skilltags' in parsed_json.keys():
+            if (skilltags := parsed_json['skilltags']) is not None:
+                if type(skilltags) != list:
+                    raise ValueError('\'skilltags\' should be list')
+                if len([x for x in skilltags if type(x) != int]) > 0:
+                    raise ValueError('\'skilltags should be int list\'')
+
+        self.projectid = projectid
+        self.parsed_json = parsed_json
+
+    def update(self) -> Project:
         with db.session_scope() as s:
-            p = db.Project.get(s, self.id)
+            p: Optional[db.Project] = s.query(db.Project).get(self.projectid)
             if p is None:
-                return None
+                raise ValueError('Project not found')
 
-            p.title = self.title
-            p.subtitle = self.subtitle
-            p.bg_image = self.bg_image
-            p.description = self.description
-            p.skilltags = self.skilltags
-            p.twitter = self.sns.twitter
-            p.instagram = self.sns.instagram
-            p.github = self.sns.github
-            p.youtube = self.sns.youtube
-            p.vimeo = self.sns.vimeo
-            p.facebook = self.sns.facebook
-            p.tiktok = self.sns.tiktok
-            p.linkedin = self.sns.linkedin
-            p.wantedly = self.sns.wantedly
-            p.url = self.sns.url
+            update_ = {
+                'title': 'p.title = v',
+                'subtitle': 'p.subtitle = v',
+                'bg_image': 'p.bg_image = v',
+                'description': 'p.description = v',
+            }
+            sns_ = {
+                'twitter': 'p.twitter = sv',
+                'instagram': 'p.instagram = sv',
+                'github': 'p.github = sv',
+                'youtube': 'p.youtube = sv',
+                'vimeo': 'p.vimeo = sv',
+                'facebook': 'p.facebook = sv',
+                'tiktok': 'p.tiktok = sv',
+                'linkedin': 'p.linkedin = sv',
+                'wantedly': 'p.wantedly = sv',
+                'url': 'p.url = sv',
+            }
+
+            for k, v in self.parsed_json.items():
+                if k == 'sns':
+                    if v is None:
+                        p.twitter = None
+                        p.instagram = None
+                        p.github = None
+                        p.youtube = None
+                        p.vimeo = None
+                        p.facebook = None
+                        p.tiktok = None
+                        p.linkedin = None
+                        p.wantedly = None
+                        p.url = None
+                    else:
+                        for sk, sv in v.items():
+                            exec(sns_[sk])
+
+                elif k == 'skilltags':
+                    if v is None:
+                        p.skilltags = []
+                    else:
+                        p.skilltags = []
+                        for i in map(int, v):
+                            if not user.tag_exist(i):
+                                raise ValueError('tag not found')
+                            skilltags = p.skilltags
+                            skilltags.append(i)
+                            p.skilltags = skilltags
+                else:
+                    exec(update_[k])
 
             s.commit()
             return Project.from_db(p)
