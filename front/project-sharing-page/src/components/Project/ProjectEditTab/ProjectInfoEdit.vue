@@ -47,7 +47,7 @@
         />
       </validation-provider>
 
-      <v-btn type="submit" :disabled="invalid">
+      <v-btn type="submit" :disabled="invalid" @click="send">
         Send
       </v-btn>
 
@@ -56,9 +56,9 @@
 </template>
 
 <script>
-import _ from "lodash"
 import { required, max, regex  } from 'vee-validate/dist/rules'
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate'
+import axios from "axios";
 
 setInteractionMode('eager');
 
@@ -70,23 +70,47 @@ export default {
   name: "ProjectInfoEdit",
   components : {ValidationObserver, ValidationProvider},
   props: {
-    project : {type:Object}
+    project : {type:Object},
+    loadingStateUpdated: {type:Function}
   },
 
   data() {
     return {
-      newProject: {}
+      newProject: {},
+      isLoading: false
     };
   },
 
   methods: {
     submit(){
       this.$refs.observer.validate();
+    },
+
+    send(){
+      this.isLoading = true;
+      axios
+          .patch("/projectapi/project/" + this.project.id + "?update_fields=" + JSON.stringify(this.newProject))
+          .then(() => {
+            this.isLoading = false;
+          })
+          .catch(() => {
+            //TODO:エラー処理
+          })
     }
   },
 
   created() {
-    this.newProject = _.cloneDeep(this.project);
+    this.newProject = {
+      "title": this.project.title,
+      "subtitle": this.project.subtitle,
+      "description": this.project.description
+    };
+  },
+
+  watch: {
+    isLoading: function (){
+      this.loadingStateUpdated(this.isLoading);
+    }
   }
 }
 </script>

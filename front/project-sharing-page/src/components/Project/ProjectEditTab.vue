@@ -2,8 +2,8 @@
   <v-container>
     <v-row>
       <v-col>
-        <v-card class="pa-3">
-          <ProjectInfoEdit :project="project" />
+        <v-card class="pa-3" :loading="isInfoLoading">
+          <ProjectInfoEdit :project="project" :loading-state-updated="updateInfoLoad" />
         </v-card>
       </v-col>
     </v-row>
@@ -27,7 +27,7 @@
             >
             </v-progress-linear>
           </template>
-          <ProjectImgEdit :project="project" :on-load-state-changed="updateLoadState" />
+          <ProjectImgEdit :project="project" :on-load-state-changed="updateImgLoad" />
         </v-card>
       </v-col>
     </v-row>
@@ -57,12 +57,16 @@ export default {
   },
   data(){
     return{
-      isImgLoading : false
+      isImgLoading : false,
+      isInfoLoading : false
     };
   },
   methods: {
-    updateLoadState(state){
+    updateImgLoad(state){
       this.isImgLoading = state;
+    },
+    updateInfoLoad(state){
+      this.isInfoLoading = state;
     }
   }
 }
