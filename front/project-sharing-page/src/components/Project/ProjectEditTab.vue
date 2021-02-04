@@ -10,8 +10,8 @@
 
     <v-row>
       <v-col>
-        <v-card class="pa-3">
-          <ProjectSnsEdit :project="project" />
+        <v-card class="pa-3" :loading="isSnsLoading">
+          <ProjectSnsEdit :project="project" :loading-state-updated="updateSnsLoad" />
         </v-card>
       </v-col>
     </v-row>
@@ -58,7 +58,8 @@ export default {
   data(){
     return{
       isImgLoading : false,
-      isInfoLoading : false
+      isInfoLoading : false,
+      isSnsLoading : false
     };
   },
   methods: {
@@ -67,6 +68,9 @@ export default {
     },
     updateInfoLoad(state){
       this.isInfoLoading = state;
+    },
+    updateSnsLoad(state){
+      this.isSnsLoading = state;
     }
   }
 }

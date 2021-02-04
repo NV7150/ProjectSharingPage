@@ -53,11 +53,11 @@
 </template>
 
 <script>
-import _ from "lodash"
 
 import { required, max, regex} from 'vee-validate/dist/rules'
 import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
 import SnsConstants from "@/assets/scripts/SnsConstants";
+import axios from "axios";
 
 setInteractionMode('eager')
 
@@ -70,7 +70,8 @@ export default {
   components : {ValidationProvider, ValidationObserver},
 
   props : {
-    project: {type:Object}
+    project: {type:Object},
+    loadingStateUpdated: {type:Function}
   },
 
   data(){
@@ -78,20 +79,38 @@ export default {
       selectingSns : "Twitter",
       selectingLink : "",
       keysDict : {},
-      newProject: {}
+      newProject: {},
+      isLoading: false
     }
   },
 
   methods : {
     send(){
       this.newProject.sns[this.keysDict[this.selectingSns]] = this.selectingLink;
-      //TODO:送信
+      this.isLoading = true;
+      axios
+          .patch("/projectapi/project/" + this.project.id + "?update_fields=" + JSON.stringify(this.newProject))
+          .then(() => {
+            this.isLoading = false;
+          })
+          .catch(() => {
+            //TODO:エラー処理
+          });
     },
     submit(){
       this.$refs.observer.validate();
     },
     remove(name){
       this.newProject.sns[name] = "";
+      this.isLoading = true;
+      axios
+          .patch("/projectapi/project/" + this.project.id + "?update_fields=" + JSON.stringify(this.newProject))
+          .then(() => {
+            this.isLoading = false;
+          })
+          .catch(() => {
+            //TODO:エラー処理
+          });
     }
   },
 
@@ -118,7 +137,15 @@ export default {
     for(let i = 0; i < keys.length; i++){
       this.keysDict[SnsConstants.sns[keys[i]].display] = keys[i];
     }
-    this.newProject = _.cloneDeep(this.project);
+    this.newProject = {
+      "sns": this.project.sns
+    }
+  },
+
+  watch: {
+    isLoading: function (){
+      this.loadingStateUpdated(this.isLoading);
+    }
   }
 }
 </script>
