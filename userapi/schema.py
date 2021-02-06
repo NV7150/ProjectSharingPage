@@ -1,6 +1,7 @@
 import enum
 from pydantic import BaseModel
 from typing import Optional, List, Any, Dict
+from fastapi import HTTPException, status
 import db
 from functools import lru_cache
 
@@ -126,6 +127,11 @@ class SkillTagCreate(BaseModel):
 
     def create(self) -> Optional[SkillTag]:
         with db.session_scope() as s:
+            # check name
+            exists = s.query(db.SkillTag).filter(db.SkillTag.name == self.name)
+            if exists.count() > 0:
+                raise HTTPException(status_code=status.HTTP_409_CONFLICT)
+
             parent = None
             if self.parent_id is not None:
                 parent = s.query(db.SkillTag).get(self.parent_id).id
