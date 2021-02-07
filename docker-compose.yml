@@ -43,13 +43,22 @@ services:
     recommendapi:
         build: recommendapi
         links:
-            - recommenddb
+            - recommendcache
+            - recommendengine
         depends_on:
-            - recommenddb
-        environment:
-            POSTGRES_USER: "postgres"
-            POSTGRES_PASSWORD: "pg_password"
-            DB_ECHO: "False"
+            - recommendengine
+    
+    recommendengine:
+        build: recommendengine
+        links:
+            - recommendcache
+        depends_on:
+            - recommendcache
+    
+    recommendcache:
+        image: redis
+        volumes:
+            - recommendcachedata
 
     caddy:
         image: caddy
@@ -111,5 +120,5 @@ volumes:
         driver: "local"
     chatpgdata:
         driver: "local"
-    recommendpgdata:
+    recommendcachedata:
         driver: "local"

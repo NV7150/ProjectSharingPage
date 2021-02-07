@@ -53,16 +53,25 @@ services:
     recommendapi:
         build: recommendapi
         links:
-            - recommenddb
+            - recommendcache
+            - recommendengine
         depends_on:
-            - recommenddb
-        environment:
-            POSTGRES_USER: "postgres"
-            POSTGRES_PASSWORD: "pg_password"
-            DB_ECHO: "False"
+            - recommendengine
         volumes: 
             - ./recommendapi:/code
     
+    recommendengine:
+        build: recommendengine
+        links:
+            - recommendcache
+        depends_on:
+            - recommendcache
+    
+    recommendcache:
+        image: redis
+        volumes:
+            - recommendcachedata
+
     caddy:
         image: caddy
         volumes:
@@ -110,15 +119,6 @@ services:
         ports:
           - 5434:5432  # Debug
     
-    recommenddb:
-        image: postgres
-        environment: 
-            POSTGRES_USER: "postgres"
-            POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
-        volumes:
-            - "recommendpgdata:/var/lib/postgresql/data"
-        ports:
-            - 5435:5432  # debug
 
 volumes: 
     userpgdata:
@@ -131,5 +131,5 @@ volumes:
         driver: "local"
     chatpgdata:
         driver: "local"
-    recommendpgdata:
+    recommendcachedata:
         driver: "local"
