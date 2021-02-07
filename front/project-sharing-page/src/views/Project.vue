@@ -176,7 +176,7 @@ export default {
       }else{
         this.tabs = 0;
       }
-    }
+    },
   },
 
   computed : {
@@ -226,7 +226,7 @@ export default {
       if(this.initTab === this.tabs)
         return;
 
-      if(this.tabs === 2){
+      if(this.tabs === 2 && this.$route.query.tab){
         this.$router.push({
           name: 'Project',
           params: {projectId: this.project.id}
@@ -234,11 +234,13 @@ export default {
         return;
       }
 
-      this.$router.push({
-        name: 'Project',
-        params: {projectId: this.project.id},
-        query: {tab: this.tabs}
-      });
+      if((Number)(this.$route.query.tab) !== this.tabs) {
+        this.$router.push({
+          name: 'Project',
+          params: {projectId: this.project.id},
+          query: {tab: this.tabs}
+        });
+      }
     }
   }
 }
