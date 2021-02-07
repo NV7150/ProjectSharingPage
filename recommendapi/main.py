@@ -2,6 +2,7 @@ from typing import Dict, Optional, List
 from fastapi import FastAPI, Cookie, HTTPException, status
 import requests
 import math
+import random
 
 
 app = FastAPI(
@@ -16,9 +17,6 @@ async def index():
 
 
 class Recommend(object):
-    # TODO: 1. 点数付け. ソート.
-    # TODO: 2. ランダムなプロジェクトを取ってくる. ランダムに挿入
-
     def __init__(self, token: str) -> None:
         self.token = token
         self.__get_user()  # get user
@@ -134,7 +132,7 @@ class Recommend(object):
     responses={
         status.HTTP_200_OK: {
             'model': List[int],
-            'description': 'Successful Response',
+            'description': 'Successful Response (list of project-id)',
         },
         status.HTTP_401_UNAUTHORIZED: {
             'description': 'Not logged in (cookie token is required)'
@@ -158,4 +156,19 @@ async def project(token: Optional[str] = Cookie(None)):
     sorted_projects = sorted(r.points.items(), key=lambda x: x[1],
                              reverse=True)
 
-    return [p_id for p_id, _ in sorted_projects]
+    result = []
+    for p_id, _ in sorted_projects:
+        # random project
+        if random.randint(0, 9) % 3 == 0:
+            resp = requests.get(
+                'http://projectapi:8000/projectapi/project/random'
+            )
+            if resp.status_code != 200:
+                raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            rand_id = resp.json()[0]
+            if rand_id not in [x for x, _ in sorted_projects]:
+                result.append(rand_id)
+
+        result.append(p_id)
+
+    return result

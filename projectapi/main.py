@@ -10,6 +10,7 @@ import os
 import db
 import schema
 from utils import user
+import random
 
 
 # Init db
@@ -205,6 +206,25 @@ async def get_project_with_tag(tags: Optional[List[int]] = Query(None)):
     with db.session_scope() as s:
         projects = db.Project.get_with_tag(s, tags)
         return [schema.Project.from_db(p) for p in projects]
+
+
+@app.get(
+    '/projectapi/project/random',
+    status_code=status.HTTP_200_OK,
+    description='Get random project id',
+    responses={
+        status.HTTP_200_OK: {
+            'model': int,
+            'description': 'Successful response (only project-id)',
+        },
+    },
+)
+async def get_random_project_id():
+    with db.session_scope() as s:
+        all_id = list(s.query(db.Project.id).all())
+        index = random.randint(0, len(all_id)-1)
+        id = all_id[index]
+        return id
 
 
 # Project Background Image
