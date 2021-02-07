@@ -64,6 +64,18 @@ class SkillTag(BaseModel):
 
             return SkillTag.from_db(t)
 
+    @staticmethod
+    def get_children(parent_id: int) -> Optional[List[Any]]:
+        with db.session_scope() as s:
+            p = s.query(db.SkillTag).get(parent_id)
+            if p is None:
+                return None
+
+            t_l = s.query(db.SkillTag).filter(
+                db.SkillTag.parent_id == p.id
+            )
+            return [SkillTag.from_db(t) for t in t_l]
+
 
 class SkillTagLookup(BaseModel):
     result: List[SkillTag]
