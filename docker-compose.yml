@@ -14,7 +14,7 @@ services:
             POSTGRES_PASSWORD: "pg_password"
             DB_ECHO: "False"
         volumes:
-            - useiconmedia:/usericon
+            - usericonmedia:/usericon
     
     projectapi:
         build: projectapi
@@ -39,7 +39,21 @@ services:
             POSTGRES_USER: "postgres"
             POSTGRES_PASSWORD: "pg_password"
             DB_ECHO: "False"
-    
+
+    recommendapi:
+        build: recommendapi
+        links:
+            - userapi
+            - projectapi
+            - recommendcache
+        depends_on:
+            - recommendcache
+
+    recommendcache:
+        image: redis
+        volumes:
+            - recommendcachedata
+
     caddy:
         image: caddy
         volumes:
@@ -81,7 +95,7 @@ services:
         volumes:
             - "chatpgdata:/var/lib/postgresql/data"
 
-        
+
 volumes: 
     userpgdata:
         driver: "local"
@@ -92,4 +106,6 @@ volumes:
     projectimagemedia:
         driver: "local"
     chatpgdata:
+        driver: "local"
+    recommendcachedata:
         driver: "local"

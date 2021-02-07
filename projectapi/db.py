@@ -182,3 +182,19 @@ class Project(Base):
             return None
 
         return p
+
+    @classmethod
+    def get_with_tag(cls, s: scoped_session, tags: List[int]) -> List:
+        projects: List[Project] = []
+        for t in tags:
+            maybe_projects: List[Project] = []
+            mp = s.query(cls).filter(
+                cls.__skilltags.like(f'%{t}%')
+            )
+            maybe_projects += list(mp)
+
+            for mp in maybe_projects:
+                if t in mp.skilltags:
+                    projects.append(mp)
+
+        return projects

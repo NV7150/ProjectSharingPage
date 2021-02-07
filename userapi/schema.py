@@ -65,6 +65,31 @@ class SkillTag(BaseModel):
 
             return SkillTag.from_db(t)
 
+    @staticmethod
+    def get_children(id: int) -> Optional[List[Any]]:
+        with db.session_scope() as s:
+            me = s.query(db.SkillTag).get(id)
+            if me is None:
+                return None
+
+            t_l = s.query(db.SkillTag).filter(
+                db.SkillTag.parent_id == me.id
+            )
+            return [SkillTag.from_db(t) for t in t_l]
+
+    @staticmethod
+    def get_bros(id: int) -> Optional[List[Any]]:
+        # 兄弟タグ: 自身のparent_idと、parent_idが一致するタグたちを探す
+        with db.session_scope() as s:
+            me = s.query(db.SkillTag).get(id)
+            if me is None:
+                return None
+
+            bros = s.query(db.SkillTag).filter(
+                db.SkillTag.parent_id == me.parent_id
+            )
+            return [SkillTag.from_db(b) for b in bros if b.id != me.id]
+
 
 class SkillTagLookup(BaseModel):
     result: List[SkillTag]

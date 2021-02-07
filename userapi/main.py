@@ -342,6 +342,50 @@ async def get_skilltag(id: int):
 
 
 @app.get(
+    '/userapi/skilltag/{id:int}/children',
+    description='Get child tags',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': List[schema.SkillTag],
+            'description': 'Successful response.',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'parent tag not found'
+        },
+    },
+)
+async def get_children(id: int):
+    children = schema.SkillTag.get_children(id)
+    if children is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return children
+
+
+@app.get(
+    '/userapi/skilltags/{id:int}/bros',
+    description='Get brother tags',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': List[schema.SkillTag],
+            'description': 'Successful response.',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'tag not found'
+        },
+    },
+)
+async def get_bros(id: int):
+    bros = schema.SkillTag.get_bros(id)
+    if bros is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return bros
+
+
+@app.get(
     '/userapi/skilltag/list',
     description='Skilltag list',
     status_code=status.HTTP_200_OK,

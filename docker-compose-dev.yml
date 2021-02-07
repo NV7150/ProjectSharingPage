@@ -49,7 +49,23 @@ services:
             DB_ECHO: "True"
         volumes: 
             - ./chatapi:/code
+
+    recommendapi:
+        build: recommendapi
+        links:
+            - userapi
+            - projectapi
+            - recommendcache
+        depends_on:
+            - recommendcache
+        volumes: 
+            - ./recommendapi:/code
     
+    recommendcache:
+        image: redis
+        volumes:
+            - recommendcachedata
+
     caddy:
         image: caddy
         volumes:
@@ -96,6 +112,7 @@ services:
             - "chatpgdata:/var/lib/postgresql/data"
         ports:
           - 5434:5432  # Debug
+    
 
 volumes: 
     userpgdata:
@@ -107,4 +124,6 @@ volumes:
     projectimagemedia:
         driver: "local"
     chatpgdata:
+        driver: "local"
+    recommendcachedata:
         driver: "local"
