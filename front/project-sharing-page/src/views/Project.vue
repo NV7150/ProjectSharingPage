@@ -80,6 +80,7 @@ export default {
       tabs : 0,
       project: {},
       members: [],
+      nonQuery : [0, 2],
 
       isProjectLoading : true
     }
@@ -226,15 +227,14 @@ export default {
       if(this.initTab === this.tabs)
         return;
 
-      if(this.tabs === 2 && this.$route.query.tab){
-        this.$router.push({
-          name: 'Project',
-          params: {projectId: this.project.id}
-        });
-        return;
-      }
-
-      if((Number)(this.$route.query.tab) !== this.tabs) {
+      if(this.nonQuery.indexOf(this.tabs) !== -1){
+        if(this.$route.query.tab && this.nonQuery.indexOf((Number)(this.$route.query.tab)) === -1) {
+          this.$router.push({
+            name: 'Project',
+            params: {projectId: this.project.id}
+          });
+        }
+      }else{
         this.$router.push({
           name: 'Project',
           params: {projectId: this.project.id},
