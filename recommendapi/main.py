@@ -2,6 +2,7 @@ from typing import Dict, Optional, List
 from fastapi import FastAPI, Cookie, HTTPException, status
 import requests
 import schema
+import math
 
 
 app = FastAPI(
@@ -43,6 +44,8 @@ class Recommend(object):
         self.child_tag_projects: List[Dict] = []
         self.bro_tag_projects: List[Dict] = []
 
+        self.points: Dict[int, int] = dict()  # k: project.id, v: point
+
     def gather_projects(self):
         pairs = [
             (self.tags, self.tag_projects),
@@ -59,6 +62,27 @@ class Recommend(object):
             projects.clear()
             for p in resp.json():
                 projects.append(p)
+
+    def calc_point(self):
+        # tag-distance
+        point_table = [
+            (1, self.tag_projects),
+            (0.4, self.child_tag_projects),
+            (0.4, self.parent_tag_projects),
+            (0.2, self.bro_tag_projects),
+        ]
+        for point, projects in point_table:
+            for project in projects:
+                p_id = project['id']
+                current = self.points.get(p_id)
+                if current is None:
+                    likes = project['likes']
+                    if likes < 1:
+                        likes = 1
+                    like_point = math.log(likes, 5)
+                    self.points[p_id] = point + like_point
+                else:
+                    self.points[p_id] += point
 
     def __get_user(self):
         cookies = {'token': self.token}
@@ -130,4 +154,6 @@ async def project(token: Optional[str] = Cookie(None)):
 
     r = Recommend(token)
     r.gather_projects()
+    r.calc_point()
+    
     return r  # DEBUG
