@@ -24,6 +24,14 @@
 
       <v-row>
         <v-col>
+          <v-card class="pa-3">
+            <UserTagEdit :user="$store.getters['getUser']" />
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col>
           <v-card class="pa-3" :loading="isLoadingSns">
             <template slot="progress">
               <v-progress-linear
@@ -59,15 +67,6 @@
           </v-card>
         </v-col>
       </v-row>
-
-      <v-row>
-        <v-col>
-          <v-card class="pa-3">
-            <UserTagEdit :user="$store.getters['getUser']" />
-          </v-card>
-        </v-col>
-      </v-row>
-
     </v-container>
   </v-main>
 </template>

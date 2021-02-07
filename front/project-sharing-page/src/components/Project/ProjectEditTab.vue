@@ -10,6 +10,14 @@
 
     <v-row>
       <v-col>
+        <v-card class="pa-3">
+          <ProjectTagEdit :project="project" />
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
         <v-card class="pa-3" :loading="isSnsLoading">
           <ProjectSnsEdit :project="project" :loading-state-updated="updateSnsLoad" />
         </v-card>
@@ -31,15 +39,6 @@
         </v-card>
       </v-col>
     </v-row>
-
-    <v-row>
-      <v-col>
-        <v-card class="pa-3">
-          <ProjectTagEdit :project="project" />
-        </v-card>
-      </v-col>
-    </v-row>
-
   </v-container>
 </template>
 
