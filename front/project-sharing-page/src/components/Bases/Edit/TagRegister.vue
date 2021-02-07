@@ -29,7 +29,7 @@
 <script>
 import axios from "axios";
 
-const CREATE_NEW = 0;
+const CREATE_NEW = -1;
 
 export default {
   name: "TagRegister",
@@ -48,14 +48,15 @@ export default {
   methods: {
     searchTag(){
       this.isSearching = true;
+      let searchingTag = this.tagName;
 
       axios
-          .get("/userapi/skilltag/search", {params: {"keyword" : this.tagName}})
+          .get("/userapi/skilltag/search", {params: {"keyword" : searchingTag}})
           .then((response) => {
             this.searchResult = response.data.result;
             let isFounded = false;
             for(let i = 0; i < this.searchResult.length; i++){
-              if(this.searchResult[i].name === this.tagName){
+              if(this.searchResult[i].name === searchingTag){
                 isFounded = true;
                 break;
               }
@@ -67,17 +68,18 @@ export default {
           .catch(() => {
             //TODO:エラー処理
             alert("ERROR!");
-          })
+          });
     },
 
     selectTag(tagIndex){
       if(this.isSending || this.isSearching)
         return;
 
-      if(tagIndex === CREATE_NEW){
+      let tag = this.searchResult[tagIndex];
+      if(tag.id === CREATE_NEW){
         this.newTag();
       }else{
-        this.tagSelected(this.searchResult[tagIndex].id);
+        this.tagSelected(tag.id);
       }
     },
     newTag(){
@@ -88,7 +90,7 @@ export default {
           })
           .catch(() => {
             //TODO:エラー処理
-            alert("ERROR!");
+            alert("ERROR! in newTag");
           });
     }
   }
