@@ -33,6 +33,10 @@ class Recommend(object):
         self.__get_children()  # 子タグ
         self.__get_bros()  # 兄弟タグ(親タグが共通)
 
+        # TODO: 1. それぞれのタグが該当するプロジェクトを集めてくる
+        # TODO: 2. 点数付け. ソート.
+        # TODO: 3. ランダムなプロジェクトを取ってくる. ランダムに挿入
+
     def __get_user(self):
         cookies = {'token': self.token}
         userresp = requests.get('http://userapi:8000/userapi/user',

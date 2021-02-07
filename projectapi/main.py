@@ -1,5 +1,6 @@
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status, Cookie
+from fastapi.param_functions import Query
 from pydantic.types import Json
 from fastapi import File, UploadFile
 from fastapi.responses import FileResponse
@@ -182,6 +183,28 @@ async def delete_project(id: int, token: Optional[str] = Cookie(None)):
 
         p.is_active = False
         s.commit()
+
+
+@app.get(
+    '/projectapi/project',
+    status_code=status.HTTP_200_OK,
+    description='get projects with tag (OR)',
+    responses={
+        status.HTTP_200_OK: {
+            'model': List[schema.Project],
+            'description': 'Successful Response',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'description': 'Missing query'
+        }
+    },
+)
+async def get_project_with_tag(tags: Optional[List[int]] = Query(None)):
+    if tags is None:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST)
+    with db.session_scope() as s:
+        projects = db.Project.get_with_tag(s, tags)
+        return [schema.Project.from_db(p) for p in projects]
 
 
 # Project Background Image
