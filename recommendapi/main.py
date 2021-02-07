@@ -1,7 +1,6 @@
 from typing import Dict, Optional, List
 from fastapi import FastAPI, Cookie, HTTPException, status
 import requests
-import schema
 import math
 
 
@@ -134,7 +133,7 @@ class Recommend(object):
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_200_OK: {
-            'model': List[schema.Project],
+            'model': List[int],
             'description': 'Successful Response',
         },
         status.HTTP_401_UNAUTHORIZED: {
@@ -155,5 +154,8 @@ async def project(token: Optional[str] = Cookie(None)):
     r = Recommend(token)
     r.gather_projects()
     r.calc_point()
-    
-    return r  # DEBUG
+
+    sorted_projects = sorted(r.points.items(), key=lambda x: x[1],
+                             reverse=True)
+
+    return [p_id for p_id, _ in sorted_projects]
