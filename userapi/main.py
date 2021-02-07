@@ -306,6 +306,9 @@ async def get_user(username: str):
         },
         status.HTTP_400_BAD_REQUEST: {
             'description': 'Bad request',
+        },
+        status.HTTP_409_CONFLICT: {
+            'description': 'Tag already exist.'
         }
     }
 )
