@@ -14,7 +14,7 @@ services:
             POSTGRES_PASSWORD: "pg_password"
             DB_ECHO: "False"
         volumes:
-            - useiconmedia:/usericon
+            - usericonmedia:/usericon
     
     projectapi:
         build: projectapi
@@ -43,18 +43,12 @@ services:
     recommendapi:
         build: recommendapi
         links:
-            - recommendcache
-            - recommendengine
-        depends_on:
-            - recommendengine
-    
-    recommendengine:
-        build: recommendengine
-        links:
+            - userapi
+            - projectapi
             - recommendcache
         depends_on:
             - recommendcache
-    
+
     recommendcache:
         image: redis
         volumes:
@@ -100,14 +94,7 @@ services:
             POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
         volumes:
             - "chatpgdata:/var/lib/postgresql/data"
-    
-    recommenddb:
-        image: postgres
-        environment: 
-            POSTGRES_USER: "postgres"
-            POSTGRES_PASSWORD: "pg_password"  # WARNING: 運用するときにはパスワードを変える・隠す
-        volumes:
-            - "recommendpgdata:/var/lib/postgresql/data"
+
 
 volumes: 
     userpgdata:

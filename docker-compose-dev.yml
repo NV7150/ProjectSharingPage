@@ -53,19 +53,13 @@ services:
     recommendapi:
         build: recommendapi
         links:
+            - userapi
+            - projectapi
             - recommendcache
-            - recommendengine
         depends_on:
-            - recommendengine
+            - recommendcache
         volumes: 
             - ./recommendapi:/code
-    
-    recommendengine:
-        build: recommendengine
-        links:
-            - recommendcache
-        depends_on:
-            - recommendcache
     
     recommendcache:
         image: redis
