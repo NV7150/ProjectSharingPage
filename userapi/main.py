@@ -8,7 +8,6 @@ import os
 import traceback
 
 from pydantic.types import Json
-from starlette.status import HTTP_404_NOT_FOUND
 
 import db
 import schema
@@ -359,6 +358,28 @@ async def get_children(id: int):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     return children
+
+
+@app.get(
+    '/userapi/skilltags/{id:int}/bros',
+    description='Get brother tags',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': List[schema.SkillTag],
+            'description': 'Successful response.',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'tag not found'
+        },
+    },
+)
+async def get_bros(id: int):
+    bros = schema.SkillTag.get_bros(id)
+    if bros is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    return bros
 
 
 @app.get(
