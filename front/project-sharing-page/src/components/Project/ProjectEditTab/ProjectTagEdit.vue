@@ -1,6 +1,17 @@
 <template>
-  <div>
+  <div v-if="!isLoading">
     <TagRegister :tag-selected="editProject" />
+    <div class="d-flex flex-row flex-wrap pa-3">
+      <v-chip
+        v-for="(tag, i) in nowTags"
+        :key="i"
+        close
+        @click:close="close(tag.id)"
+        class="mr-2 mb-4"
+      >
+        {{tag.name}}
+      </v-chip>
+    </div>
   </div>
 </template>
 
@@ -23,13 +34,27 @@ export default {
 
   methods: {
     editProject(tagId){
-      if(this.nowTags.indexOf(tagId) !== -1)
-        return;
-      this.nowTags.push(tagId);
-      this.nowTags = this.nowTags.filter(v => (typeof v) === "number");
+      for(let i = 0; i < this.nowTags.length; i++){
+        if(this.nowTags[i].id === tagId){
+          return;
+        }
+      }
 
+      this.getTag(tagId).then(() => { this.send(); });
+    },
+
+    close(id){
+      this.nowTags = this.nowTags.filter(tag => tag.id !== id);
+      this.send();
+    },
+
+    send(){
+      let tagIds = [];
+      for(let i = 0; i < this.nowTags.length; i++){
+        tagIds.push(this.nowTags[i].id);
+      }
       let newProject = {
-        "skilltags": this.nowTags
+        "skilltags": tagIds
       };
 
       this.isLoading = true;
@@ -42,15 +67,42 @@ export default {
             //TODO:エラー処理
             alert("ERROR in patch Project");
           });
+    },
+
+    getTag(id){
+      return new Promise((resolve, reject) => {
+        axios
+            .get("/userapi/skilltag/" + id)
+            .then((response) => {
+              this.nowTags.push(response.data);
+              resolve();
+            })
+            .catch(() => {
+              //TODO:エラー処理
+              alert("ERROR in get skilltag");
+              reject();
+            });
+      });
     }
   },
 
   created() {
-    this.nowTags = []
+    this.nowTags = [];
     let tags = this.project.skilltags;
+    let tasks = [];
     for(let i = 0; i < tags.length; i++){
-      this.nowTags.push(tags[i]);
+      tasks.push(this.getTag(tags[i]));
     }
+
+    this.isLoading = true;
+    Promise
+        .all(tasks)
+        .then(() => {
+          this.isLoading = false;
+        })
+        .catch(() => {
+          //TODO
+        })
   }
 }
 </script>
