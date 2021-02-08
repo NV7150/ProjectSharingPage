@@ -51,11 +51,16 @@ class Recommend(object):
             (self.bro_tags, self.bro_tag_projects),
         ]
         for tags, projects in pairs:
+            if len(tags) == 0:
+                continue
+
             query = {'tags': tags}
             resp = requests.get('http://projectapi:8000/projectapi/project',
                                 params=query)
+
             if resp.status_code != 200:
                 raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             projects.clear()
             for p in resp.json():
                 projects.append(p)
