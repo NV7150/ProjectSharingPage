@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row v-if="!isLoading">
       <v-col
           cols="12"
           sm="6"
@@ -17,20 +17,36 @@
 
 <script>
 import ProjectCard from "./ProjectCard";
+import axios from "axios";
 
 export default {
   name: "Projects",
   components: {ProjectCard},
   data(){
     return{
-      recommends: []
+      recommends: [],
+      isLoading : false
     }
   },
   mounted() {
-    //TODO:APIからリコメンドのIDを取得
-    //仮置き
-    this.recommends = [1, 2, 3]
-    //仮置きここまで
+    if(!this.$store.getters["getUser"]){
+      //TODO:ログイン者じゃない向けの処理
+      this.recommends=[1,2,3,4];
+      return;
+    }
+
+
+    this.isLoading = true;
+    axios
+        .get("/recommendapi/project")
+        .then((response) => {
+          this.recommends = response.data;
+          this.isLoading = false;
+        })
+        .catch(() => {
+          //TODO:エラー処理
+          alert("Error in get:recommend");
+        });
   }
 }
 </script>
