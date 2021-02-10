@@ -86,6 +86,14 @@ export default {
           }
         },
         {
+          name: "New project",
+          func: () => {
+            this.$router.push({
+              name: "newProject"
+            });
+          }
+        },
+        {
           name: "Logout",
           func: () => {
             this.$emit('logout');

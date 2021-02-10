@@ -8,6 +8,7 @@ import Chat from "../views/Chat";
 import NotFound from "@/views/NotFound";
 import Search from "@/views/Search";
 import UserEdit from "@/views/UserEdit";
+import CreateProject from "@/views/CreateProject";
 
 Vue.use(VueRouter)
 
@@ -61,6 +62,11 @@ const routes = [
     path: '/search/:keyword',
     name: 'Search',
     component: Search
+  },
+  {
+    path: '/newProject',
+    name: 'newProject',
+    component: CreateProject
   }
 ]
 
