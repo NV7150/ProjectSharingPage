@@ -310,7 +310,7 @@ async def upload_image(
             f.write(data)
 
         # delete previous image
-        if os.path.exists(p.bg_image):
+        if p.bg_image is not None and os.path.exists(p.bg_image):
             os.remove(p.bg_image)
 
         p.bg_image = f'/projectapi/projectimage/{filename}.{ext}'
