@@ -530,7 +530,7 @@ async def join_member(
         s.commit()
 
 
-@app.get(
+@app.post(
     '/projectapi/project/{proj_id:int}/join-request',
     description='Join request',
     status_code=status.HTTP_200_OK,
@@ -556,6 +556,14 @@ async def join_request(proj_id: int, token: Optional[str] = Cookie(None)):
         p: Optional[db.Project] = s.query(db.Project).get(proj_id)
         if p is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+        if len([m for m in p.members if m.username == username]) > 0:
+            raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS,
+                                "Already joined to project")
+
+        if len([ju for ju in p.join_request_users if ju.username == username]) > 0:
+            raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS,
+                                "Already added to waitlist")
 
         u = db.JoinRequestUser(
             project_id=proj_id,
