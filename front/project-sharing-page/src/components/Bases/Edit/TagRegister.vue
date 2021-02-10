@@ -72,21 +72,21 @@ export default {
     },
 
     selectTag(tagIndex){
-      if(this.isSending || this.isSearching)
+      if(this.isSearching)
         return;
 
       let tag = this.searchResult[tagIndex];
       if(tag.id === CREATE_NEW){
         this.newTag();
       }else{
-        this.tagSelected(tag.id);
+        this.tagSelected(tag);
       }
     },
     newTag(){
       axios
           .post("/userapi/skilltag", {"name": this.tagName})
           .then((response) => {
-            this.tagSelected(response.data.id);
+            this.tagSelected(response.data);
           })
           .catch(() => {
             //TODO:エラー処理

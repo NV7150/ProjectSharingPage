@@ -35,14 +35,14 @@ export default {
   },
 
   methods: {
-    editProject(tagId){
+    editProject(tag){
       for(let i = 0; i < this.nowTags.length; i++){
-        if(this.nowTags[i].id === tagId){
+        if(this.nowTags[i].id === tag.id){
           return;
         }
       }
-
-      this.getTag(tagId).then(() => { this.send(); });
+      this.nowTags.push(tag);
+      this.send();
     },
 
     close(id){
@@ -92,7 +92,7 @@ export default {
         })
         .catch(() => {
           //TODO:エラー処理
-        })
+        });
   },
 
   watch: {
