@@ -10,19 +10,19 @@
       </v-btn>
       <v-toolbar-title>{{toolbarText}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-tooltip bottom>
-        <template v-slot:activator="{on}">
+      <v-dialog v-model="createDialog">
+        <template v-slot:activator="{on, attrs}">
           <v-btn
-              v-show="window === 2"
+              v-show="window === 1"
               icon
-              @click="goToPage"
+              v-bind="attrs"
               v-on="on"
           >
-            <v-icon color="primary">mdi-application</v-icon>
+            <v-icon color="primary">mdi-plus</v-icon>
           </v-btn>
         </template>
-        <span>Go to chat page</span>
-      </v-tooltip>
+        <ChatNewThread :project="project" :type="selectingChannel.send" :selected="threadNewCreated" />
+      </v-dialog>
     </v-toolbar>
 
     <v-row>
@@ -98,6 +98,7 @@ import ChatDestList from "./ProjectChat/ChatDestList";
 import ChatSettings from "../../assets/scripts/ProjectPageConstants";
 import ChatWindow from "./ProjectChat/ChatWindow";
 import ChatInput from "./ProjectChat/ChatInput";
+import ChatNewThread from "@/components/Project/ProjectChat/ChatNewThread";
 
 export default {
   name: "ProjectChat",
@@ -109,7 +110,7 @@ export default {
     threadId : {Type: Number, default: -1},
     selectReset: {Type:Function}
   },
-  components: {ChatWindow, ChatDestList, ChatInput},
+  components: {ChatNewThread, ChatWindow, ChatDestList, ChatInput},
   data(){
     return{
       window: 0,
@@ -119,7 +120,8 @@ export default {
       isLoadingMessages: true,
       threads: [],
       threadObjects : [],
-      selectingThread: {}
+      selectingThread: {},
+      createDialog: false
     }
   },
   methods: {
@@ -173,15 +175,7 @@ export default {
           break;
       }
     },
-    goToPage(){
-      this.$router.push({
-        name: "Chat",
-        params: {
-          projectId: this.$route.params.projectId,
-          threadId: this.selectingThread.id
-        }
-      });
-    },
+
     getThreads(){
       let threadObjects = [];
       for(let i = 0; i < this.threads.length; i++){
@@ -232,6 +226,11 @@ export default {
           }
         }
       }
+    },
+
+    threadNewCreated(){
+      this.createDialog = false;
+      this.$router.go({path: this.$router.currentRoute.path, force: true});
     }
   },
 
