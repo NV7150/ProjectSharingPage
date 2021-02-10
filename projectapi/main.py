@@ -551,11 +551,6 @@ async def join_request(proj_id: int, token: Optional[str] = Cookie(None)):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     if (username := user.auth(token)) is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-    if user.exist(username) is False:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            'User not found',
-        )
 
     with db.session_scope() as s:
         p: Optional[db.Project] = s.query(db.Project).get(proj_id)
@@ -589,6 +584,9 @@ async def join_request(proj_id: int, token: Optional[str] = Cookie(None)):
             'description': 'Successful Response (List of waiting username)',
             'model': List[str],
         },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Invalid user token.'
+        },
         status.HTTP_404_NOT_FOUND: {
             'description': 'Project/User not found',
         },
@@ -603,12 +601,6 @@ async def waitlist(proj_id: int, token: Optional[str] = Cookie(None)):
     if (username := user.auth(token)) is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-    if user.exist(username) is False:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            'User not found',
-        )
-
     with db.session_scope() as s:
         if (p := db.Project.get(s, proj_id)) is None:
             raise HTTPException(
@@ -622,6 +614,76 @@ async def waitlist(proj_id: int, token: Optional[str] = Cookie(None)):
                                 'Admin only')
 
         return [ju.username for ju in p.waitlist]
+
+
+@app.delete(
+    '/projectapi/project/{proj_id:int}/join-request',
+    description='Delete join request (by admin or requested user)',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful response (deleted)',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Project/User not found.',
+        },
+    },
+)
+async def delete_join_request(
+    proj_id: int,
+    username: Optional[str] = Query(None),
+    token: Optional[str] = Cookie(None),
+):
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if (req_username := user.auth(token)) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    with db.session_scope() as s:
+        p: Optional[db.Project] = s.query(db.Project).get(proj_id)
+        if p is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+        if username is not None:  # by Admin
+            if user.exist(username) is False:
+                raise HTTPException(
+                    status.HTTP_404_NOT_FOUND,
+                    'User not found',
+                )
+
+            # permission
+            if req_username not in [au.username for au in p.admin_users]:
+                raise HTTPException(status.HTTP_403_FORBIDDEN,
+                                    'Admin only')
+
+            for wu in p.waitlist:
+                if wu.username == username:
+                    s.delete(wu)
+                    s.commit()
+                    return "deleted"
+
+            raise HTTPException(status.HTTP_404_NOT_FOUND,
+                                'username not in waitlist')
+
+        else:
+            # by User
+            if user.exist(req_username) is False:
+                raise HTTPException(
+                    status.HTTP_404_NOT_FOUND,
+                    'User not found.'
+                )
+
+            wl = [wu for wu in p.waitlist if wu.username == req_username]
+            if len(wl) == 0:
+                raise HTTPException(
+                    status.HTTP_404_NOT_FOUND,
+                    'User not in waitlist',
+                )
+
+            for w in wl:
+                s.delete(w)
+        s.commit()
+        return "deleted"
 
 
 # Search
