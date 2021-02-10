@@ -155,7 +155,7 @@ class Project(Base):
     members = relationship('ProjectUser', backref='project')
     announce_users = relationship('ProjectAnnounceUser', backref='project')
     admin_users = relationship('ProjectAdminUser', backref='project')
-    join_request_users = relationship('JoinRequestUser', backref='project')
+    waitlist = relationship('JoinRequestUser', backref='project')
     likes = relationship('Like', backref='project')
 
     # SNS

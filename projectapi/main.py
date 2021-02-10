@@ -542,7 +542,7 @@ async def join_member(
             'description': 'Already joined',
         },
         status.HTTP_404_NOT_FOUND: {
-            'description': 'Project not found',
+            'description': 'Project/User not found',
         },
     },
 )
@@ -551,6 +551,11 @@ async def join_request(proj_id: int, token: Optional[str] = Cookie(None)):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     if (username := user.auth(token)) is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if user.exist(username) is False:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            'User not found',
+        )
 
     with db.session_scope() as s:
         p: Optional[db.Project] = s.query(db.Project).get(proj_id)
@@ -561,7 +566,7 @@ async def join_request(proj_id: int, token: Optional[str] = Cookie(None)):
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS,
                                 "Already joined to project")
 
-        if len([ju for ju in p.join_request_users if ju.username == username]) > 0:
+        if len([ju for ju in p.waitlist if ju.username == username]) > 0:
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS,
                                 "Already added to waitlist")
 
@@ -573,6 +578,50 @@ async def join_request(proj_id: int, token: Optional[str] = Cookie(None)):
         s.commit()
 
     return "Added to waitlist"
+
+
+@app.get(
+    '/projectapi/project/{proj_id:int}/waitlist',
+    description='Waitlist',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful Response (List of waiting username)',
+            'model': List[str],
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Project/User not found',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'Permission denied (Admin only)'
+        }
+    },
+)
+async def waitlist(proj_id: int, token: Optional[str] = Cookie(None)):
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if (username := user.auth(token)) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if user.exist(username) is False:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            'User not found',
+        )
+
+    with db.session_scope() as s:
+        if (p := db.Project.get(s, proj_id)) is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                'Project not found',
+            )
+
+        # permission (admin only)
+        if username not in [au.username for au in p.admin_users]:
+            raise HTTPException(status.HTTP_403_FORBIDDEN,
+                                'Admin only')
+
+        return [ju.username for ju in p.waitlist]
 
 
 # Search
