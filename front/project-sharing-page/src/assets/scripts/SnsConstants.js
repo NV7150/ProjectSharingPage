@@ -10,5 +10,6 @@ export default {
         "tiktok": {display: "TikTok", color: "#000000", link:"https://www.tiktok.com/@.*"},
         "wantedly": {display: "WANTEDLY", color: "#1DE9B6", link: "https://www.wantedly.com/id/.*"},
         "url": {display: "WebSite", icon: "mdi-card-search", color: "#00C853", link:"htt(p|ps)://.*"}
-    }
+    },
+    defaultSelect : "Twitter"
 }

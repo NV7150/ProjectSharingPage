@@ -5,14 +5,14 @@
 </template>
 
 <script>
-import axios from "axios";
 import TagRegister from "@/components/Bases/Edit/TagRegister";
 
 export default {
   name: "UserTagEdit",
   components: {TagRegister},
   props: {
-    user : {type: Object}
+    user : {type: Object, required: true},
+    fieldUpdated: {type: Function, required: true}
   },
   data(){
     return{
@@ -26,19 +26,7 @@ export default {
         return;
 
       this.nowTags.push(tagId);
-      let newUser = {
-        "skilltags": this.nowTags
-      };
-
-      this.isSending = true;
-      axios
-          .patch("/userapi/user?json_data=" + JSON.stringify(newUser))
-          .then(() => {
-            this.isSending = false;
-          })
-          .catch(() => {
-            alert("ERROR in patch user")
-          });
+      this.fieldUpdated("skilltags", this.nowTags);
     },
   },
 

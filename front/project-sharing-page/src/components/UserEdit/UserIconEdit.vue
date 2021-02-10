@@ -7,9 +7,9 @@
         show-size
         label="アイコン画像"
     />
-    <v-btn @click="upload">
-      Upload
-    </v-btn>
+<!--    <v-btn @click="upload">-->
+<!--      Upload-->
+<!--    </v-btn>-->
   </div>
 </template>
 
@@ -19,7 +19,7 @@ import axios from "axios";
 export default {
   name: "UserIconEdit",
   props: {
-    onLoadStateChanged: {type: Function}
+    imgUploaded: {type: Function, required: true}
   },
   data(){
     return{
@@ -63,8 +63,8 @@ export default {
     },
   },
   watch: {
-    isLoading : function (){
-      this.onLoadStateChanged(this.isLoading);
+    iconFile: function (){
+      this.uploadUserIcon(this.iconFile);
     }
   }
 }

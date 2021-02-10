@@ -1,13 +1,13 @@
 <template>
-  <validation-observer ref="observer" v-slot="{ invalid }">
-    <form @submit.prevent="submit">
+  <validation-observer ref="observer">
+    <form @submit.prevent="validate">
       <validation-provider
           v-slot="{ errors }"
           name="title"
           :rules="{required: true, max:10}"
       >
         <v-text-field
-            v-model="newUser.display_name"
+            v-model="displayName"
             :counter="10"
             :error-messages="errors"
             label="表示名"
@@ -22,7 +22,7 @@
           :rules="{required: true, max:500}"
       >
         <v-textarea
-            v-model="newUser.bio"
+            v-model="bio"
             :counter="500"
             :error-messages="errors"
             label="プロフィール"
@@ -30,17 +30,11 @@
             class="mb-3"
         />
       </validation-provider>
-
-      <v-btn type="submit" :disabled="invalid" @click="send">
-        Send
-      </v-btn>
-
     </form>
   </validation-observer>
 </template>
 
 <script>
-import axios from "axios";
 import { required, max, regex  } from 'vee-validate/dist/rules';
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate';
 
@@ -56,45 +50,35 @@ export default {
   components: {ValidationObserver, ValidationProvider},
 
   props: {
-    user : {type: Object},
-    loadingStateUpdated : {type: Function}
+    user : {type: Object, required: true},
+    fieldUpdated: {type:Function, required: true}
   },
+
   data(){
     return{
-      newUser : {},
-      isLoading : false
+      displayName: "",
+      bio: ""
     }
   },
 
   methods : {
-    submit(){
-      this.$refs.observer.validate();
+    async validate(){
+      return await this.$refs.observer.validate();
     },
-    send(){
-      axios.interceptors.request.use(request => {
-        console.log('Starting Request: ', request)
-        return request
-      });
-      this.isLoading = true;
+  },
 
-      axios
-          .patch("/userapi/user?json_data=" + JSON.stringify(this.newUser))
-          .then(() => {
-            this.isLoading = false;
-          });
-    }
+
+  created() {
+    this.displayName = this.user.display_name;
+    this.bio = this.user.bio;
   },
 
   watch: {
-    isLoading : function() {
-      this.loadingStateUpdated(this.isLoading);
-    }
-  },
-
-  created() {
-    this.newUser =  {
-      "display_name" : this.user.display_name,
-      "bio" : this.user.bio
+    displayName: function (){
+      this.fieldUpdated("display_name", this.displayName);
+    },
+    bio: function (){
+      this.fieldUpdated("bio", this.bio);
     }
   }
 }

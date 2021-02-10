@@ -29,7 +29,7 @@ export default {
                         resolve();
                     });
             });
-        }
+        },
     },
     getters: {
         getUser : (state) => {return state.user;},

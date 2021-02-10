@@ -36,12 +36,12 @@
 
     <div class="d-flex flex-row flex-wrap pa-3">
       <div
-          v-for="(name, i) in Object.keys(newUser.sns)"
+          v-for="(name, i) in Object.keys(newSns)"
           :key="i"
       >
         <v-chip
             close
-            v-if="newUser.sns[name]"
+            v-if="newSns[name]"
             @click:close="remove(name)"
             class="mr-2 mb-4"
         >
@@ -53,7 +53,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import _ from "lodash";
+
 import { required, max, regex  } from 'vee-validate/dist/rules';
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate';
 import SnsConstants from "@/assets/scripts/SnsConstants";
@@ -70,42 +71,29 @@ export default {
   components: {ValidationObserver, ValidationProvider},
 
   props: {
-    user : {type: Object},
-    loadingStateUpdated: {type: Function}
+    user : {type: Object, required: true},
+    fieldUpdated: {type:Function, required: true}
   },
   data(){
     return {
-      newUser : {},
+      newSns: [],
       keysDict : [],
-      selectingSns : "Twitter",
-      selectingLink : "",
-      isLoading : false
+      selectingSns : SnsConstants.defaultSelect,
+      selectingLink : ""
     }
   },
 
   methods : {
     send(){
-      this.newUser.sns[this.keysDict[this.selectingSns]] = this.selectingLink;
-
-      this.isLoading = true;
-      axios
-          .patch("/userapi/user?json_data=" + JSON.stringify(this.newUser))
-          .then(() => {
-            this.isLoading = false;
-          });
+      this.newSns[this.keysDict[this.selectingSns]] = this.selectingLink;
+      this.fieldUpdated("sns", this.newSns);
     },
     submit(){
       this.$refs.observer.validate();
     },
     remove(name){
-      this.newUser.sns[name] = "";
-
-      this.isLoading = true;
-      axios
-          .patch("/userapi/user?json_data=" + JSON.stringify(this.newUser))
-          .then(() => {
-            this.isLoading = false;
-          });
+      this.newSns[name] = "";
+      this.fieldUpdated("sns", this.newSns);
     }
   },
 
@@ -127,20 +115,12 @@ export default {
     }
   },
 
-  watch: {
-    isLoading : function() {
-      this.loadingStateUpdated(this.isLoading);
-    }
-  },
-
   created() {
     let keys = Object.keys(SnsConstants.sns);
     for(let i = 0; i < keys.length; i++){
       this.keysDict[SnsConstants.sns[keys[i]].display] = keys[i];
     }
-    this.newUser = {
-      "sns" : this.user.sns
-    }
+    this.newSns = _.cloneDeep(this.user.sns);
   }
 }
 </script>

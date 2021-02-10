@@ -75,7 +75,7 @@ export default {
 
   data(){
     return {
-      selectingSns : "Twitter",
+      selectingSns : SnsConstants.defaultSelect,
       selectingLink : "",
       keysDict : {},
       newSns: {}
@@ -92,7 +92,7 @@ export default {
     },
     remove(name){
       this.newSns[name] = "";
-      this.send();
+      this.fieldUpdated("sns", this.newSns);
     }
   },
 
