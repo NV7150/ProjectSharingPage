@@ -69,6 +69,9 @@ async def get_login_user(token: Optional[str] = Cookie(None)):
         },
         status.HTTP_400_BAD_REQUEST: {
             'description': 'Bad request'
+        },
+        status.HTTP_409_CONFLICT: {
+            'description': 'unique field already exists'
         }
     }
 )

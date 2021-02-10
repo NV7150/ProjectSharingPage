@@ -489,6 +489,19 @@ class UserCreate(BaseModel):
     def create(self) -> Optional[User]:
         db_skilltags = []
         with db.session_scope() as s:
+            exists = s.query(db.User).filter(db.User.username == self.username)
+            if exists.count() > 0:
+                raise HTTPException(
+                    status.HTTP_409_CONFLICT,
+                    'username already exists',
+                )
+            exists = s.query(db.User).filter(db.User.email == self.email)
+            if exists.count() > 0:
+                raise HTTPException(
+                    status.HTTP_409_CONFLICT,
+                    'email already exists',
+                )
+
             for tagid in self.skilltags:
                 tag = s.query(db.SkillTag).get(tagid)
                 if tag is None:
