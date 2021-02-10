@@ -530,6 +530,43 @@ async def join_member(
         s.commit()
 
 
+@app.get(
+    '/projectapi/project/{proj_id:int}/join-request',
+    description='Join request',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Added to waitlist',
+        },
+        status.HTTP_429_TOO_MANY_REQUESTS: {
+            'description': 'Already joined',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Project not found',
+        },
+    },
+)
+async def join_request(proj_id: int, token: Optional[str] = Cookie(None)):
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if (username := user.auth(token)) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    with db.session_scope() as s:
+        p: Optional[db.Project] = s.query(db.Project).get(proj_id)
+        if p is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+        u = db.JoinRequestUser(
+            project_id=proj_id,
+            username=username,
+        )
+        s.add(u)
+        s.commit()
+
+    return "Added to waitlist"
+
+
 # Search
 @app.get(
     '/projectapi/project/search',

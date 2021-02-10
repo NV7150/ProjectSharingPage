@@ -101,6 +101,20 @@ class ProjectAdminUser(Base):
     )
 
 
+class JoinRequestUser(Base):
+    """Association object
+    """
+    __tablename__ = 'project_join_request_user'
+    project_id = Column(
+        Integer, ForeignKey('project.id'),
+        primary_key=True, nullable=False,
+    )
+    username = Column(
+        'username', String, nullable=False,
+        primary_key=True,
+    )
+
+
 class Project(Base):
     """[DB] Project Class
 
@@ -141,6 +155,7 @@ class Project(Base):
     members = relationship('ProjectUser', backref='project')
     announce_users = relationship('ProjectAnnounceUser', backref='project')
     admin_users = relationship('ProjectAdminUser', backref='project')
+    join_request_users = relationship('JoinRequestUser', backref='project')
     likes = relationship('Like', backref='project')
 
     # SNS
