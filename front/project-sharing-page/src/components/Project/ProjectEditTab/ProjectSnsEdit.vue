@@ -36,12 +36,12 @@
 
     <div class="d-flex flex-row flex-wrap pa-3">
       <div
-          v-for="(name, i) in Object.keys(newProject.sns)"
+          v-for="(name, i) in Object.keys(newSns)"
           :key="i"
       >
         <v-chip
             close
-            v-if="newProject.sns[name]"
+            v-if="newSns[name]"
             @click:close="remove(name)"
             class="mr-2 mb-4"
         >
@@ -53,11 +53,10 @@
 </template>
 
 <script>
-
+import _ from "lodash";
 import { required, max, regex} from 'vee-validate/dist/rules'
 import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
 import SnsConstants from "@/assets/scripts/SnsConstants";
-import axios from "axios";
 
 setInteractionMode('eager')
 
@@ -70,8 +69,8 @@ export default {
   components : {ValidationProvider, ValidationObserver},
 
   props : {
-    project: {type:Object},
-    loadingStateUpdated: {type:Function}
+    project: {type:Object, required: true},
+    fieldUpdated: {type:Function, required: true}
   },
 
   data(){
@@ -79,38 +78,21 @@ export default {
       selectingSns : "Twitter",
       selectingLink : "",
       keysDict : {},
-      newProject: {},
-      isLoading: false
+      newSns: {}
     }
   },
 
   methods : {
     send(){
-      this.newProject.sns[this.keysDict[this.selectingSns]] = this.selectingLink;
-      this.isLoading = true;
-      axios
-          .patch("/projectapi/project/" + this.project.id + "?update_fields=" + JSON.stringify(this.newProject))
-          .then(() => {
-            this.isLoading = false;
-          })
-          .catch(() => {
-            //TODO:エラー処理
-          });
+      this.newSns[this.keysDict[this.selectingSns]] = this.selectingLink;
+      this.fieldUpdated("sns", this.newSns);
     },
     submit(){
       this.$refs.observer.validate();
     },
     remove(name){
-      this.newProject.sns[name] = "";
-      this.isLoading = true;
-      axios
-          .patch("/projectapi/project/" + this.project.id + "?update_fields=" + JSON.stringify(this.newProject))
-          .then(() => {
-            this.isLoading = false;
-          })
-          .catch(() => {
-            //TODO:エラー処理
-          });
+      this.newSns[name] = "";
+      this.send();
     }
   },
 
@@ -137,16 +119,8 @@ export default {
     for(let i = 0; i < keys.length; i++){
       this.keysDict[SnsConstants.sns[keys[i]].display] = keys[i];
     }
-    this.newProject = {
-      "sns": this.project.sns
-    }
+    this.newSns = _.cloneDeep(this.project.sns);
   },
-
-  watch: {
-    isLoading: function (){
-      this.loadingStateUpdated(this.isLoading);
-    }
-  }
 }
 </script>
 

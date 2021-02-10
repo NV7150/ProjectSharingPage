@@ -23,12 +23,14 @@ export default {
   name: "ProjectTagEdit",
   components: {TagRegister},
   props: {
-    project: {type:Object, required: true}
+    project: {type:Object, required: true},
+    fieldUpdated: {type:Function, required: true},
+    loadingStateUpdated: {type:Function}
   },
   data(){
     return{
-      isLoading : false,
-      nowTags: []
+      nowTags: [],
+      isLoading: false
     }
   },
 
@@ -53,20 +55,8 @@ export default {
       for(let i = 0; i < this.nowTags.length; i++){
         tagIds.push(this.nowTags[i].id);
       }
-      let newProject = {
-        "skilltags": tagIds
-      };
 
-      this.isLoading = true;
-      axios
-          .patch("/projectapi/project/" + this.project.id + "?update_fields=" + JSON.stringify(newProject))
-          .then(() => {
-            this.isLoading = false;
-          })
-          .catch(() => {
-            //TODO:エラー処理
-            alert("ERROR in patch Project");
-          });
+      this.fieldUpdated("skilltags", tagIds);
     },
 
     getTag(id){
@@ -101,8 +91,14 @@ export default {
           this.isLoading = false;
         })
         .catch(() => {
-          //TODO
+          //TODO:エラー処理
         })
+  },
+
+  watch: {
+    isLoading: function (){
+      this.loadingStateUpdated(this.isLoading);
+    }
   }
 }
 </script>

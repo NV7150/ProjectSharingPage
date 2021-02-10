@@ -2,31 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <v-card class="pa-3" :loading="isInfoLoading">
-          <ProjectInfoEdit :project="project" :loading-state-updated="updateInfoLoad" />
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col>
-        <v-card class="pa-3">
-          <ProjectTagEdit :project="project" />
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col>
-        <v-card class="pa-3" :loading="isSnsLoading">
-          <ProjectSnsEdit :project="project" :loading-state-updated="updateSnsLoad" />
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col>
-        <v-card class="pa-3" :loading="isImgLoading">
+        <v-card class="pa-3" :loading="isLoading" :disabled="isLoading">
           <template slot="progress">
             <v-progress-linear
                 color="deep-purple"
@@ -35,7 +11,37 @@
             >
             </v-progress-linear>
           </template>
-          <ProjectImgEdit :project="project" :on-load-state-changed="updateImgLoad" />
+          <v-container>
+            <v-row>
+              <v-col>
+                <ProjectInfoEdit ref="info" :project="project" :field-updated="fieldUpdated" />
+              </v-col>
+            </v-row>
+
+            <v-row>
+              <v-col>
+                <ProjectTagEdit :project="project" :field-updated="fieldUpdated" :loading-state-updated="updateLoad" />
+              </v-col>
+            </v-row>
+
+            <v-row>
+              <v-col>
+                <ProjectSnsEdit :project="project" :field-updated="fieldUpdated" />
+              </v-col>
+            </v-row>
+
+            <v-row>
+              <v-col>
+                <ProjectImgEdit :project="project" :img-uploaded="imgUploaded" />
+              </v-col>
+            </v-row>
+          </v-container>
+
+          <v-card-actions>
+            <v-btn  @click="send" :disabled="!isValid || isLoading" >
+              Update
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -43,6 +49,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 import ProjectSnsEdit from "@/components/Project/ProjectEditTab/ProjectSnsEdit";
 import ProjectInfoEdit from "@/components/Project/ProjectEditTab/ProjectInfoEdit";
 import ProjectImgEdit from "@/components/Project/ProjectEditTab/ProjectImgEdit";
@@ -56,20 +64,77 @@ export default {
   },
   data(){
     return{
-      isImgLoading : false,
-      isInfoLoading : false,
-      isSnsLoading : false
+      isLoading: false,
+      newProject: {},
+      imgFile: null,
+      isValid : false
     };
   },
   methods: {
-    updateImgLoad(state){
-      this.isImgLoading = state;
+    validation(){
+      this.isLoading = true;
+      this.$refs.info.validate()
+          .then((result) => {
+            this.isLoading = false;
+            this.isValid = result;
+          })
+          .catch(() => {
+            //TODO:エラー処理
+            alert("error in validate");
+          });
     },
-    updateInfoLoad(state){
-      this.isInfoLoading = state;
+    updateLoad(state){
+      this.isLoading = state;
     },
-    updateSnsLoad(state){
-      this.isSnsLoading = state;
+    fieldUpdated(fieldName, val){
+      this.newProject[fieldName] = val;
+      this.validation();
+    },
+    imgUploaded(file){
+      this.imgFile = file;
+    },
+    send(){
+      let patchInfo = () => {
+        return new Promise((resolve, reject) => {
+          axios
+              .patch("/projectapi/project/" + this.project.id + "?update_fields=" + JSON.stringify(this.newProject))
+              .then((response) => {
+                this.project = response.data;
+                resolve();
+              })
+              .catch(() => {
+                reject();
+              });
+        });
+      };
+
+      let patchImg = () => {
+        return new Promise((resolve, reject) => {
+          if(this.imgFile === null)
+            resolve();
+
+          let formData = new FormData();
+          formData.append("file", this.imgFile);
+
+          axios
+              .post("/projectapi/projectimage/" + this.project.id, formData)
+              .then(() => {
+                resolve();
+              })
+              .catch(() => {
+                reject();
+              });
+        });
+      };
+
+      this.isLoading = true;
+      Promise
+          .all([patchInfo(), patchImg()])
+          .then(() => {this.isLoading = false;})
+          .catch(() => {
+            //TODO:エラー処理
+            alert("error in send");
+          });
     }
   }
 }
