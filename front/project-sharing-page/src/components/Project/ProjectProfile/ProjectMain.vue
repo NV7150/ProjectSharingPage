@@ -7,6 +7,11 @@
     <v-card-text>
       {{project.description}}
     </v-card-text>
+    <v-row justify="center">
+      <v-btn :disabled="!hasJoinRight" @click="join">
+        Join this project
+      </v-btn>
+    </v-row>
     <v-responsive class="align-center">
       <v-card-actions>
         <v-btn
@@ -31,6 +36,7 @@ export default {
   data() {
     return{
       hasLikeRight : false,
+      hasJoinRight: false,
       liked : false,
       movingLike: false
     }
@@ -89,16 +95,56 @@ export default {
               this.hasLikeRight = false;
             });
       }
-    }
-  },
-  computed : {
-    loginUser(){
-      return this.$store.getters['getUser'];
+    },
+    checkIsMember(){
+      let user = this.$store.getters["getUser"];
+      if(!user){
+        this.hasJoinRight = false;
+        return;
+      }
+      let mems = this.project.members;
+
+      for(let i = 0; i < mems.length;i++){
+        if(mems[i] === user.username){
+          this.hasJoinRight = false;
+          return;
+        }
+      }
+
+      //TODO:ウェイトリストに入ってるかを取得
+      this.hasJoinRight = true;
+
+      // axios
+      //     .get("/projectapi/project/" + this.project.id + "/waitlist")
+      //     .then((response) => {
+      //       let wait = response.data;
+      //       for(let i = 0; i < wait.length; i++){
+      //         if(wait[i] === user.username){
+      //           this.hasJoinRight = false;
+      //           return;
+      //         }
+      //       }
+      //       this.hasJoinRight = true;
+      //     })
+      //     .catch(() => {
+      //       alert("error in waitlist");
+      //     });
+
+    },
+
+    join(){
+      axios
+          .post("/projectapi/project/" + this.project.id + "/join-request")
+          .catch(() => {
+            //TODO:エラー処理
+            alert("error in join");
+          });
     }
   },
 
   created() {
     this.checkLiked();
+    this.checkIsMember();
   }
 }
 </script>
