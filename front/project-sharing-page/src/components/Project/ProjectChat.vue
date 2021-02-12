@@ -13,7 +13,7 @@
       <v-dialog v-model="createDialog">
         <template v-slot:activator="{on, attrs}">
           <v-btn
-              v-show="window === 1"
+              v-show="window === 1 && canCreateThread"
               icon
               v-bind="attrs"
               v-on="on"
@@ -99,6 +99,7 @@ import ChatSettings from "../../assets/scripts/ProjectPageConstants";
 import ChatWindow from "./ProjectChat/ChatWindow";
 import ChatInput from "./ProjectChat/ChatInput";
 import ChatNewThread from "@/components/Project/ProjectChat/ChatNewThread";
+import ProjectPageConstants from "../../assets/scripts/ProjectPageConstants";
 
 export default {
   name: "ProjectChat",
@@ -121,7 +122,7 @@ export default {
       threads: [],
       threadObjects : [],
       selectingThread: {},
-      createDialog: false
+      createDialog: false,
     }
   },
   methods: {
@@ -243,6 +244,12 @@ export default {
           return this.selectingThread.name;
       }
       return "";
+    },
+    canCreateThread(){
+      if(this.selectingChannel.canCreate === ProjectPageConstants.canCreateEveryone)
+        return true;
+      let memberProp = ProjectPageConstants.memberTypes[this.selectingChannel.canCreate].prop;
+      return this.project[memberProp].indexOf(this.$store.getters["getUser"]) !== -1;
     }
   },
 
