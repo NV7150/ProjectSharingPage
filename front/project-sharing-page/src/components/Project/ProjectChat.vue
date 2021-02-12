@@ -83,6 +83,7 @@
               <v-spacer></v-spacer>
               <ChatInput
                   :thread="selectingThread"
+                  v-if="canWriteThread"
               />
             </v-card>
           </v-window-item>
@@ -123,6 +124,8 @@ export default {
       threadObjects : [],
       selectingThread: {},
       createDialog: false,
+      canCreateThread: false,
+      canWriteThread: false
     }
   },
   methods: {
@@ -130,6 +133,9 @@ export default {
       this.selectingChannel = channel;
       this.window = 1;
       this.loadThread();
+
+      this.checkCreateThread();
+      this.checkWriteThread();
 
       this.channelSelected(this.selectingChannel.id);
     },
@@ -227,11 +233,47 @@ export default {
           }
         }
       }
+
+      this.checkWriteThread();
+      this.checkCreateThread();
     },
 
     threadNewCreated(){
       this.createDialog = false;
       this.$router.go({path: this.$router.currentRoute.path, force: true});
+    },
+
+    checkCreateThread(){
+      if(this.selectingChannel.canCreate === undefined) {
+        this.canCreateThread = false;
+        return;
+      }
+
+      if(this.selectingChannel.canCreate === ProjectPageConstants.canCreateEveryone) {
+        this.canCreateThread = true;
+        return;
+      }
+
+      let memberProp = ProjectPageConstants.memberTypes[this.selectingChannel.canCreate].prop;
+      this.canCreateThread =  this.project[memberProp].indexOf(this.$store.getters["getUser"].username) !== -1;
+    },
+
+    checkWriteThread(){
+      console.log("enterd");
+      if(this.selectingChannel.canWrite === undefined) {
+        this.canWriteThread = false
+        return;
+      }
+
+      if(this.selectingChannel.canWrite === ProjectPageConstants.canCreateEveryone){
+        this.canWriteThread = true;
+        return;
+      }
+
+      let memberProp = ProjectPageConstants.memberTypes[this.selectingChannel.canWrite].prop;
+      console.log(memberProp);
+      this.canWriteThread =  this.project[memberProp].indexOf(this.$store.getters["getUser"].username) !== -1;
+      console.log(this.canWriteThread);
     }
   },
 
@@ -245,12 +287,6 @@ export default {
       }
       return "";
     },
-    canCreateThread(){
-      if(this.selectingChannel.canCreate === ProjectPageConstants.canCreateEveryone)
-        return true;
-      let memberProp = ProjectPageConstants.memberTypes[this.selectingChannel.canCreate].prop;
-      return this.project[memberProp].indexOf(this.$store.getters["getUser"]) !== -1;
-    }
   },
 
   created() {
