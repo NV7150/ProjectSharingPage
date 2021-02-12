@@ -26,5 +26,10 @@ export default {
         bg_image: PlaceHolder,
         subtitle: "Something went wrong...",
         likes: 0
+    },
+    memberTypes: {
+        "Admin" : {prop: "admin_users", send: "MEMBERTYPE_ADMIN"},
+        "Advanced Member": {prop: "announce_users", send: "MEMBERTYPE_ANNOUNCE"},
+        "Member": {prop: "members", send: "MEMBERTYPE_MEMBER"},
     }
 }

@@ -12,7 +12,8 @@
         >
           <v-tab>General</v-tab>
           <v-tab>Chat</v-tab>
-          <v-tab v-if="getIsMember">Edit</v-tab>
+          <v-tab v-if="getIsAdmin">Edit</v-tab>
+          <v-tab v-if="getIsAdmin">Admin</v-tab>
         </v-tabs>
 
         <v-card-text>
@@ -46,9 +47,15 @@
               </v-responsive>
             </v-tab-item>
 
-            <v-tab-item v-if="getIsMember">
+            <v-tab-item v-if="getIsAdmin">
               <v-responsive min-height="100vh">
                 <ProjectEditTab :project="project" />
+              </v-responsive>
+            </v-tab-item>
+
+            <v-tab-item v-if="getIsAdmin">
+              <v-responsive min-height="100vh">
+                <ProjectAdmin :project="project"/>
               </v-responsive>
             </v-tab-item>
 
@@ -66,10 +73,11 @@ import ProjectProfileTab from "../components/Project/ProjectProfileTab";
 import ProjectChat from "../components/Project/ProjectChat";
 import ProjectTop from "../components/Project/ProjectTop";
 import ProjectEditTab from "@/components/Project/ProjectEditTab";
+import ProjectAdmin from "@/components/Project/ProjectAdmin";
 
 export default {
   name: "Project",
-  components: {ProjectEditTab, ProjectTop, ProjectChat, ProjectProfileTab, NavigationBar},
+  components: {ProjectAdmin, ProjectEditTab, ProjectTop, ProjectChat, ProjectProfileTab, NavigationBar},
   props: {
     initTab: {type: Number, default: 0},
     initChannel: {type: Number, default: -1},
@@ -80,7 +88,7 @@ export default {
       tabs : 0,
       project: {},
       members: [],
-      nonQuery : [0, 2],
+      nonQuery : [0, 2, 3],
 
       isProjectLoading : true
     }
@@ -172,7 +180,7 @@ export default {
     processLink(){
       if(this.initThread !== -1 || this.initChannel !== -1) {
         this.tabs = 1;
-      }else if(this.initTab !== 2){
+      }else if(this.nonQuery.indexOf(this.initTab) === -1 ){
         this.tabs = this.initTab;
       }else{
         this.tabs = 0;
@@ -181,15 +189,11 @@ export default {
   },
 
   computed : {
-    getIsMember(){
+    getIsAdmin(){
       if(!this.$store.getters["getUser"] || !this.$store.getters["getUser"].username)
         return;
 
-      for(let i = 0; i < this.project.members.length; i++){
-        if(this.$store.getters["getUser"].username === this.project.members[i])
-          return true;
-      }
-      return false;
+      return this.project.admin_users.indexOf(this.$store.getters["getUser"].username) !== -1;
     }
   },
 

@@ -133,6 +133,7 @@ export default {
     },
 
     join(){
+      this.hasJoinRight = false;
       axios
           .post("/projectapi/project/" + this.project.id + "/join-request")
           .catch(() => {
