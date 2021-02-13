@@ -121,9 +121,8 @@ export default {
       let tasks = [];
       for(let i = 0; i < this.selecting.length; i++) {
         let task = () => new Promise((resolve, reject) => {
-          //TODO:/を削除
           axios
-              .post("/projectapi/project/" + this.project.id + "/members/", {
+              .post("/projectapi/project/" + this.project.id + "/members", {
                 username: this.selecting[i],
                 type: memberType.send
               })
