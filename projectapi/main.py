@@ -434,7 +434,7 @@ def unlike(id: int, token: Optional[str] = Cookie(None)):
 
 # Member
 @app.post(
-    '/projectapi/project/{proj_id:int}/members/',
+    '/projectapi/project/{proj_id:int}/members',
     description='Join user as member_type',
     status_code=status.HTTP_200_OK,
     responses={
