@@ -576,8 +576,44 @@ async def join_request(proj_id: int, token: Optional[str] = Cookie(None)):
 
 
 @app.get(
+    '/projectapi/project/waitlist',
+    description='Waitlist per user',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful Response (List of waiting project id)',
+            'model': List[schema.Project],
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Invalid user token.'
+        },
+    },
+)
+async def user_waitlist(token: Optional[str] = Cookie(None)):
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if (username := user.auth(token)) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    with db.session_scope() as s:
+        waiting_projects = s.query(db.JoinRequestUser).filter(
+            db.JoinRequestUser.username == username
+        )
+
+        result: List[schema.Project] = []
+        for wp in waiting_projects:
+            p = db.Project.get(s, wp.project_id)
+            if p is None:
+                continue
+
+            result.append(schema.Project.from_db(p))
+
+        return result
+
+
+@app.get(
     '/projectapi/project/{proj_id:int}/waitlist',
-    description='Waitlist',
+    description='Waitlist per project',
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_200_OK: {
