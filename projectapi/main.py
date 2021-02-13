@@ -435,7 +435,7 @@ def unlike(id: int, token: Optional[str] = Cookie(None)):
 # Member
 @app.post(
     '/projectapi/project/{proj_id:int}/members',
-    description='Join user as member_type',
+    description='Set user as member_type',
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_200_OK: {
@@ -526,6 +526,119 @@ async def join_member(
                     username=project_join.username,
                 )
                 s.add(adu)
+
+        s.commit()
+
+
+# Member
+@app.delete(
+    '/projectapi/project/{proj_id:int}/members',
+    description='Strip member_type from user',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'description': 'Successful response (Stripped)'
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'not logged in',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'permitted (only for admin user)',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Project/User not found',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'description': 'User does\'nt have member_type',
+        },
+    },
+)
+async def strip_membertype(proj_id: int, project_strip: schema.ProjectJoin,
+                           token: Optional[str] = Cookie(None)):
+    if token is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if (username := user.auth(token)) is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if user.exist(project_strip.username) is False:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            'User not found',
+        )
+
+    with db.session_scope() as s:
+        if (p := db.Project.get(s, proj_id)) is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                'Project not found',
+            )
+
+        # permission (admin only)
+        if username not in [au.username for au in p.admin_users]:
+            raise HTTPException(status.HTTP_403_FORBIDDEN)
+
+        # check
+        if project_strip.type == schema.MemberType.MEMBER:
+            if project_strip.username not in [x.username
+                                              for x in p.members]:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST)
+        if project_strip.type == schema.MemberType.ANNOUNCE:
+            if project_strip.username not in [x.username
+                                              for x in p.announce_users]:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST)
+        if project_strip.type == schema.MemberType.ADMIN:
+            if project_strip.username not in [x.username
+                                              for x in p.admin_users]:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST)
+
+        # join
+        if project_strip.type == schema.MemberType.ADMIN:
+            # adminだけ消す
+            au = s.query(db.ProjectAdminUser).filter(
+                db.ProjectAdminUser.project_id == proj_id
+            ).filter(
+                db.ProjectAdminUser.username == project_strip.username
+            )
+            [s.delete(x) for x in au]
+
+        elif project_strip.type == schema.MemberType.ANNOUNCE:
+            # adminとannounceだけ消す
+            adu = s.query(db.ProjectAdminUser).filter(
+                db.ProjectAdminUser.project_id == proj_id
+            ).filter(
+                db.ProjectAdminUser.username == project_strip.username
+            )
+            [s.delete(x) for x in adu]
+
+            au = s.query(db.ProjectAnnounceUser).filter(
+                db.ProjectAnnounceUser.project_id == proj_id
+            ).filter(
+                db.ProjectAnnounceUser.username == project_strip.username
+            )
+            [s.delete(x) for x in au]
+
+        elif project_strip.type == schema.MemberType.MEMBER:
+            # admin, announce, member全消し
+            adu = s.query(db.ProjectAdminUser).filter(
+                db.ProjectAdminUser.project_id == proj_id
+            ).filter(
+                db.ProjectAdminUser.username == project_strip.username
+            )
+            [s.delete(x) for x in adu]
+
+            au = s.query(db.ProjectAnnounceUser).filter(
+                db.ProjectAnnounceUser.project_id == proj_id
+            ).filter(
+                db.ProjectAnnounceUser.username == project_strip.username
+            )
+            [s.delete(x) for x in au]
+
+            u = s.query(db.ProjectUser).filter(
+                db.ProjectUser.project_id == proj_id
+            ).filter(
+                db.ProjectUser.username == project_strip.username
+            )
+            [s.delete(x) for x in u]
 
         s.commit()
 
