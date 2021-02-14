@@ -51,14 +51,7 @@ export default {
         };
       }
     },
-  },
-  methods: {
-    getColor(){
-      //TODO:タグの色を取得
-      return "";
-    }
   }
-
 }
 </script>
 

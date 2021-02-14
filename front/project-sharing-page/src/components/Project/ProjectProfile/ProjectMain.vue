@@ -29,6 +29,7 @@
 
 <script>
 import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "ProjectMain",
@@ -56,7 +57,7 @@ export default {
               this.project.likes++;
             })
             .catch(() => {
-              //TODO:その他のエラーページへ飛ばす
+              ErrorResolver.resolveError(this.$router);
             });
       }else{
         axios
@@ -67,7 +68,7 @@ export default {
               this.project.likes--;
             })
             .catch(() => {
-              //TODO:その他のエラーページへ飛ばす
+              ErrorResolver.resolveError(this.$router);
             });
       }
     },
@@ -137,8 +138,7 @@ export default {
       axios
           .post("/projectapi/project/" + this.project.id + "/join-request")
           .catch(() => {
-            //TODO:エラー処理
-            alert("error in join");
+            ErrorResolver.resolveError(this.$router);
           });
     }
   },

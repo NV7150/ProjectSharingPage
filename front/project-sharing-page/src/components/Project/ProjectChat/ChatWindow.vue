@@ -39,6 +39,7 @@
 
 <script>
 import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "ChatWindow",
@@ -119,7 +120,7 @@ export default {
             this.isLoadingMessages = false;
           })
           .catch(() => {
-            //TODO:エラー処理
+            ErrorResolver.resolveError(this.$router);
           });
     },
 

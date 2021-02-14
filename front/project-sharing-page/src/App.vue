@@ -14,7 +14,6 @@ export default {
     };
   },
   created() {
-
     this.isLoaded = false;
     //ログインを行う
     this.$store.dispatch("checkLogin")

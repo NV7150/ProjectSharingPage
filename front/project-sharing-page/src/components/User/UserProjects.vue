@@ -41,6 +41,7 @@
 
 import UserProjectCard from "@/components/User/UserProjects/UserProjectCard";
 import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "UserProjects",
@@ -66,8 +67,7 @@ export default {
           this.isLoading = false;
         })
         .catch(() => {
-          //TODO:エラー処理
-          alert("Error in get projects");
+          ErrorResolver.resolveError(this.$router);
         });
   }
 }

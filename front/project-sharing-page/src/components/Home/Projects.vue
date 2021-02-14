@@ -41,6 +41,7 @@
 <script>
 import ProjectCard from "./ProjectCard";
 import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "Projects",
@@ -70,8 +71,7 @@ export default {
           }
         })
         .catch(() => {
-          //TODO:エラー処理
-          alert("Error in get:recommend");
+          ErrorResolver.resolveError(this.$router);
         });
   }
 }

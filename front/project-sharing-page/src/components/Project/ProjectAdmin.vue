@@ -82,6 +82,7 @@
 import MemberRow from "@/components/Project/ProjectAdmin/MemberRow";
 import axios from "axios";
 import ProjectConsts from "@/assets/scripts/ProjectConsts";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "ProjectAdmin",
@@ -203,8 +204,7 @@ export default {
             this.isLoading = false;
           })
           .catch(() => {
-            //TODO:エラー処理
-            alert("Error in change member");
+            ErrorResolver.resolveError(this.$router);
           });
     },
     hasDup(target, v){
@@ -249,8 +249,7 @@ export default {
     this.initMemberList()
         .then(() => {this.isLoading = false;})
         .catch(() => {
-          //TODO:エラー処理
-          alert("error on init memberlist");
+          ErrorResolver.resolveError(this.$router);
         })
   }
 }
