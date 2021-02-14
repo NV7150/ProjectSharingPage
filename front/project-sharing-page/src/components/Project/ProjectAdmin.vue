@@ -203,17 +203,6 @@ export default {
             alert("Error in change member");
           });
     },
-    // removeDup(target){
-    //   let checking = ["waits"];
-    //   for(let key in this.memberTypes){
-    //     checking.push(this.memberTypes[key].prop);
-    //   }
-    //   checking = checking.filter(v => v !== target);
-    //   for(let i in checking){
-    //     let check = checking[i];
-    //     this.memberList[check] = this.memberList[check].filter(v => !this.hasDup(check, v));
-    //   }
-    // },
     hasDup(target, v){
       let exists = false;
       for(let key in this.memberList){
