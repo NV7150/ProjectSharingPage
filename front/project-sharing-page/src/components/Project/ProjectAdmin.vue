@@ -149,8 +149,12 @@ export default {
                   }
                 });
           }else{
-            request = axios
-                .delete("/projectapi/project/" + this.project.id + "/join-request?username=" + this.selecting[i]);
+            request =
+                axios.delete("/projectapi/project/" + this.project.id + "/join-request", {
+                  params: {
+                    username: this.selecting[i]
+                  }
+                });
           }
         }
 

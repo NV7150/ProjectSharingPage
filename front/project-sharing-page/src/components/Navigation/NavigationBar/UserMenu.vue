@@ -21,7 +21,7 @@
             <v-avatar>
               <v-img :src="user.icon" />
             </v-avatar>
-            <v-card-title>{{user.display_name}}</v-card-title>
+            <v-card-title class="text-center">{{user.display_name}}</v-card-title>
           </div>
 
           <div

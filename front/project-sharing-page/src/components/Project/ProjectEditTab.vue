@@ -97,7 +97,11 @@ export default {
       let patchInfo = () => {
         return new Promise((resolve, reject) => {
           axios
-              .patch("/projectapi/project/" + this.project.id + "?update_fields=" + JSON.stringify(this.newProject))
+              .patch("/projectapi/project/" + this.project.id, {}, {
+                params: {
+                  update_fields: JSON.stringify(this.newProject)
+                }
+              })
               .then((response) => {
                 this.project = response.data;
                 resolve();
