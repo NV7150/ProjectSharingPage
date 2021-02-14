@@ -307,18 +307,16 @@ async def get_user(username: str):
             'model': schema.SkillTag,
             'description': 'Successful response',
         },
-        status.HTTP_400_BAD_REQUEST: {
-            'description': 'Bad request',
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Parent tag not found.'
         },
-        status.HTTP_409_CONFLICT: {
-            'description': 'Tag already exist.'
+        status.HTTP_429_TOO_MANY_REQUESTS: {
+            'description': 'Tag already exists'
         }
     }
 )
 async def create_skilltag(tag: schema.SkillTagCreate):
     result = tag.create()
-    if result is None:
-        HTTPException(status.HTTP_400_BAD_REQUEST)
     return result
 
 
