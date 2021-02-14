@@ -5,6 +5,7 @@ from utils import user
 from sqlalchemy import func
 from typing import Optional, List, Dict
 import enum
+import datetime
 
 
 class Sns(BaseModel):
@@ -33,6 +34,7 @@ class Project(BaseModel):
     likes: int
     sns: Sns
     skilltags: List[int]
+    created_at: datetime.datetime
 
     @classmethod
     def from_db(cls, db_proj: db.Project):
@@ -60,6 +62,7 @@ class Project(BaseModel):
             likes=len(db_proj.likes),
             sns=sns,
             skilltags=db_proj.skilltags,
+            created_at=db_proj.created_at,
         )
 
 
@@ -188,6 +191,7 @@ class ProjectCreate(BaseModel):
             p.linkedin = self.sns.linkedin
             p.wantedly = self.sns.wantedly
             p.url = self.sns.url
+            p.created_at = datetime.datetime.now()
 
             s.add(p)
             s.commit()

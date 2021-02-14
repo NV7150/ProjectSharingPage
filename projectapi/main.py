@@ -200,11 +200,14 @@ async def delete_project(id: int, token: Optional[str] = Cookie(None)):
         }
     },
 )
-async def get_project_with_tag(tags: Optional[List[int]] = Query(None)):
+async def get_project_with_tag(tags: List[int] = Query([]),
+                               sortbydatetime: bool = Query(False),
+                               reverse: bool = Query(False)):
     if tags is None:
         raise HTTPException(status.HTTP_400_BAD_REQUEST)
     with db.session_scope() as s:
-        projects = db.Project.get_with_tag(s, tags)
+        projects = db.Project.get_with_tag(s, tags,
+                                           sortbydatetime, reverse)
         return [schema.Project.from_db(p) for p in projects]
 
 

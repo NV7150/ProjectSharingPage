@@ -2,11 +2,14 @@ from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 
 import os
+import datetime
 from contextlib import contextmanager
 from typing import Any, List, Optional
+
+from sqlalchemy.sql.expression import desc
 
 
 PG_USER = os.environ.get('POSTGRES_USER')
@@ -174,6 +177,9 @@ class Project(Base):
     __skilltags = Column('skilltags', String, nullable=False)
     is_active = Column('is_active', Boolean, nullable=False, default=True)
 
+    created_at = Column('created_at', DateTime, nullable=False,
+                        default=datetime.datetime.now)
+
     @property
     def skilltags(self) -> List[int]:
         return [
@@ -199,14 +205,21 @@ class Project(Base):
         return p
 
     @classmethod
-    def get_with_tag(cls, s: scoped_session, tags: List[int]) -> List:
+    def get_with_tag(cls, s: scoped_session, tags: List[int],
+                     datetime_sort: bool = False, reverse: bool = False) -> List:
         projects: List[Project] = []
         for t in tags:
-            maybe_projects: List[Project] = []
             mp = s.query(cls).filter(
                 cls.__skilltags.like(f'%{t}%')
             )
-            maybe_projects += list(mp)
+
+            # sort
+            if datetime_sort and not reverse:
+                mp = mp.order_by(cls.created_at)
+            if datetime_sort and reverse:
+                mp = mp.order_by(desc(cls.created_at))
+
+            maybe_projects: List[Project] = mp.all()
 
             for mp in maybe_projects:
                 if t in mp.skilltags:
