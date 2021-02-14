@@ -19,7 +19,7 @@ export default {
       if(!this.keyword)
         return;
 
-      this.$router.push({name: "Search", query: {
+      this.$router.push({name: "Search", params: {
         keyword: this.keyword
       }});
     }

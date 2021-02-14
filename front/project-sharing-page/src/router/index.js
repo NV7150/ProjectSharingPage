@@ -61,7 +61,7 @@ const routes = [
   {
     path: '/search/:keyword',
     name: 'Search',
-    component: Search
+    component: Search,
   },
   {
     path: '/newProject',
