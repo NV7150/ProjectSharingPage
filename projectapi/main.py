@@ -200,11 +200,15 @@ async def delete_project(id: int, token: Optional[str] = Cookie(None)):
         }
     },
 )
-async def get_project_with_tag(tags: Optional[List[int]] = Query(None)):
-    if tags is None:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST)
+async def get_project_with_tag(tags: List[int] = Query([]),
+                               limit: Optional[int] = Query(None),
+                               offset: Optional[int] = Query(None),
+                               sortbydatetime: bool = Query(False),
+                               reverse: bool = Query(False)):
     with db.session_scope() as s:
-        projects = db.Project.get_with_tag(s, tags)
+        projects = schema.ProjectSearchResult.get_with_tag(
+            s, tags, limit, offset, sortbydatetime, reverse
+        )
         return [schema.Project.from_db(p) for p in projects]
 
 
@@ -508,6 +512,15 @@ async def join_member(
                     username=project_join.username
                 )
                 s.add(pu)
+
+                # delete from waitlist
+                wl = s.query(db.JoinRequestUser).filter(
+                    db.JoinRequestUser.project_id == proj_id
+                ).filter(
+                    db.JoinRequestUser.username == project_join.username
+                )
+                [s.delete(x) for x in wl]
+
         if project_join.type in all_type[1:]:
             # announce, admin
             au_list = [x.username for x in p.announce_users]
@@ -517,6 +530,7 @@ async def join_member(
                     username=project_join.username,
                 )
                 s.add(au)
+
         if project_join.type in all_type[2:]:
             # admin
             adu_list = [x.username for x in p.admin_users]
