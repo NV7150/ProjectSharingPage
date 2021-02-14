@@ -52,7 +52,6 @@ export default {
       for(let i = 0; i < this.nowTags.length; i++){
         tagIds.push(this.nowTags[i].id);
       }
-      console.log(tagIds);
 
       this.fieldUpdated("skilltags", tagIds);
     },
@@ -60,7 +59,6 @@ export default {
 
   created() {
     this.nowTags = _.cloneDeep(this.user.skilltags);
-    console.log(this.nowTags);
   }
 }
 </script>

@@ -74,7 +74,7 @@
 
 <script>
 import axios from "axios";
-import ProjectPageSettings from "@/assets/scripts/ProjectPageConstants";
+import ProjectPageSettings from "@/assets/scripts/ProjectConsts";
 import PlaceHolder from "@/assets/img/PlaceHolder.png"
 
 export default {

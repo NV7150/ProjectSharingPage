@@ -65,6 +65,12 @@
           >
             {{key}}
           </v-btn>
+          <v-btn
+              @click="moveMember(projectConst.removeKey)"
+              class="ml-2"
+          >
+            {{projectConst.removeKey}}
+          </v-btn>
         </v-row>
       </v-snackbar>
 
@@ -75,19 +81,20 @@
 <script>
 import MemberRow from "@/components/Project/ProjectAdmin/MemberRow";
 import axios from "axios";
-import ProjectPageConstants from "@/assets/scripts/ProjectPageConstants";
+import ProjectConsts from "@/assets/scripts/ProjectConsts";
 
 export default {
   name: "ProjectAdmin",
   components: {MemberRow},
   props: {
-    project: {type:Object, required: true},
+    projectRaw: {type:Object, required: true},
     loadingStateUpdated: {type: Function}
   },
   data(){
     return{
+      project: {},
       isSelectingMember: false,
-      memberTypes: ProjectPageConstants.memberTypes,
+      memberTypes: ProjectConsts.memberTypes,
       isLoading: true,
       memberList: {
         admin_users: [],
@@ -95,7 +102,8 @@ export default {
         members: [],
         waits: []
       },
-      selecting: []
+      selecting: [],
+      projectConst: ProjectConsts
     };
   },
 
@@ -112,22 +120,46 @@ export default {
       this.isSelectingMember = this.selecting.length > 0;
     },
     moveMember(key){
-      if(key === "Remove"){
-        //TODO:メンバーの削除
-        return;
-      }
-      let memberType = this.memberTypes[key];
+      let memberType = (key !== ProjectConsts.removeKey) ? this.memberTypes[key] : ProjectConsts.removeKey;
+
       this.isLoading = true;
       let tasks = [];
+
       for(let i = 0; i < this.selecting.length; i++) {
-        let task = () => new Promise((resolve, reject) => {
-          axios
-              .post("/projectapi/project/" + this.project.id + "/members", {
+        let request;
+        if(memberType !== ProjectConsts.removeKey && this.project[memberType.prop].indexOf(this.selecting[i]) === -1){
+          request =
+              axios.post("/projectapi/project/" + this.project.id + "/members", {
                 username: this.selecting[i],
                 type: memberType.send
-              })
+              });
+        }else{
+          if(this.memberList.waits.indexOf(this.selecting[i]) === -1) {
+            let upType = this.memberTypes[ProjectConsts.getOneRankUp(key)];
+
+            //指定階級に存在して一つ上の階級に存在しない＝うごかさないのでcontinue
+            if(this.project[upType.prop].indexOf(this.selecting[i]) === -1)
+              continue;
+
+            request =
+                axios.delete("/projectapi/project/" + this.project.id + "/members", {
+                  data: {
+                    username: this.selecting[i],
+                    type: upType.send
+                  }
+                });
+          }else{
+            request = axios
+                .delete("/projectapi/project/" + this.project.id + "/join-request?username=" + this.selecting[i]);
+          }
+        }
+
+        let task = () => new Promise((resolve, reject) => {
+          request
               .then(() => {
-                this.memberList[memberType.prop].push(this.selecting[i]);
+                if(memberType !== ProjectConsts.removeKey) {
+                  this.memberList[memberType.prop].push(this.selecting[i]);
+                }
                 resolve();
               })
               .catch(() => {
@@ -137,64 +169,97 @@ export default {
 
         tasks.push(task());
       }
+
       Promise
-          .all(tasks)
+          .resolve()
           .then(() => {
-            this.isLoading = false;
-            this.removeDup(memberType.prop);
+            return new Promise((resolve, reject) => {
+              Promise.all(tasks)
+                  .then(() => {resolve();})
+                  .catch(() => {reject();})
+            });
+          })
+          .then(() => {
+            return new Promise((resolve, reject) => {
+              axios
+                  .get("/projectapi/project/" + this.project.id)
+                  .then((response) => {
+                    this.project = response.data;
+                    resolve();
+                  })
+                  .catch(() => {
+                    reject();
+                  });
+            })
+          })
+          .then(this.initMemberList)
+          .then(() => {
             this.selecting = [];
             this.isSelectingMember = false;
+            this.isLoading = false;
           })
           .catch(() => {
             //TODO:エラー処理
             alert("Error in change member");
           });
     },
-    removeDup(target){
-      let checking = ["waits"];
-      for(let key in this.memberTypes){
-        checking.push(this.memberTypes[key].prop);
-      }
-      checking = checking.filter(v => v !== target);
-      for(let i in checking){
-        let check = checking[i];
-        this.memberList[check] = this.memberList[check].filter(v => !this.hasDup(check, v));
-      }
-    },
+    // removeDup(target){
+    //   let checking = ["waits"];
+    //   for(let key in this.memberTypes){
+    //     checking.push(this.memberTypes[key].prop);
+    //   }
+    //   checking = checking.filter(v => v !== target);
+    //   for(let i in checking){
+    //     let check = checking[i];
+    //     this.memberList[check] = this.memberList[check].filter(v => !this.hasDup(check, v));
+    //   }
+    // },
     hasDup(target, v){
       let exists = false;
       for(let key in this.memberList){
-        console.log(this.memberList[key] + " " + key);
         if(key !== target && this.memberList[key].indexOf(v) !== -1){
           exists = true;
           break;
         }
       }
       return exists;
-    }
-  },
+    },
+    initMemberList(){
+      this.memberList = {
+        admin_users: [],
+        announce_users: [],
+        members: [],
+        waits: []
+      };
+      this.memberList.admin_users = this.project.admin_users;
+      this.memberList.announce_users = this.project.announce_users.filter(v => !this.hasDup("announce_users", v));
+      this.memberList.members = this.project.members.filter(v => !this.hasDup("members", v));
 
+      return new Promise((resolve, reject) => {
+        axios
+            .get("/projectapi/project/" + this.project.id + "/waitlist")
+            .then((response) => {
+              this.memberList.waits = response.data.filter(v => !this.hasDup("waits", v));
+              resolve();
+            })
+            .catch(() => {
+              reject();
+            });
+      });
+    },
+  },
   created() {
     this.isLoading = true;
 
-    this.memberList.admin_users = this.project.admin_users;
-    this.memberList.announce_users = this.project.announce_users.filter(v => !this.hasDup("announce_users", v));
-    this.memberList.members = this.project.members.filter(v => !this.hasDup("members", v));
+    this.project = this.projectRaw;
 
-    // this.memberTypes["Remove"] = {};
-
-    axios
-        .get("/projectapi/project/" + this.project.id + "/waitlist")
-        .then((response) => {
-          this.memberList.waits = response.data.filter(v => !this.hasDup("waits", v));
-          this.isLoading = false;
-        })
+    this.initMemberList()
+        .then(() => {this.isLoading = false;})
         .catch(() => {
           //TODO:エラー処理
-          alert("Error in get waitlist");
-        });
+          alert("error on init memberlist");
+        })
   }
-
 }
 </script>
 

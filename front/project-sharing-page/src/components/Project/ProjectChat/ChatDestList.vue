@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import ChatSettings from "@/assets/scripts/ProjectPageConstants";
+import ChatSettings from "@/assets/scripts/ProjectConsts";
 
 export default {
   name: "ChatDestList",

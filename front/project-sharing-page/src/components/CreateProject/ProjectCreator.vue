@@ -104,7 +104,6 @@ export default {
       axios
           .post("/projectapi/project", this.newProject)
           .then((response) => {
-            console.log(response);
             this.editImg(response.data.id)
                 .then(() => {
                   this.moveToCratedPage(response.data.id);
@@ -148,7 +147,6 @@ export default {
     for(let i = 0; i < keys.length; i++){
       this.newProject.sns[keys[i]] = "";
     }
-    console.log(this.newProject);
     this.initing = false;
   }
 }

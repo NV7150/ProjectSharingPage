@@ -55,7 +55,7 @@
 
             <v-tab-item v-if="getIsAdmin">
               <v-responsive min-height="100vh">
-                <ProjectAdmin :project="project"/>
+                <ProjectAdmin :projectRaw="project"/>
               </v-responsive>
             </v-tab-item>
 

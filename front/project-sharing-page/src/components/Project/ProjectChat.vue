@@ -96,11 +96,11 @@
 <script>
 import axios from "axios";
 import ChatDestList from "./ProjectChat/ChatDestList";
-import ChatSettings from "../../assets/scripts/ProjectPageConstants";
+import ChatSettings from "../../assets/scripts/ProjectConsts";
 import ChatWindow from "./ProjectChat/ChatWindow";
 import ChatInput from "./ProjectChat/ChatInput";
 import ChatNewThread from "@/components/Project/ProjectChat/ChatNewThread";
-import ProjectPageConstants from "../../assets/scripts/ProjectPageConstants";
+import ProjectPageConstants from "../../assets/scripts/ProjectConsts";
 
 export default {
   name: "ProjectChat",
@@ -259,7 +259,6 @@ export default {
     },
 
     checkWriteThread(){
-      console.log("enterd");
       if(this.selectingChannel.canWrite === undefined) {
         this.canWriteThread = false
         return;
@@ -271,9 +270,7 @@ export default {
       }
 
       let memberProp = ProjectPageConstants.memberTypes[this.selectingChannel.canWrite].prop;
-      console.log(memberProp);
       this.canWriteThread =  this.project[memberProp].indexOf(this.$store.getters["getUser"].username) !== -1;
-      console.log(this.canWriteThread);
     }
   },
 

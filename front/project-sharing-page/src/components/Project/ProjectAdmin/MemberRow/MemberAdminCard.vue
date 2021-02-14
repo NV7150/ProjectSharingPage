@@ -41,7 +41,7 @@
 
 <script>
 import axios from "axios";
-import ProjectPageConstants from "@/assets/scripts/ProjectPageConstants";
+import ProjectPageConstants from "@/assets/scripts/ProjectConsts";
 
 export default {
   name: "MemberAdminCard",

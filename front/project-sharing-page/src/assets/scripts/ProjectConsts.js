@@ -56,4 +56,16 @@ export default {
             canCreate: "Member"
         }
     ],
+    getOneRankUp(memberType){
+        if(memberType === "Admin"){
+            throw new Error("invalid argument");
+        }else if(memberType === "Advanced Member"){
+            return "Admin";
+        }else if(memberType === "Member"){
+            return "Advanced Member";
+        }else{
+            return "Member";
+        }
+    },
+    removeKey : "Remove"
 }

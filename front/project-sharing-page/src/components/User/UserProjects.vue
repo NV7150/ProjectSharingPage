@@ -59,13 +59,10 @@ export default {
   },
   created() {
     this.isLoading = true;
-    console.log(this.user);
     axios
         .get("/projectapi/project/" + this.user.username)
         .then((response) => {
           this.projects = response.data;
-          console.log("loaded ");
-          console.log(this.projects);
           this.isLoading = false;
         })
         .catch(() => {
