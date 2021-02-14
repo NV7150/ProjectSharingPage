@@ -508,6 +508,15 @@ async def join_member(
                     username=project_join.username
                 )
                 s.add(pu)
+
+                # delete from waitlist
+                wl = s.query(db.JoinRequestUser).filter(
+                    db.JoinRequestUser.project_id == proj_id
+                ).filter(
+                    db.JoinRequestUser.username == project_join.username
+                )
+                [s.delete(x) for x in wl]
+
         if project_join.type in all_type[1:]:
             # announce, admin
             au_list = [x.username for x in p.announce_users]
@@ -517,6 +526,7 @@ async def join_member(
                     username=project_join.username,
                 )
                 s.add(au)
+
         if project_join.type in all_type[2:]:
             # admin
             adu_list = [x.username for x in p.admin_users]
