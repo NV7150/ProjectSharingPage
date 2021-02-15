@@ -221,13 +221,23 @@ async def get_project_with_tag(tags: List[int] = Query([]),
             'model': int,
             'description': 'Successful response (only project-id)',
         },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'No project in project-sharing-page'
+        }
     },
 )
 async def get_random_project_id():
     with db.session_scope() as s:
-        all_id = list(s.query(db.Project.id).all())
-        index = random.randint(0, len(all_id)-1)
-        id = all_id[index]
+        all_proj = s.query(db.Project.id).filter(
+            db.Project.is_active
+        )
+        if all_proj.count() < 1:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                'No project in project-sharing-page'
+            )
+        index = random.randint(0, all_proj.count()-1)
+        id = all_proj.all()[index]
         return id
 
 
