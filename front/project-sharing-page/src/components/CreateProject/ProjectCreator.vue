@@ -73,12 +73,18 @@ export default {
         sns: {},
         skilltags: []
       },
-      isValid: false
+      isValid: false,
+      imgFile: null
     }
   },
 
   methods: {
     validation(){
+      if(this.imgFile === null) {
+        this.isValid = false;
+        return;
+      }
+
       this.isLoading = true;
       this.$refs.info.validate()
           .then((result) => {
@@ -98,6 +104,7 @@ export default {
     },
     imgUploaded(file){
       this.imgFile = file;
+      this.validation();
     },
 
     send(){
