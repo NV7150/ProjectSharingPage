@@ -100,24 +100,23 @@ async def recommend_projects_without_usertoken(
     sorted_by_date: List[int] = sorted_by_date_resp.json()
 
     result: List[int] = []
-    print(sorted_by_date, sorted_by_like)
-    while len(result) < len(sorted_by_date):
-        count = random.randint(1, 3)
-        for _ in range(count):
-            if len(sorted_by_date) == 0:
-                break
+    if len(sorted_by_date) != len(sorted_by_like):
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            p = sorted_by_date.pop()
-            if p not in result:
-                result.append(p)
-
-        count = random.randint(0, 3)
-        for _ in range(count):
-            if len(sorted_by_like) == 0:
-                break
+    len_sorted_by_date = len(sorted_by_date)
+    while len(result) < len_sorted_by_date:
+        c = random.choice(['like', 'like', 'date'])  # like:date = 2:1
+        print(c)
+        if len(sorted_by_like) > 0 and c == 'like':
             p = sorted_by_like.pop()
             if p not in result:
                 result.append(p)
+        elif len(sorted_by_date) > 0 and c == 'date':
+            p = sorted_by_date.pop()
+            if p not in result:
+                result.append(p)
+        else:
+            continue
 
     if offset is None:
         return result[:limit]
