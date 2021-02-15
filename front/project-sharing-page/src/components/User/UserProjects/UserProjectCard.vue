@@ -1,12 +1,10 @@
 <template>
   <v-card
-      :loading="loading"
       @mouseover="hovered = true"
       @mouseleave="hovered = false"
       :height="height"
       width="100%"
   >
-
     <v-img
         height="100%"
         :src="project.bg_image"
@@ -34,7 +32,7 @@
             <v-spacer></v-spacer>
             <v-btn
               icon
-              :disabled="loading || failed"
+              :disabled="failed"
               @click="toProjectPage"
             >
               <v-icon>mdi-page-next</v-icon>
@@ -47,14 +45,11 @@
 </template>
 
 <script>
-import axios from "axios";
-import ProjectPageSettings from "@/assets/scripts/ProjectPageConstants";
-
 export default {
   name: "UserProjectCard",
   props: {
-    projectId : {
-      type: Number,
+    project : {
+      type: Object,
       require: true
     },
     height: {
@@ -65,9 +60,6 @@ export default {
   },
   data() {
     return {
-      //place holder
-      project : ProjectPageSettings.defaultProject,
-      loading : true,
       hovered : false,
       failed : false
     }
@@ -78,30 +70,8 @@ export default {
         name:'Project',
         params: { projectId: this.project.id }
       })
-    },
-    getProject(){
-      axios
-          .get("/projectapi/project/" + this.projectId)
-          .then((response) => {
-            this.project = response.data;
-            this.loading = false;
-          })
-          .catch(() => {
-            this.project = ProjectPageSettings.failedProject;
-            this.loading = false;
-            this.failed = true;
-          });
     }
   },
-
-  created() {
-    this.getProject();
-  },
-  // watch: {
-  //   projectId: function (){
-  //     this.getProject();
-  //   }
-  // }
 }
 </script>
 

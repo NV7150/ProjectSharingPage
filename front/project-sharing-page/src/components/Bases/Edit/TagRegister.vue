@@ -28,6 +28,7 @@
 
 <script>
 import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 const CREATE_NEW = -1;
 
@@ -66,8 +67,7 @@ export default {
             this.isSearching = false;
           })
           .catch(() => {
-            //TODO:エラー処理
-            alert("ERROR!");
+            ErrorResolver.resolveError(this.$router);
           });
     },
 
@@ -89,8 +89,7 @@ export default {
             this.tagSelected(response.data);
           })
           .catch(() => {
-            //TODO:エラー処理
-            alert("ERROR! in newTag");
+            ErrorResolver.resolveError(this.$router);
           });
     }
   }

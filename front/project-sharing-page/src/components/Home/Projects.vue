@@ -7,17 +7,41 @@
           md="4"
           lg="3"
           xl="2"
-          v-for="recommend in recommends" :key="recommend"
+          v-for="(recommend, i) in recommends"
+          :key="i"
       >
-        <ProjectCard :project-id="recommend"></ProjectCard>
+        <v-lazy
+            v-model="isActive[i]"
+            :options="{threshold: .5}"
+            transition="fade-transition"
+        >
+          <ProjectCard :project-id="recommend"></ProjectCard>
+        </v-lazy>
       </v-col>
     </v-row>
+    <v-container v-else>
+      <v-row align="center" justify="center" >
+        <v-progress-circular
+            class="ma-3"
+            indeterminate
+            color="primary"
+            :size="100"
+            :width="7"
+        />
+      </v-row>
+      <v-row>
+        <v-col class="text-center font-weight-light text--secondary">
+          Loading, please wait...
+        </v-col>
+      </v-row>
+    </v-container>
   </v-container>
 </template>
 
 <script>
 import ProjectCard from "./ProjectCard";
 import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "Projects",
@@ -25,7 +49,8 @@ export default {
   data(){
     return{
       recommends: [],
-      isLoading : false
+      isLoading : false,
+      isActive: []
     }
   },
   mounted() {
@@ -35,17 +60,18 @@ export default {
       return;
     }
 
-
     this.isLoading = true;
     axios
         .get("/recommendapi/project")
         .then((response) => {
           this.recommends = response.data;
           this.isLoading = false;
+          for(let i = 0; i < this.recommends.length; i++){
+            this.isActive.push(false);
+          }
         })
         .catch(() => {
-          //TODO:エラー処理
-          alert("Error in get:recommend");
+          ErrorResolver.resolveError(this.$router);
         });
   }
 }

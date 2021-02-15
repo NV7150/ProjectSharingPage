@@ -55,6 +55,7 @@ import ProjectSnsEdit from "@/components/Project/ProjectEditTab/ProjectSnsEdit";
 import ProjectInfoEdit from "@/components/Project/ProjectEditTab/ProjectInfoEdit";
 import ProjectImgEdit from "@/components/Project/ProjectEditTab/ProjectImgEdit";
 import ProjectTagEdit from "@/components/Project/ProjectEditTab/ProjectTagEdit";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "ProjectEditTab",
@@ -79,8 +80,7 @@ export default {
             this.isValid = result;
           })
           .catch(() => {
-            //TODO:エラー処理
-            alert("error in validate");
+            ErrorResolver.resolveError(this.$router);
           });
     },
     updateLoad(state){
@@ -97,7 +97,11 @@ export default {
       let patchInfo = () => {
         return new Promise((resolve, reject) => {
           axios
-              .patch("/projectapi/project/" + this.project.id + "?update_fields=" + JSON.stringify(this.newProject))
+              .patch("/projectapi/project/" + this.project.id, {}, {
+                params: {
+                  update_fields: JSON.stringify(this.newProject)
+                }
+              })
               .then((response) => {
                 this.project = response.data;
                 resolve();
@@ -132,8 +136,7 @@ export default {
           .all([patchInfo(), patchImg()])
           .then(() => {this.isLoading = false;})
           .catch(() => {
-            //TODO:エラー処理
-            alert("error in send");
+            ErrorResolver.resolveError(this.$router);
           });
     }
   }

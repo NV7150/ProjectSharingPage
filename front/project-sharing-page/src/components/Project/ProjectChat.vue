@@ -13,7 +13,7 @@
       <v-dialog v-model="createDialog">
         <template v-slot:activator="{on, attrs}">
           <v-btn
-              v-show="window === 1"
+              v-show="window === 1 && canCreateThread"
               icon
               v-bind="attrs"
               v-on="on"
@@ -83,6 +83,7 @@
               <v-spacer></v-spacer>
               <ChatInput
                   :thread="selectingThread"
+                  v-if="canWriteThread"
               />
             </v-card>
           </v-window-item>
@@ -95,10 +96,11 @@
 <script>
 import axios from "axios";
 import ChatDestList from "./ProjectChat/ChatDestList";
-import ChatSettings from "../../assets/scripts/ProjectPageConstants";
+import ChatSettings from "../../assets/scripts/ProjectConsts";
 import ChatWindow from "./ProjectChat/ChatWindow";
 import ChatInput from "./ProjectChat/ChatInput";
 import ChatNewThread from "@/components/Project/ProjectChat/ChatNewThread";
+import ProjectPageConstants from "../../assets/scripts/ProjectConsts";
 
 export default {
   name: "ProjectChat",
@@ -121,7 +123,9 @@ export default {
       threads: [],
       threadObjects : [],
       selectingThread: {},
-      createDialog: false
+      createDialog: false,
+      canCreateThread: false,
+      canWriteThread: false
     }
   },
   methods: {
@@ -129,6 +133,9 @@ export default {
       this.selectingChannel = channel;
       this.window = 1;
       this.loadThread();
+
+      this.checkCreateThread();
+      this.checkWriteThread();
 
       this.channelSelected(this.selectingChannel.id);
     },
@@ -226,11 +233,44 @@ export default {
           }
         }
       }
+
+      this.checkWriteThread();
+      this.checkCreateThread();
     },
 
     threadNewCreated(){
       this.createDialog = false;
       this.$router.go({path: this.$router.currentRoute.path, force: true});
+    },
+
+    checkCreateThread(){
+      if(this.selectingChannel.canCreate === undefined) {
+        this.canCreateThread = false;
+        return;
+      }
+
+      if(this.selectingChannel.canCreate === ProjectPageConstants.canCreateEveryone) {
+        this.canCreateThread = true;
+        return;
+      }
+
+      let memberProp = ProjectPageConstants.memberTypes[this.selectingChannel.canCreate].prop;
+      this.canCreateThread =  this.project[memberProp].indexOf(this.$store.getters["getUser"].username) !== -1;
+    },
+
+    checkWriteThread(){
+      if(this.selectingChannel.canWrite === undefined) {
+        this.canWriteThread = false
+        return;
+      }
+
+      if(this.selectingChannel.canWrite === ProjectPageConstants.canCreateEveryone){
+        this.canWriteThread = true;
+        return;
+      }
+
+      let memberProp = ProjectPageConstants.memberTypes[this.selectingChannel.canWrite].prop;
+      this.canWriteThread =  this.project[memberProp].indexOf(this.$store.getters["getUser"].username) !== -1;
     }
   },
 
@@ -243,7 +283,7 @@ export default {
           return this.selectingThread.name;
       }
       return "";
-    }
+    },
   },
 
   created() {

@@ -48,12 +48,16 @@
 </template>
 
 <script>
+import axios from "axios";
+
 import ProjectTagEdit from "@/components/Project/ProjectEditTab/ProjectTagEdit";
 import ProjectImgEdit from "@/components/Project/ProjectEditTab/ProjectImgEdit";
 import ProjectSnsEdit from "@/components/Project/ProjectEditTab/ProjectSnsEdit";
 import ProjectInfoEdit from "@/components/Project/ProjectEditTab/ProjectInfoEdit";
-import axios from "axios";
+
 import SnsConstants from "@/assets/scripts/SnsConstants";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
+
 export default {
   name: "ProjectCreator",
   components: {ProjectInfoEdit, ProjectImgEdit, ProjectSnsEdit, ProjectTagEdit},
@@ -82,8 +86,7 @@ export default {
             this.isValid = result;
           })
           .catch(() => {
-            //TODO:エラー処理
-            alert("error in validate");
+            ErrorResolver.resolveError(this.$router);
           });
     },
     updateLoad(state){
@@ -104,14 +107,12 @@ export default {
       axios
           .post("/projectapi/project", this.newProject)
           .then((response) => {
-            console.log(response);
             this.editImg(response.data.id)
                 .then(() => {
                   this.moveToCratedPage(response.data.id);
                 })
                 .catch(() => {
-                  //TODO:エラー処理
-                  alert("error in editImg");
+                  ErrorResolver.resolveError(this.$router);
                 });
           });
     },
@@ -148,7 +149,6 @@ export default {
     for(let i = 0; i < keys.length; i++){
       this.newProject.sns[keys[i]] = "";
     }
-    console.log(this.newProject);
     this.initing = false;
   }
 }
