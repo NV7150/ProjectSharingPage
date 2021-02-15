@@ -15,31 +15,35 @@
     </template>
 
     <v-card class="justify-center">
-      <v-list-item-content>
-        <v-card-text>
-          <div class="mx-auto text-center">
-            <v-avatar>
-              <v-img :src="user.icon" />
-            </v-avatar>
-            <v-card-title>{{user.display_name}}</v-card-title>
-          </div>
+      <v-card-text>
+        <v-list-item class="text-center justify-center">
+          <v-avatar>
+            <v-img :src="user.icon" />
+          </v-avatar>
+        </v-list-item>
 
-          <div
-            v-for="(item, i) in menuItems"
-            :key="i"
+        <v-list-item class="text-center justify-center">
+          <v-card-title>
+            {{user.display_name}}
+          </v-card-title>
+        </v-list-item>
+
+        <v-divider class="my-3"></v-divider>
+
+        <v-list-item
+          v-for="(item, i) in menuItems"
+          :key="i"
+        >
+          <v-btn
+            text
+            block
+            depressed
+            @click="item.func()"
           >
-            <v-divider class="my-3"></v-divider>
-            <v-btn
-              text
-              block
-              depressed
-              @click="item.func()"
-            >
-              {{item.name}}
-            </v-btn>
-          </div>
-        </v-card-text>
-      </v-list-item-content>
+            {{item.name}}
+          </v-btn>
+        </v-list-item>
+      </v-card-text>
     </v-card>
 
   </v-menu>
@@ -55,7 +59,7 @@ export default {
       type: Object,
       default:function(){
         return {
-          username: '',
+          username: 'aaaaaa',
           display_name: 'Loading...',
           icon: PlaceHolder
         };

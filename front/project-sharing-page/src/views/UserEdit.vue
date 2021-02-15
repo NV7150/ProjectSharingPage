@@ -109,7 +109,7 @@ export default {
       let patchInfo = () => {
         return new Promise((resolve, reject) => {
           axios
-              .patch("/userapi/user?json_data=" + JSON.stringify(this.newUser))
+              .patch("/userapi/user", {}, {params: {json_data: JSON.stringify(this.newUser)}})
               .then((response) => {
                 this.user = response.data;
                 this.$store.dispatch("checkLogin")

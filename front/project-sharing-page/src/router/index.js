@@ -9,6 +9,7 @@ import NotFound from "@/views/NotFound";
 import Search from "@/views/Search";
 import UserEdit from "@/views/UserEdit";
 import CreateProject from "@/views/CreateProject";
+import ErrorPage from "@/views/ErrorPage";
 
 Vue.use(VueRouter)
 
@@ -54,20 +55,27 @@ const routes = [
     component: UserEdit
   },
   {
-    path: '/404',
-    name: '404',
-    component: NotFound
-  },
-  {
     path: '/search/:keyword',
     name: 'Search',
-    component: Search
+    component: Search,
   },
   {
     path: '/newProject',
     name: 'newProject',
     component: CreateProject
-  }
+  },
+  {
+    path: "/Error",
+    name: "Error",
+    component: ErrorPage
+  },
+
+
+  {
+    path: '*',
+    name: '404',
+    component: NotFound
+  },
 ]
 
 const router = new VueRouter({

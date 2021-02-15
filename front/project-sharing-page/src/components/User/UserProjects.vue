@@ -2,19 +2,34 @@
   <v-card
     rounded
     outlined
+    :loading="isLoading"
+    :disabled="isLoading"
   >
+    <template slot="progress">
+      <v-progress-linear
+          color="deep-purple"
+          height="10"
+          indeterminate
+      >
+      </v-progress-linear>
+      <v-skeleton-loader
+          class="mx-auto"
+          type="card"
+      />
+    </template>
+
     <v-card-title>Projects</v-card-title>
 
-    <v-divider class="my-3"></v-divider>
+    <v-divider class="my-3" />
 
     <v-card-text>
-      <v-list>
+      <v-list v-if="!isLoading">
         <v-list-item
           v-for="(project, i) in projects"
           :key = "i"
           class="mb-2"
         >
-          <UserProjectCard :project-id="project" height="10vh" />
+          <UserProjectCard :project="project" height="10vh" />
         </v-list-item>
       </v-list>
     </v-card-text>
@@ -24,8 +39,9 @@
 
 <script>
 
-import PlaceHolder from "../../assets/img/PlaceHolder.png";
 import UserProjectCard from "@/components/User/UserProjects/UserProjectCard";
+import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "UserProjects",
@@ -33,26 +49,26 @@ export default {
   props:{
     user: {
       type: Object,
-      default: function () {
-        return {
-          username: '',
-          name: 'Loading...',
-          bio: '',
-          icon: PlaceHolder,
-          skillTags: []
-        };
-      }
+      required: true
     }
   },
   data(){
     return{
-      //仮置き
-      projects: []
+      projects: [],
+      isLoading: true
     }
   },
   created() {
-    //TODO:プロジェクトを逆引き
-    this.projects = [1, 2, 3, 1, 2, 3, 1]
+    this.isLoading = true;
+    axios
+        .get("/projectapi/project/" + this.user.username)
+        .then((response) => {
+          this.projects = response.data;
+          this.isLoading = false;
+        })
+        .catch(() => {
+          ErrorResolver.resolveError(this.$router);
+        });
   }
 }
 </script>

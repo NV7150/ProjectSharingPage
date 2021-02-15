@@ -50,6 +50,7 @@
 <script>
 
 import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "LoginForm",
@@ -96,7 +97,7 @@ export default {
             if (code === 401){
               _this.error();
             }else{
-              //TODO:エラーページへのリダイレクト
+              ErrorResolver.resolveError(this.$router);
             }
           });
     },

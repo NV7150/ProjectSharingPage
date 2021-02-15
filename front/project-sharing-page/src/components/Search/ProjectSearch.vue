@@ -51,7 +51,7 @@ export default {
   },
 
   created() {
-    axios.get("/projectapi/project/search/",
+    axios.get("/projectapi/project/search",
         {
           params: {
             "title": this.keyword,

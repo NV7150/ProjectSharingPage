@@ -12,14 +12,31 @@
           indeterminate
       >
       </v-progress-linear>
+      <v-skeleton-loader
+        class="mx-auto"
+        type="card"
+      />
     </template>
 
     <v-img
         height="80%"
         :src="project.bg_image"
+        :lazy-src="placeHolder"
         class="align-end"
         gradient="to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)"
     >
+      <template v-slot:placeholder>
+        <v-row
+            class="fill-height ma-0"
+            align="center"
+            justify="center"
+        >
+          <v-progress-circular
+            indeterminate
+            color="white"
+          />
+        </v-row>
+      </template>
       <v-card-title>
         <div class="white--text rounded pl-1 pr-1">{{project.title}}</div>
         <v-spacer />
@@ -57,7 +74,8 @@
 
 <script>
 import axios from "axios";
-import ProjectPageSettings from "@/assets/scripts/ProjectPageConstants";
+import ProjectPageSettings from "@/assets/scripts/ProjectConsts";
+import PlaceHolder from "@/assets/img/PlaceHolder.png"
 
 export default {
   name: "ProjectCard",
@@ -82,7 +100,8 @@ export default {
       project : ProjectPageSettings.defaultProject,
       loading : true,
       hovered : false,
-      failed : false
+      failed : false,
+      placeHolder: PlaceHolder
     }
   },
   methods:{

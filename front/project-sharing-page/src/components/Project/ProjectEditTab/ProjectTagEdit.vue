@@ -18,6 +18,7 @@
 <script>
 import TagRegister from "@/components/Bases/Edit/TagRegister";
 import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "ProjectTagEdit",
@@ -68,8 +69,6 @@ export default {
               resolve();
             })
             .catch(() => {
-              //TODO:エラー処理
-              alert("ERROR in get skilltag");
               reject();
             });
       });
@@ -91,7 +90,7 @@ export default {
           this.isLoading = false;
         })
         .catch(() => {
-          //TODO:エラー処理
+          ErrorResolver.resolveError(this.$router);
         });
   },
 

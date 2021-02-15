@@ -15,6 +15,7 @@
 
 <script>
 import axios from "axios";
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "UserIconEdit",
@@ -39,8 +40,7 @@ export default {
             this.isLoading = false;
           })
           .catch(() => {
-            //TODO:エラー処理
-            alert("error!");
+            ErrorResolver.resolveError(this.$router);
           });
     },
     uploadUserIcon(){
