@@ -274,6 +274,8 @@ class ProjectSearchResult(BaseModel):
                offset: Optional[int] = None):
         with db.session_scope() as s:
             q = s.query(db.Project).filter(
+                db.Project.is_active
+            ).filter(
                 func.upper(db.Project.title).like(
                     f"%{title.upper()}%"
                 )

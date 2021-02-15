@@ -1,6 +1,7 @@
 from typing import Optional, List
 from fastapi import FastAPI, Cookie, HTTPException, status
 import random
+from fastapi.param_functions import Query
 import requests
 
 import recommend
@@ -37,8 +38,10 @@ async def index():
         }
     },
 )
-async def recommend_projects_with_usertoken(token: Optional[str] = Cookie(None)):
-    # TODO: limit/offset
+async def recommend_projects_with_usertoken(
+    token: Optional[str] = Cookie(None),
+    limit: Optional[int] = Query(None), offset: Optional[int] = Query(None)
+):
     if token is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
@@ -64,7 +67,7 @@ async def recommend_projects_with_usertoken(token: Optional[str] = Cookie(None))
 
         result.append(p_id)
 
-    return result
+    return result[offset:limit]
 
 
 @app.get(
@@ -72,19 +75,26 @@ async def recommend_projects_with_usertoken(token: Optional[str] = Cookie(None))
     description='Recommend projects without user-token',
     status_code=status.HTTP_200_OK,
 )
-async def recommend_projects_without_usertoken():
-    # TODO: limit/offset
-    sorted_by_like_resp = requests.get('http://projectapi:8000/projectapi/project/all?sort_by=LIKE&reverse=false')
+async def recommend_projects_without_usertoken(
+    limit: Optional[int] = Query(None), offset: Optional[int] = Query(None)
+):
+    endpoint = 'http://projectapi:8000/projectapi/project/all'
+    sorted_by_like_resp = requests.get(
+        f'{endpoint}?sort_by=LIKE&reverse=false'
+    )
     if sorted_by_like_resp.status_code != 200:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
     sorted_by_like: List[int] = sorted_by_like_resp.json()
 
-    sorted_by_date_resp = requests.get('http://projectapi:8000/projectapi/project/all?sort_by=DATETIME&reverse=false')
+    sorted_by_date_resp = requests.get(
+        f'{endpoint}?sort_by=DATETIME&reverse=false'
+    )
     if sorted_by_date_resp.status_code != 200:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
     sorted_by_date: List[int] = sorted_by_date_resp.json()
 
-    result = []
+    result: List[int] = []
+    print(sorted_by_date, sorted_by_like)
     while len(result) < len(sorted_by_date):
         count = random.randint(1, 3)
         for _ in range(count):
@@ -103,4 +113,4 @@ async def recommend_projects_without_usertoken():
             if p not in result:
                 result.append(p)
 
-    return result
+    return result[offset:limit]
