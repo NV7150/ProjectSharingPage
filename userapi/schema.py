@@ -351,7 +351,7 @@ class UserSearchResult(BaseModel):
     display_name_total: int
 
     @classmethod
-    def search(cls, keyword, limit: int, offset: int):
+    def search(cls, keyword, limit: Optional[int], offset: Optional[int]):
         with db.session_scope() as s:
             username_list = s.query(db.User).filter(
                 db.User.username.like(f'%{keyword}%')
@@ -432,10 +432,30 @@ class UserSearchResult(BaseModel):
                 for i in displayname_sort_index
             ]
 
+            if offset is None:
+                return cls(
+                    all_result=all_sorted[:limit],
+                    username=username_sorted[:limit],
+                    display_name=displayname_sorted[:limit],
+                    all_result_total=len(all_sorted),
+                    username_total=len(username_sorted),
+                    display_name_total=len(displayname_sorted),
+                )
+
+            if limit is None:
+                return cls(
+                    all_result=all_sorted[offset:],
+                    username=username_sorted[offset:],
+                    display_name=displayname_sorted[offset:],
+                    all_result_total=len(all_sorted),
+                    username_total=len(username_sorted),
+                    display_name_total=len(displayname_sorted),
+                )
+
             return cls(
-                all_result=all_sorted[offset:offset+limit],
-                username=username_sorted[offset:offset+limit],
-                display_name=displayname_sorted[offset:offset+limit],
+                all_result=all_sorted[:limit],
+                username=username_sorted[:limit],
+                display_name=displayname_sorted[:limit],
                 all_result_total=len(all_sorted),
                 username_total=len(username_sorted),
                 display_name_total=len(displayname_sorted),
