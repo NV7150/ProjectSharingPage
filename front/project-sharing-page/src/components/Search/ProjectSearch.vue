@@ -9,33 +9,37 @@
       />
     </template>
 
-    <v-toolbar>
-      <v-toolbar-title>
-        Projects
-      </v-toolbar-title>
-    </v-toolbar>
+    <template v-if="!isSearchLoading">
+      <v-container v-if="searchResult.length > 0" class="pa-3">
+        <v-row>
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+            v-for="(resultProject, i) in searchResult"
+            :key="i"
+          >
+            <ProjectCard :project-id="resultProject.id" />
+          </v-col>
+        </v-row>
+      </v-container>
 
-    <v-container v-if="!isSearchLoading" class="pa-3">
-      <v-row>
-        <v-col
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
-          xl="2"
-          v-for="(resultProject, i) in searchResult"
-          :key="i"
-        >
-          <ProjectCard :project-id="resultProject.id" />
-        </v-col>
-      </v-row>
-    </v-container>
+      <v-container v-else>
+        <v-row justify="center" align="center" >
+          <v-col class="text-center font-weight-light">
+            No projects found
+          </v-col>
+        </v-row>
+      </v-container>
+    </template>
   </v-card>
 </template>
 
 <script>
 import axios from "axios";
 import ProjectCard from "@/components/Home/ProjectCard";
+
+import ErrorResolver from "@/assets/scripts/ErrorResolver";
 
 export default {
   name: "ProjectSearch",
@@ -54,9 +58,7 @@ export default {
     axios.get("/projectapi/project/search",
         {
           params: {
-            "title": this.keyword,
-            "limit": 99999,
-            "offset": 0
+            "title": this.keyword
           }
         })
         .then((response) => {
@@ -64,7 +66,7 @@ export default {
           this.isSearchLoading = false;
         })
         .catch(() => {
-          this.$router.push("404");
+          ErrorResolver.resolveError(this.$router);
         });
   }
 

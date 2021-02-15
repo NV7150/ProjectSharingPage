@@ -1,24 +1,31 @@
 <template>
   <v-main>
     <NavigationBar />
-
-    <div ref="bodies" :key="$route.path">
-      <v-container>
+    <v-container>
+      <v-responsive min-height="80vh">
         <v-row>
           <v-col>
-            <UserSearch :keyword="$route.params.keyword" />
-          </v-col>
-        </v-row>
-      </v-container>
 
-      <v-container>
-        <v-row>
-          <v-col>
-            <ProjectSearch :keyword="$route.params.keyword" />
+            <v-card :key="$route.path" :elevation="5">
+              <v-tabs v-model="tabs" grow>
+                <v-tab>User</v-tab>
+                <v-tab>Project</v-tab>
+              </v-tabs>
+
+              <v-tabs-items v-model="tabs">
+                <v-tab-item>
+                  <UserSearch :keyword="$route.params.keyword" />
+                </v-tab-item>
+                <v-tab-item>
+                  <ProjectSearch :keyword="$route.params.keyword" />
+                </v-tab-item>
+              </v-tabs-items>
+            </v-card>
+
           </v-col>
         </v-row>
-      </v-container>
-    </div>
+      </v-responsive>
+    </v-container>
   </v-main>
 </template>
 
@@ -32,7 +39,7 @@ export default {
   data(){
     return {
       keyword: "",
-      reset : false
+      tabs: 0
     }
   },
   created() {
