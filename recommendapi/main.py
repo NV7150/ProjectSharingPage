@@ -67,7 +67,13 @@ async def recommend_projects_with_usertoken(
 
         result.append(p_id)
 
-    return result[offset:limit]
+    if offset is None:
+        return result[:limit]
+
+    if limit is None:
+        return result[offset:]
+
+    return result[offset:offset+limit]
 
 
 @app.get(
@@ -113,4 +119,10 @@ async def recommend_projects_without_usertoken(
             if p not in result:
                 result.append(p)
 
-    return result[offset:limit]
+    if offset is None:
+        return result[:limit]
+
+    if limit is None:
+        return result[offset:]
+
+    return result[offset:offset+limit]
