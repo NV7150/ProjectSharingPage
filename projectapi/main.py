@@ -282,6 +282,23 @@ async def get_projects(
             return [p.id for p in sorted_proj]
 
 
+@app.get(
+    '/projectapi/project/count',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': int,
+            'description': 'Successful Response',
+        },
+    },
+)
+async def get_projects_count():
+    with db.session_scope() as s:
+        return s.query(db.Project).filter(
+            db.Project.is_active
+        ).count()
+
+
 # Project Background Image
 
 @app.get(
