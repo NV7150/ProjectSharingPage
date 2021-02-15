@@ -8,8 +8,6 @@ from sqlalchemy import desc
 import uuid
 import os
 
-from starlette.status import HTTP_404_NOT_FOUND
-
 import db
 import schema
 from utils import user

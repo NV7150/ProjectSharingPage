@@ -2,7 +2,6 @@ import enum
 from pydantic import BaseModel
 from fastapi import HTTPException, status
 from typing import Optional, List, Any, Dict
-from fastapi import HTTPException, status
 import db
 from functools import lru_cache
 
@@ -211,8 +210,8 @@ class User(BaseModel):
 
     skilltags: List[SkillTag]
 
-    @staticmethod
-    def from_db(db_user: db.User):
+    @classmethod
+    def from_db(cls, db_user: db.User):
         skilltags_db = db_user.skilltags
         skilltags = [
             SkillTag.from_db(x)
@@ -230,7 +229,7 @@ class User(BaseModel):
             wantedly=db_user.wantedly,
             url=db_user.url,
         )
-        return User(
+        return cls(
             username=db_user.username,
             display_name=db_user.display_name,
             icon=db_user.icon,
@@ -238,6 +237,15 @@ class User(BaseModel):
             sns=sns,
             skilltags=skilltags
         )
+
+    @classmethod
+    def from_id(cls, id: int):
+        with db.session_scope() as s:
+            u = s.query(db.User).get(id)
+            if u is None:
+                raise ValueError('User not found.')
+
+            return cls.from_db(u)
 
 
 class UserUpdate():
@@ -412,15 +420,15 @@ class UserSearchResult(BaseModel):
                 d_sort_idx += 1
 
             all_sorted = [
-                User.from_db(u)
+                User.from_id(u.id)
                 for u in all_sorted
             ]
             username_sorted = [
-                User.from_db(username_list[i])
+                User.from_id(username_list[i].id)
                 for i in username_sort_index
             ]
             displayname_sorted = [
-                User.from_db(displayname_list[i])
+                User.from_id(displayname_list[i].id)
                 for i in displayname_sort_index
             ]
 
