@@ -6,8 +6,6 @@
             cols="12"
             sm="6"
             md="4"
-            lg="3"
-            xl="2"
             v-for="(recommend, i) in recommends"
             :key="i"
         >

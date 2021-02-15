@@ -13,13 +13,13 @@
               justify="center"
               class="text-center text--primary"
           >
-            <v-col cols="8">
-              <h1
+            <v-col cols="9">
+              <p
                   v-bind:style="headStyle"
-                  class="text-h1"
+                  class="font-weight-light project-title"
               >
                 {{project.title}}
-              </h1>
+              </p>
             </v-col>
           </v-row>
           <v-divider class="my-3"></v-divider>
@@ -64,5 +64,9 @@ export default {
 .project-about{
   background-color: rgba(255, 255, 255, 0.75);
   color: dimgrey;
+}
+
+.project-title{
+  font-size: 1.5rem;
 }
 </style>

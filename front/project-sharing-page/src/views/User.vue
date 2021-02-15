@@ -5,11 +5,11 @@
     <div v-if="!isLoading">
       <v-container v-if="hasContact">
         <v-row>
-          <v-col md="10" cols="12">
+          <v-col md="9" cols="12">
             <UserProfile :user="user" />
           </v-col>
   <!--        Show LARGER than md -->
-          <v-col md="2" class="d-md-flex d-none">
+          <v-col md="3" class="d-md-flex d-none">
             <UserContacts :user="user" />
           </v-col>
         </v-row>
