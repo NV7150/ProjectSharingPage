@@ -930,8 +930,8 @@ async def delete_join_request(
 )
 async def search_project(
     title: str,
-    limit: int,
-    offset: int,
+    limit: Optional[int] = Query(None),
+    offset: Optional[int] = Query(None),
 ):
     return schema.ProjectSearchResult.search(title, limit, offset)
 
