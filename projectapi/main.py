@@ -4,8 +4,11 @@ from fastapi.param_functions import Query
 from pydantic.types import Json
 from fastapi import File, UploadFile
 from fastapi.responses import FileResponse
+from sqlalchemy import desc
 import uuid
 import os
+
+from starlette.status import HTTP_404_NOT_FOUND
 
 import db
 import schema
@@ -239,6 +242,44 @@ async def get_random_project_id():
         index = random.randint(0, all_proj.count()-1)
         id = all_proj.all()[index]
         return id
+
+
+@app.get(
+    '/projectapi/project/all',
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            'model': List[int],
+            'description': 'Project id list'
+        }
+    }
+)
+async def get_projects(
+    sort_by: schema.SortType = Query(schema.SortType.DATETIME),
+    reverse: bool = Query(False)
+):
+    with db.session_scope() as s:
+        if sort_by == schema.SortType.DATETIME:
+            all_proj = s.query(db.Project.id).filter(
+                db.Project.is_active
+            )
+            sort_column = db.Project.created_at
+            if reverse:
+                sort_column = desc(sort_column)
+
+            all_proj = all_proj.order_by(sort_column)
+
+            return all_proj.all()
+
+        elif sort_by == schema.SortType.LIKE:
+            all_proj = s.query(db.Project).filter(
+               db.Project.is_active
+            )
+            sorted_proj = sorted(all_proj.all(),
+                                 key=lambda p: len(p.likes),
+                                 reverse=reverse)
+
+            return [p.id for p in sorted_proj]
 
 
 # Project Background Image

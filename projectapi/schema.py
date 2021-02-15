@@ -226,6 +226,11 @@ class ProjectCreate(BaseModel):
             return Project.from_db(p)
 
 
+class SortType(str, enum.Enum):
+    LIKE = 'LIKE'
+    DATETIME = 'DATETIME'
+
+
 class MemberType(str, enum.Enum):
     MEMBER = 'MEMBERTYPE_MEMBER'
     ANNOUNCE = 'MEMBERTYPE_ANNOUNCE'
