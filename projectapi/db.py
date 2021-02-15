@@ -2,11 +2,12 @@ from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 
 import os
+import datetime
 from contextlib import contextmanager
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 
 PG_USER = os.environ.get('POSTGRES_USER')
@@ -115,6 +116,20 @@ class JoinRequestUser(Base):
     )
 
 
+class ProjectSkillTag(Base):
+    """Association object
+    """
+    __tablename__ = "project_skilltag"
+    project_id = Column(
+        Integer, ForeignKey('project.id'),
+        primary_key=True, nullable=False,
+    )
+    tag = Column(
+        'skilltag', Integer, nullable=False,
+        primary_key=True,
+    )
+
+
 class Project(Base):
     """[DB] Project Class
 
@@ -171,21 +186,11 @@ class Project(Base):
     url = Column('url', String, nullable=True)
 
     # skill
-    __skilltags = Column('skilltags', String, nullable=False)
+    skilltags = relationship('ProjectSkillTag', backref='project')
     is_active = Column('is_active', Boolean, nullable=False, default=True)
 
-    @property
-    def skilltags(self) -> List[int]:
-        return [
-            int(tag.replace(' ', ''))
-            for tag in self.__skilltags.split(',')
-            if tag not in ['', ' ']
-        ]
-
-    @skilltags.setter
-    def skilltags(self, tagid_list: List[int]):
-        s = ','.join([str(t) for t in tagid_list])
-        self.__skilltags = s
+    created_at = Column('created_at', DateTime, nullable=False,
+                        default=datetime.datetime.now)
 
     @classmethod
     def get(cls, s: scoped_session, id: int) -> Optional[Any]:
@@ -197,19 +202,3 @@ class Project(Base):
             return None
 
         return p
-
-    @classmethod
-    def get_with_tag(cls, s: scoped_session, tags: List[int]) -> List:
-        projects: List[Project] = []
-        for t in tags:
-            maybe_projects: List[Project] = []
-            mp = s.query(cls).filter(
-                cls.__skilltags.like(f'%{t}%')
-            )
-            maybe_projects += list(mp)
-
-            for mp in maybe_projects:
-                if t in mp.skilltags:
-                    projects.append(mp)
-
-        return projects

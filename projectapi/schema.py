@@ -3,8 +3,10 @@ import db
 from utils.func import levenshtein_distance
 from utils import user
 from sqlalchemy import func
+from sqlalchemy.sql.expression import desc
 from typing import Optional, List, Dict
 import enum
+import datetime
 
 
 class Sns(BaseModel):
@@ -33,6 +35,7 @@ class Project(BaseModel):
     likes: int
     sns: Sns
     skilltags: List[int]
+    created_at: datetime.datetime
 
     @classmethod
     def from_db(cls, db_proj: db.Project):
@@ -59,7 +62,8 @@ class Project(BaseModel):
             admin_users=[au.username for au in db_proj.admin_users],
             likes=len(db_proj.likes),
             sns=sns,
-            skilltags=db_proj.skilltags,
+            skilltags=[t.tag for t in db_proj.skilltags],
+            created_at=db_proj.created_at,
         )
 
 
@@ -145,16 +149,20 @@ class ProjectUpdate():
                             exec(sns_[sk])
 
                 elif k == 'skilltags':
-                    if v is None:
-                        p.skilltags = []
-                    else:
-                        p.skilltags = []
-                        for i in map(int, v):
+                    # initialize
+                    tags = s.query(db.ProjectSkillTag).filter(
+                        db.ProjectSkillTag.project_id == p.id
+                    )
+                    [s.delete(t) for t in tags]
+                    if v is not None:
+                        for i in v:
                             if not user.tag_exist(i):
                                 raise ValueError('tag not found')
-                            skilltags = p.skilltags
-                            skilltags.append(i)
-                            p.skilltags = skilltags
+
+                            new_t = db.ProjectSkillTag(
+                                project_id=p.id, tag=i
+                            )
+                            s.add(new_t)
                 else:
                     exec(update_[k])
 
@@ -177,7 +185,6 @@ class ProjectCreate(BaseModel):
             p.subtitle = self.subtitle
             p.bg_image = self.bg_image
             p.description = self.description
-            p.skilltags = self.skilltags
             p.twitter = self.sns.twitter
             p.instagram = self.sns.instagram
             p.github = self.sns.github
@@ -188,9 +195,16 @@ class ProjectCreate(BaseModel):
             p.linkedin = self.sns.linkedin
             p.wantedly = self.sns.wantedly
             p.url = self.sns.url
+            p.created_at = datetime.datetime.now()
 
             s.add(p)
             s.commit()
+
+            for t in self.skilltags:
+                dbt = db.ProjectSkillTag()
+                dbt.project_id = p.id
+                dbt.tag = t
+                s.add(dbt)
 
             pu = db.ProjectUser(
                 project_id=p.id,
@@ -251,12 +265,8 @@ class ProjectSearchResult(BaseModel):
     next_exist: bool
 
     @classmethod
-    def search(
-        cls,
-        title: str,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-    ):
+    def search(cls, title: str, limit: Optional[int] = None,
+               offset: Optional[int] = None):
         with db.session_scope() as s:
             q = s.query(db.Project).filter(
                 func.upper(db.Project.title).like(
@@ -285,3 +295,29 @@ class ProjectSearchResult(BaseModel):
                 offset=offset,
                 next_exist=next_exist,
             )
+
+    @classmethod
+    def get_with_tag(cls, s: db.scoped_session, tags: List[int],
+                     limit: Optional[int] = None, offset: Optional[int] = None,
+                     datetime_sort: bool = False, reverse: bool = False):
+
+        tagp = s.query(db.ProjectSkillTag).filter(
+            db.ProjectSkillTag.tag.in_(tags)
+        )
+        mp = s.query(db.Project).filter(
+            db.Project.id.in_([tp.project_id for tp in tagp])
+        )
+
+        # limit/offset
+        if offset:
+            mp = mp.offset(offset)
+        if limit:
+            mp = mp.limit(limit)
+
+        # sort
+        if datetime_sort and not reverse:
+            mp = mp.order_by(db.Project.created_at)
+        if datetime_sort and reverse:
+            mp = mp.order_by(desc(db.Project.created_at))
+
+        return mp.all()

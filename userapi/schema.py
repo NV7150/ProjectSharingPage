@@ -1,5 +1,6 @@
 import enum
 from pydantic import BaseModel
+from fastapi import HTTPException, status
 from typing import Optional, List, Any, Dict
 from fastapi import HTTPException, status
 import db
@@ -159,7 +160,23 @@ class SkillTagCreate(BaseModel):
 
             parent = None
             if self.parent_id is not None:
-                parent = s.query(db.SkillTag).get(self.parent_id).id
+                parent = s.query(db.SkillTag).get(self.parent_id)
+                if parent is None:
+                    raise HTTPException(
+                        status.HTTP_404_NOT_FOUND,
+                        'Parent id not found'
+                    )
+
+                parent = parent.id
+
+            already_exists = s.query(db.SkillTag).filter(
+                db.SkillTag.name == self.name
+            ).count()
+            if already_exists > 0:
+                raise HTTPException(
+                    status.HTTP_429_TOO_MANY_REQUESTS,
+                    'Tag already exists'
+                )
 
             skilltag = db.SkillTag(
                 name=self.name,
