@@ -1,5 +1,6 @@
 from typing import Optional, List
 from fastapi import FastAPI, HTTPException, status, Response
+from fastapi.param_functions import Query
 from fastapi.responses import FileResponse
 from fastapi import File, UploadFile
 from fastapi import Cookie
@@ -264,7 +265,10 @@ async def delete_user(
         }
     }
 )
-async def search_user(keyword: str, limit: int, offset: int):
+async def search_user(
+    keyword: str, limit: Optional[int] = Query(None),
+    offset: Optional[int] = Query(None)
+):
     return schema.UserSearchResult.search(keyword, limit, offset)
 
 
