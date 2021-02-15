@@ -310,6 +310,8 @@ class ProjectSearchResult(BaseModel):
             db.ProjectSkillTag.tag.in_(tags)
         )
         mp = s.query(db.Project).filter(
+            db.Project.is_active
+        ).filter(
             db.Project.id.in_([tp.project_id for tp in tagp])
         )
 
