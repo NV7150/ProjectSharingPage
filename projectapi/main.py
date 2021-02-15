@@ -260,7 +260,7 @@ async def get_projects(
 ):
     with db.session_scope() as s:
         if sort_by == schema.SortType.DATETIME:
-            all_proj = s.query(db.Project.id).filter(
+            all_proj = s.query(db.Project).filter(
                 db.Project.is_active
             )
             sort_column = db.Project.created_at
@@ -269,7 +269,7 @@ async def get_projects(
 
             all_proj = all_proj.order_by(sort_column)
 
-            return all_proj.all()
+            return [p.id for p in all_proj.all()]
 
         elif sort_by == schema.SortType.LIKE:
             all_proj = s.query(db.Project).filter(
