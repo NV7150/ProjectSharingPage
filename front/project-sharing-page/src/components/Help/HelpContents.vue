@@ -68,13 +68,13 @@
       <h2 id="contact">お問い合わせ</h2><br>
       <p>
         <router-link
-            :to="{name: 'User', params: { username: 'publicClassMain' }}"
+            :to="{name: 'UserPage', params: { username: 'publicClassMain' }}"
             class="text-decoration-none"
         >
           だんご
         </router-link><br>
         <router-link
-            :to="{name: 'User', params: { username: 'kekeho' }}"
+            :to="{name: 'UserPage', params: { username: 'kekeho' }}"
             class="text-decoration-none"
         >
           kekeho
