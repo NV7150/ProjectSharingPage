@@ -63,7 +63,7 @@ services:
             - front
         environment: 
             TZ: "UTC"
-            HOSTNAME: "localhost"
+            HOSTNAME: "projshare.com"
         depends_on:
             - userapi
             - front
