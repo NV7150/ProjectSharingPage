@@ -16,6 +16,7 @@
         <MemberAdminCard
             :username="member"
             :select-state-changed="selectMember"
+            :can-select="canSelect"
         />
       </v-col>
     </v-row>
@@ -38,7 +39,8 @@ export default {
     project: {type: Object, required: true},
     members: {type: Array, required: true},
     title: {type: String, required: true},
-    memberSelected: {type: Function, required: true}
+    memberSelected: {type: Function, required: true},
+    canSelect: {type: Boolean, default(){return true;}}
   },
 
   methods: {

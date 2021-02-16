@@ -3,8 +3,8 @@
       :loading="isLoading"
       :disabled="isLoading"
       @click="select"
-      hover
-      ripple
+      :hover="canSelect"
+      :ripple="canSelect"
       :color="getColor"
   >
     <template slot="progress">
@@ -47,7 +47,8 @@ export default {
   name: "MemberAdminCard",
   props: {
     username: {type: String, required: true},
-    selectStateChanged: {type: Function, required: true}
+    selectStateChanged: {type: Function, required: true},
+    canSelect: {type: Boolean, default(){return true;}}
   },
   data(){
     return{
@@ -65,7 +66,8 @@ export default {
       });
     },
     select(){
-      this.isSelecting = !(this.isSelecting);
+      if(this.canSelect)
+        this.isSelecting = !(this.isSelecting);
     }
   },
 

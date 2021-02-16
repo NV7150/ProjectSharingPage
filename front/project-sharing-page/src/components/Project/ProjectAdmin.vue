@@ -8,6 +8,7 @@
               :members="memberList.admin_users"
               title="Admins"
               :member-selected="memberSelected"
+              :can-select="false"
           />
         </v-col>
       </v-row>
