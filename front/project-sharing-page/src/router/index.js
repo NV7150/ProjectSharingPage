@@ -10,6 +10,7 @@ import Search from "@/views/Search";
 import UserEdit from "@/views/UserEdit";
 import CreateProject from "@/views/CreateProject";
 import ErrorPage from "@/views/ErrorPage";
+import Help from "@/views/Help";
 
 Vue.use(VueRouter)
 
@@ -68,6 +69,11 @@ const routes = [
     path: "/Error",
     name: "Error",
     component: ErrorPage
+  },
+  {
+    path: "/Help",
+    name: "Help",
+    component: Help
   },
 
 

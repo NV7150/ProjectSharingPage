@@ -11,6 +11,9 @@
     <SearchBar class="mt-7 ml-4" />
 
     <v-spacer></v-spacer>
+    <v-btn text @click="moveTo('Help')">
+      help
+    </v-btn>
 
     <template
       v-if="logined"
