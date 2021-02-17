@@ -16,6 +16,8 @@
               text-color="white"
               label
               :href="user.sns[snsName]"
+              target="_blank"
+              :link="true"
           >
             <v-icon left v-if="snsSettings[snsName].icon">
               {{snsSettings[snsName].icon}}

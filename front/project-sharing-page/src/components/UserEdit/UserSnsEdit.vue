@@ -30,7 +30,7 @@
       </validation-provider>
 
       <v-btn type="submit" :disabled="invalid" @click="send">
-        追加
+        add
       </v-btn>
     </validation-observer>
 
@@ -79,7 +79,7 @@ export default {
       newSns: [],
       keysDict : [],
       selectingSns : SnsConstants.defaultSelect,
-      selectingLink : ""
+      selectingLink : SnsConstants.sns["twitter"].link
     }
   },
 
@@ -109,8 +109,7 @@ export default {
 
     getLinkRule(){
       return {
-        required : true,
-        regex : SnsConstants.sns[this.keysDict[this.selectingSns]].link
+        required : true
       };
     }
   },
@@ -121,6 +120,12 @@ export default {
       this.keysDict[SnsConstants.sns[keys[i]].display] = keys[i];
     }
     this.newSns = _.cloneDeep(this.user.sns);
+  },
+
+  watch: {
+    selectingSns: function (){
+      this.selectingLink = SnsConstants.sns[this.keysDict[this.selectingSns]].link;
+    }
   }
 }
 </script>

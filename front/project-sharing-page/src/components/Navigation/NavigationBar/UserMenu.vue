@@ -90,6 +90,14 @@ export default {
           }
         },
         {
+          name: "Change Password",
+          func: () => {
+            this.$router.push({
+              name: "PassEdit"
+            });
+          }
+        },
+        {
           name: "New project",
           func: () => {
             this.$router.push({
