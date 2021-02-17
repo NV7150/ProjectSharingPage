@@ -2,36 +2,35 @@
     redir https://www.{$HOSTNAME}{uri}
 }
 
-www.{$HOSTNAME} {
-    encode zstd gzip
+www.{$HOSTNAME}
+encode zstd gzip
 
-    route /favicon.ico {
-        file_server {
-            root /public
-        }
-    }
-
-    route /userapi/* {
-        reverse_proxy userapi:8000
-    }
-
-    route /projectapi/* {
-        reverse_proxy projectapi:8000
-    }
-
-    route /chatapi/* {
-        reverse_proxy chatapi:8000
-    }
-
-    route /recommendapi/* {
-        reverse_proxy recommendapi:8000
-    }
-
-    route /* {
-        reverse_proxy front:8080
-    }
-
+route /favicon.ico {
     file_server {
         root /public
     }
+}
+
+route /userapi/* {
+    reverse_proxy userapi:8000
+}
+
+route /projectapi/* {
+    reverse_proxy projectapi:8000
+}
+
+route /chatapi/* {
+    reverse_proxy chatapi:8000
+}
+
+route /recommendapi/* {
+    reverse_proxy recommendapi:8000
+}
+
+route /* {
+    reverse_proxy front:8080
+}
+
+file_server {
+    root /public
 }
