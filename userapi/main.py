@@ -528,7 +528,7 @@ async def upload_usericon(
         if u is None:
             # user is missing
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
-        old_icon = u.icon.split('/')[-1]
+        old_icon = u.icon.split('/')[-1] if u.icon is not None else None
         u.icon = url
         s.commit()
 
