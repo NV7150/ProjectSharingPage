@@ -2,12 +2,6 @@
 
 encode zstd gzip
 
-route /favicon.ico {
-    file_server {
-        root /public
-    }
-}
-
 route /userapi/* {
     reverse_proxy userapi:8000
 }
@@ -25,9 +19,7 @@ route /recommendapi/* {
 }
 
 route /* {
-    reverse_proxy front:8080
-}
-
-file_server {
-    root /public
+    root * /code/dist/
+    try_files {path} index.html
+    file_server
 }

@@ -1,8 +1,5 @@
 version: "3"
 services:
-    front:
-        build: front/project-sharing-page
-
     userapi:
         build: 
             context: userapi
@@ -67,18 +64,16 @@ services:
             - recommendcachedata
 
     caddy:
-        image: caddy
+        build: .
         volumes:
             - "./CaddyfileDev:/etc/caddy/Caddyfile"
         links:
             - userapi
-            - front
         environment: 
             TZ: "UTC"
             HOSTNAME: "localhost"
         depends_on:
             - userapi
-            - front
         ports:
             - 8080:80
             - 8081:443
