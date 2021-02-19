@@ -48,7 +48,9 @@ services:
             - ./chatapi:/code
 
     recommendapi:
-        build: recommendapi
+        build:
+            context: recommendapi
+            dockerfile: Dockerfile_dev
         links:
             - userapi
             - projectapi
