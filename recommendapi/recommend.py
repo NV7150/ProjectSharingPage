@@ -13,6 +13,16 @@ class RecommendWithUsertoken(object):
         # 持っているタグ
         self.tags: List[int] = [t['id'] for t in self.raw_user_skilltags]
 
+        # プロジェクト全て
+        endpoint = 'http://projectapi:8000/projectapi/project/all'
+        resp = requests.get(
+            f'{endpoint}?sort_by=DATETIME&reverse=false'
+        )
+        if resp.status_code != 200:
+            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.all: List[int] = resp.json()
+        print('ALL', self.all)
+
         # 親タグ (父母まで。祖父母までは今の所遡らない)
         self.parent_tags: List[int] = []
         for t in self.raw_user_skilltags:
@@ -28,6 +38,7 @@ class RecommendWithUsertoken(object):
         self.parent_tag_projects: List[Dict] = []
         self.child_tag_projects: List[Dict] = []
         self.bro_tag_projects: List[Dict] = []
+        self.all_projects: List[Dict] = []
 
         self.points: Dict[int, int] = dict()  # k: project.id, v: point
 
@@ -43,10 +54,24 @@ class RecommendWithUsertoken(object):
             resp = requests.get('http://projectapi:8000/projectapi/project',
                                 params=query)
             if resp.status_code != 200:
+                print('NORMAL ERROR')
                 raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
             projects.clear()
             for p in resp.json():
                 projects.append(p)
+
+        print('PAIRS', pairs)
+        # projects without tag
+        already_added = self.tag_projects + self.parent_tag_projects +\
+            self.child_tag_projects + self.bro_tag_projects
+        self.all_projects = []
+        for proj_id in self.all:
+            if proj_id not in already_added:
+                url = f'http://projectapi:8000/projectapi/project/{proj_id}'
+                resp = requests.get(url)
+                if resp.status_code != 200:
+                    raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
+                self.all_projects.append(resp.json())
 
     def calc_point(self):
         # tag-distance
@@ -55,7 +80,9 @@ class RecommendWithUsertoken(object):
             (0.4, self.child_tag_projects),
             (0.4, self.parent_tag_projects),
             (0.2, self.bro_tag_projects),
+            (0, self.all_projects)
         ]
+        print('POINT_TABLE', point_table)
         for point, projects in point_table:
             for project in projects:
                 p_id = project['id']
