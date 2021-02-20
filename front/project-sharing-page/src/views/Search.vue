@@ -1,6 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar />
     <v-container>
       <v-responsive min-height="80vh">
         <v-row>
@@ -26,18 +25,15 @@
         </v-row>
       </v-responsive>
     </v-container>
-    <Footer />
   </v-main>
 </template>
 
 <script>
 import ProjectSearch from "@/components/Search/ProjectSearch";
-import NavigationBar from "@/components/Navigation/NavigationBar";
 import UserSearch from "@/components/Search/UserSearch";
-import Footer from "@/components/Footer/Footer";
 export default {
   name: "Search",
-  components: {Footer, UserSearch, NavigationBar, ProjectSearch},
+  components: {UserSearch, ProjectSearch},
   data(){
     return {
       keyword: "",

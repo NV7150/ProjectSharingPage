@@ -1,7 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar />
-
     <v-container>
       <v-row>
         <v-col>
@@ -9,17 +7,14 @@
         </v-col>
       </v-row>
     </v-container>
-    <Footer />
   </v-main>
 </template>
 
 <script>
-import NavigationBar from "@/components/Navigation/NavigationBar";
 import HelpContents from "@/components/Help/HelpContents";
-import Footer from "@/components/Footer/Footer";
 export default {
 name: "Help",
-  components: {Footer, HelpContents, NavigationBar}
+  components: {HelpContents}
 }
 </script>
 

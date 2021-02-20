@@ -1,13 +1,18 @@
 <template>
   <v-app v-if="isLoaded">
-    <router-view />
+    <NavigationBar />
+    <router-view class="main" />
+    <Footer />
   </v-app>
 </template>
 
 <script>
 
+import NavigationBar from "@/components/Navigation/NavigationBar";
+import Footer from "@/components/Footer/Footer";
 export default {
   name: 'App',
+  components: {Footer, NavigationBar},
   data() {
     return {
       isLoaded : false
@@ -23,3 +28,5 @@ export default {
   }
 };
 </script>
+<style scoped>
+</style>

@@ -1,6 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar />
     <v-container>
       <v-row class="text-center" align="center" justify="center" >
         <v-responsive height="30vh">
@@ -19,10 +18,8 @@
 </template>
 
 <script>
-import NavigationBar from "@/components/Navigation/NavigationBar";
 export default {
 name: "ErrorPage",
-  components: {NavigationBar}
 }
 </script>
 
