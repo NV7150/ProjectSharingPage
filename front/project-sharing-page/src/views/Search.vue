@@ -26,6 +26,7 @@
         </v-row>
       </v-responsive>
     </v-container>
+    <Footer />
   </v-main>
 </template>
 
@@ -33,9 +34,10 @@
 import ProjectSearch from "@/components/Search/ProjectSearch";
 import NavigationBar from "@/components/Navigation/NavigationBar";
 import UserSearch from "@/components/Search/UserSearch";
+import Footer from "@/components/Footer/Footer";
 export default {
   name: "Search",
-  components: {UserSearch, NavigationBar, ProjectSearch},
+  components: {Footer, UserSearch, NavigationBar, ProjectSearch},
   data(){
     return {
       keyword: "",

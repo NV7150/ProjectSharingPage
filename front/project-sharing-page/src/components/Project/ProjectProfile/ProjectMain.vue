@@ -4,9 +4,7 @@
       Description
     </v-card-title>
     <v-divider class="my-3"></v-divider>
-    <v-card-text>
-      {{project.description}}
-    </v-card-text>
+    <v-card-text style="white-space: pre-wrap;" v-text="project.description" />
     <v-row justify="center">
       <v-btn :disabled="!hasJoinRight" @click="join">
         Join this project

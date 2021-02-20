@@ -12,6 +12,7 @@ import CreateProject from "@/views/CreateProject";
 import ErrorPage from "@/views/ErrorPage";
 import Help from "@/views/Help";
 import EditPassword from "@/views/EditPassword";
+import PrivacyPolicy from "@/views/PrivacyPolicy";
 
 Vue.use(VueRouter)
 
@@ -80,6 +81,11 @@ const routes = [
     path: "/PasswordEdit",
     name: "PassEdit",
     component: EditPassword
+  },
+  {
+    path: "/PrivacyPolicy",
+    name: "Privacy",
+    component: PrivacyPolicy
   },
 
   {

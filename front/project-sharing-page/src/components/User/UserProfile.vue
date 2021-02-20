@@ -16,9 +16,7 @@
     </v-card-title>
     <v-divider class="my-3"></v-divider>
 
-    <v-card-text>
-      {{user.bio}}
-    </v-card-text>
+    <v-card-text style="white-space: pre-wrap;" v-text="user.bio" />
 
     <v-card-actions class="d-flex flex-row flex-wrap pa-3">
       <v-card
