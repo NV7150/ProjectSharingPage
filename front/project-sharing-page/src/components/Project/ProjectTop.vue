@@ -6,7 +6,7 @@
         justify="center"
     >
       <v-row justify="center">
-        <v-col cols="12" md="6" class="project-about rounded-xl">
+        <v-col cols="12" md="10" class="project-about rounded-xl">
 
           <v-row
               align="center"

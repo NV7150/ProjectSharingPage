@@ -27,7 +27,7 @@
           class="transition-fast-in-fast-out hover-trans"
       >
         <v-card-text>
-          <v-row align="center" class="pl-3">
+          <v-row align="center" class="pl-3 subtitle">
             {{project.subtitle}}
             <v-spacer></v-spacer>
             <v-btn
@@ -79,12 +79,12 @@ export default {
 .hover-trans{
   height: 100%;
   bottom: 0;
-  opacity: 0.8 !important;
+  opacity: 0.9 !important;
   position: absolute;
   width: 100%;
 }
 
-.bg-title-text{
-  background-color: rgba(0,0,0,0.3);
+.subtitle{
+  font-size: 0.8em;
 }
 </style>
