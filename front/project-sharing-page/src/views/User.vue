@@ -37,6 +37,7 @@
         </v-row>
       </v-container>
     </div>
+    <Footer />
   </v-main>
 </template>
 
@@ -46,10 +47,11 @@ import NavigationBar from "../components/Navigation/NavigationBar";
 import UserProfile from "../components/User/UserProfile";
 import UserProjects from "../components/User/UserProjects";
 import UserContacts from "../components/User/UserContacts";
+import Footer from "@/components/Footer/Footer";
 
 export default {
   name: "User",
-  components: {UserContacts, UserProjects, UserProfile, NavigationBar},
+  components: {Footer, UserContacts, UserProjects, UserProfile, NavigationBar},
   data(){
     return {
       window: 0,
