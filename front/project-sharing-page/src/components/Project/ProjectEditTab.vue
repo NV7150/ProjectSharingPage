@@ -45,6 +45,11 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-row>
+      <v-col>
+        <DeleteProject :project="project" />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -56,10 +61,11 @@ import ProjectInfoEdit from "@/components/Project/ProjectEditTab/ProjectInfoEdit
 import ProjectImgEdit from "@/components/Project/ProjectEditTab/ProjectImgEdit";
 import ProjectTagEdit from "@/components/Project/ProjectEditTab/ProjectTagEdit";
 import ErrorResolver from "@/assets/scripts/ErrorResolver";
+import DeleteProject from "@/components/Project/ProjectEditTab/DeleteProject";
 
 export default {
   name: "ProjectEditTab",
-  components: {ProjectTagEdit, ProjectImgEdit, ProjectInfoEdit, ProjectSnsEdit},
+  components: {DeleteProject, ProjectTagEdit, ProjectImgEdit, ProjectInfoEdit, ProjectSnsEdit},
   props: {
     project : {type: Object}
   },

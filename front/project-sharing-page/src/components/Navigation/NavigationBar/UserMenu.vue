@@ -59,7 +59,7 @@ export default {
       type: Object,
       default:function(){
         return {
-          username: 'aaaaaa',
+          username: '',
           display_name: 'Loading...',
           icon: PlaceHolder
         };
