@@ -6,6 +6,9 @@ import db
 from functools import lru_cache
 
 
+STANDARD_ICON = '/img/basic-user-icon.png'
+
+
 @lru_cache(maxsize=4096)
 def levenshtein_distance(s: str, t: str) -> int:
     s = s.upper()
@@ -229,10 +232,15 @@ class User(BaseModel):
             wantedly=db_user.wantedly,
             url=db_user.url,
         )
+
+        icon = db_user.icon
+        if icon is None:
+            icon = STANDARD_ICON
+        print('ICON', icon)
         return cls(
             username=db_user.username,
             display_name=db_user.display_name,
-            icon=db_user.icon,
+            icon=icon,
             bio=db_user.bio,
             sns=sns,
             skilltags=skilltags
@@ -484,11 +492,15 @@ class LoginUser(User):
             wantedly=db_user.wantedly,
             url=db_user.url,
         )
+
+        icon = db_user.icon
+        if icon is None:
+            icon = STANDARD_ICON
         return LoginUser(
             username=db_user.username,
             email=db_user.email,
             display_name=db_user.display_name,
-            icon=db_user.icon,
+            icon=icon,
             bio=db_user.bio,
             sns=sns,
             skilltags=skilltags

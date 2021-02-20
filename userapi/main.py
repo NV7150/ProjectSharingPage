@@ -76,21 +76,22 @@ async def get_login_user(token: Optional[str] = Cookie(None)):
         }
     }
 )
-async def create_user(c_user: schema.UserCreate, token: Optional[str] = Cookie(None)):
+async def create_user(c_user: schema.UserCreate,
+                      token: Optional[str] = Cookie(None)):
     # auth
     # だんごさん(id: 2)かkekeho(id: 1)しか作れないように
-    if token is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    # if token is None:
+    #     raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-    db_token: Optional[db.Token] = db.Token.get_token(token)
-    if db_token is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    # db_token: Optional[db.Token] = db.Token.get_token(token)
+    # if db_token is None:
+    #     raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-    if db_token.user_id not in [1, 2]:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN,
-            "Please contact to だんご or kekeho",
-        )
+    # if db_token.user_id not in [1, 2]:
+    #     raise HTTPException(
+    #         status.HTTP_403_FORBIDDEN,
+    #         "Please contact to だんご or kekeho",
+    #     )
 
     user: Optional[schema.User] = c_user.create()
     if user is None:
