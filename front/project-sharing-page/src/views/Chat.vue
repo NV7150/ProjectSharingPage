@@ -1,7 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar />
-
     <v-container>
       <v-row>
         <v-col
@@ -51,13 +49,12 @@
 <script>
 import axios from "axios";
 
-import NavigationBar from "../components/Navigation/NavigationBar";
 import ChatWindow from "../components/Project/ProjectChat/ChatWindow";
 import ChatInput from "../components/Project/ProjectChat/ChatInput";
 
 export default {
   name: "Chat",
-  components: {ChatInput, ChatWindow, NavigationBar},
+  components: {ChatInput, ChatWindow},
   data(){
     return {
       isThreadLoading: true,

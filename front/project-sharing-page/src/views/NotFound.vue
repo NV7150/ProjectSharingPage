@@ -1,7 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar />
-
     <v-container>
       <v-row>
         <v-col>
@@ -13,10 +11,8 @@
 </template>
 
 <script>
-import NavigationBar from "@/components/Navigation/NavigationBar";
 export default {
   name: "Error",
-  components: {NavigationBar}
 }
 </script>
 

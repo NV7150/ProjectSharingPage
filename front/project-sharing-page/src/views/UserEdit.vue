@@ -1,6 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar />
     <v-container v-if="$store.getters['getUser']">
       <v-row>
         <v-col>
@@ -65,7 +64,6 @@
 </template>
 
 <script>
-import NavigationBar from "@/components/Navigation/NavigationBar";
 import UserInfoEdit from "@/components/UserEdit/UserInfoEdit";
 import UserSnsEdit from "@/components/UserEdit/UserSnsEdit";
 import UserIconEdit from "@/components/UserEdit/UserIconEdit";
@@ -74,7 +72,7 @@ import axios from "axios";
 
 export default {
   name: "UserEdit",
-  components: {UserTagEdit, UserIconEdit, UserSnsEdit, UserInfoEdit, NavigationBar},
+  components: {UserTagEdit, UserIconEdit, UserSnsEdit, UserInfoEdit},
   data(){
     return {
       isLoading: false,

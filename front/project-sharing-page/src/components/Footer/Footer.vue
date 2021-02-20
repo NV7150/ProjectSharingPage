@@ -1,5 +1,5 @@
 <template>
-  <v-footer padless>
+  <v-footer padless class="footer" app absolute>
     <v-row justify="center">
       <v-btn
           text
@@ -31,5 +31,8 @@ export default {
 </script>
 
 <style scoped>
+.footer{
+  bottom: 0;
+}
 
 </style>

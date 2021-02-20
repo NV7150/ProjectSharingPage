@@ -1,7 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar></NavigationBar>
-
     <template v-if="!isProjectLoading">
       <ProjectTop :project="project"></ProjectTop>
 
@@ -63,23 +61,20 @@
         </v-card-text>
       </v-card>
     </template>
-    <Footer />
   </v-main>
 </template>
 
 <script>
 import axios from "axios";
-import NavigationBar from "../components/Navigation/NavigationBar";
 import ProjectProfileTab from "../components/Project/ProjectProfileTab";
 import ProjectChat from "../components/Project/ProjectChat";
 import ProjectTop from "../components/Project/ProjectTop";
 import ProjectEditTab from "@/components/Project/ProjectEditTab";
 import ProjectAdmin from "@/components/Project/ProjectAdmin";
-import Footer from "@/components/Footer/Footer";
 
 export default {
   name: "Project",
-  components: {Footer, ProjectAdmin, ProjectEditTab, ProjectTop, ProjectChat, ProjectProfileTab, NavigationBar},
+  components: {ProjectAdmin, ProjectEditTab, ProjectTop, ProjectChat, ProjectProfileTab},
   props: {
     initTab: {type: Number, default: 0},
     initChannel: {type: Number, default: -1},

@@ -1,6 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar></NavigationBar>
 
     <div v-if="!isLoading">
       <v-container v-if="hasContact">
@@ -37,21 +36,18 @@
         </v-row>
       </v-container>
     </div>
-    <Footer />
   </v-main>
 </template>
 
 <script>
 import axios from "axios";
-import NavigationBar from "../components/Navigation/NavigationBar";
 import UserProfile from "../components/User/UserProfile";
 import UserProjects from "../components/User/UserProjects";
 import UserContacts from "../components/User/UserContacts";
-import Footer from "@/components/Footer/Footer";
 
 export default {
   name: "User",
-  components: {Footer, UserContacts, UserProjects, UserProfile, NavigationBar},
+  components: {UserContacts, UserProjects, UserProfile},
   data(){
     return {
       window: 0,

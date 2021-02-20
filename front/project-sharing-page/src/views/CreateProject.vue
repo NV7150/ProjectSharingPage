@@ -1,6 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar />
     <v-container>
       <v-row>
         <v-col>
@@ -12,11 +11,10 @@
 </template>
 
 <script>
-import NavigationBar from "@/components/Navigation/NavigationBar";
 import ProjectCreator from "@/components/CreateProject/ProjectCreator";
 export default {
   name: "CreateProject",
-  components: {ProjectCreator, NavigationBar}
+  components: {ProjectCreator}
 }
 </script>
 

@@ -1,7 +1,5 @@
 <template>
   <v-main>
-    <NavigationBar />
-
     <v-container>
       <v-row>
         <v-col>
@@ -16,10 +14,9 @@
 
 
 import UserPasswordEdit from "@/components/UserEdit/UserPasswordEdit";
-import NavigationBar from "@/components/Navigation/NavigationBar";
 export default {
   name: "EditPassword",
-  components: {NavigationBar, UserPasswordEdit}
+  components: { UserPasswordEdit}
 }
 </script>
 
