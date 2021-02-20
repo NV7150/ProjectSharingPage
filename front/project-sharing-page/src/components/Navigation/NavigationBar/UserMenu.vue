@@ -14,7 +14,7 @@
       </v-btn>
     </template>
 
-    <v-card class="justify-center">
+    <v-card class="justify-center" max-width="30vw">
       <v-card-text>
         <v-list-item class="text-center justify-center">
           <v-avatar>
@@ -59,7 +59,7 @@ export default {
       type: Object,
       default:function(){
         return {
-          username: 'aaaaaa',
+          username: '',
           display_name: 'Loading...',
           icon: PlaceHolder
         };

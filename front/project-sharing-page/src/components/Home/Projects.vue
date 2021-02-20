@@ -4,7 +4,6 @@
       <v-row>
         <v-col
             cols="12"
-            sm="6"
             md="4"
             v-for="(recommend, i) in recommends"
             :key="i"
@@ -62,7 +61,9 @@ export default {
         axios
             .get("/projectapi/project/count")
             .then((response) => {
-              this.length = Math.floor((Number)(response.data) / HomeConsts.projectPerPage) + 1;
+              let count = (Number)(response.data);
+              this.length = Math.floor(count/ HomeConsts.projectPerPage);
+              this.length += count % HomeConsts.projectPerPage === 0 ? 0 : 1;
               this.page = 1;
               resolve();
             })
