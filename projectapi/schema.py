@@ -33,12 +33,13 @@ class Project(BaseModel):
     announce_users: List[str]
     admin_users: List[str]
     likes: int
+    like_by_user: Optional[bool]
     sns: Sns
     skilltags: List[int]
     created_at: datetime.datetime
 
     @classmethod
-    def from_db(cls, db_proj: db.Project):
+    def from_db(cls, s: db.scoped_session, db_proj: db.Project, login_username: Optional[str] = None):
         sns = Sns(
             twitter=db_proj.twitter,
             instagram=db_proj.instagram,
@@ -51,6 +52,19 @@ class Project(BaseModel):
             wantedly=db_proj.wantedly,
             url=db_proj.url,
         )
+
+        like_by_user = None
+        if login_username is not None:
+            user_like = s.query(db.Like).filter(
+                db.Like.username == login_username
+            ).filter(
+                db.Like.project_id == db_proj.id
+            ).count()
+            if user_like == 0:
+                like_by_user = False
+            else:
+                like_by_user = True
+
         return cls(
             id=db_proj.id,
             title=db_proj.title,
@@ -61,6 +75,7 @@ class Project(BaseModel):
             announce_users=[au.username for au in db_proj.announce_users],
             admin_users=[au.username for au in db_proj.admin_users],
             likes=len(db_proj.likes),
+            like_by_user=like_by_user,
             sns=sns,
             skilltags=[t.tag for t in db_proj.skilltags],
             created_at=db_proj.created_at,
@@ -106,7 +121,7 @@ class ProjectUpdate():
         self.projectid = projectid
         self.parsed_json = parsed_json
 
-    def update(self) -> Project:
+    def update(self, login_username: Optional[str] = None) -> Project:
         with db.session_scope() as s:
             p: Optional[db.Project] = s.query(db.Project).get(self.projectid)
             if p is None:
@@ -167,7 +182,7 @@ class ProjectUpdate():
                     exec(update_[k])
 
             s.commit()
-            return Project.from_db(p)
+            return Project.from_db(s, p, login_username)
 
 
 class ProjectCreate(BaseModel):
@@ -223,7 +238,8 @@ class ProjectCreate(BaseModel):
             s.add(adu)
             s.commit()
 
-            return Project.from_db(p)
+            # 作った瞬間にいいねはしてないので、3番めの引数はNoneでOK
+            return Project.from_db(s, p, None)
 
 
 class SortType(str, enum.Enum):
@@ -271,7 +287,8 @@ class ProjectSearchResult(BaseModel):
 
     @classmethod
     def search(cls, title: str, limit: Optional[int] = None,
-               offset: Optional[int] = None):
+               offset: Optional[int] = None,
+               login_username: Optional[str] = None):
         with db.session_scope() as s:
             q = s.query(db.Project).filter(
                 db.Project.is_active
@@ -291,7 +308,7 @@ class ProjectSearchResult(BaseModel):
                 db_projects = db_projects[:limit]
 
             projects = [
-                Project.from_db(p)
+                Project.from_db(s, p, login_username)
                 for p in db_projects
             ]
             next_exist = len(projects) + (offset if offset else 0) < length

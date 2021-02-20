@@ -45,13 +45,17 @@ async def index():
         },
     },
 )
-async def get_project(id: int):
+async def get_project(id: int, token: Optional[str] = Cookie(None)):
     with db.session_scope() as s:
         p: Optional[db.Project] = db.Project.get(s, id)
         if p is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND)
 
-        return schema.Project.from_db(p)
+        username: Optional[str] = None
+        if token is not None:
+            username = user.auth(token)
+
+        return schema.Project.from_db(s, p, username)
 
 
 @app.post(
@@ -140,7 +144,7 @@ async def update_project(
     # Update
     try:
         project_update = schema.ProjectUpdate(id, update_fields)
-        result = project_update.update()
+        result = project_update.update(username)
     except ValueError as e:
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -205,12 +209,18 @@ async def get_project_with_tag(tags: List[int] = Query([]),
                                limit: Optional[int] = Query(None),
                                offset: Optional[int] = Query(None),
                                sortbydatetime: bool = Query(False),
-                               reverse: bool = Query(False)):
+                               reverse: bool = Query(False),
+                               token: Optional[str] = Cookie(None)):
+    username: Optional[str] = None
+    if token is not None:
+        username = user.auth(token)
+
     with db.session_scope() as s:
         projects = schema.ProjectSearchResult.get_with_tag(
             s, tags, limit, offset, sortbydatetime, reverse
         )
-        return [schema.Project.from_db(p) for p in projects]
+
+        return [schema.Project.from_db(s, p, username) for p in projects]
 
 
 @app.get(
@@ -799,7 +809,7 @@ async def user_waitlist(token: Optional[str] = Cookie(None)):
             if p is None:
                 continue
 
-            result.append(schema.Project.from_db(p))
+            result.append(schema.Project.from_db(s, p, username))
 
         return result
 
@@ -932,8 +942,13 @@ async def search_project(
     title: str,
     limit: Optional[int] = Query(None),
     offset: Optional[int] = Query(None),
+    token: Optional[str] = Cookie(None),
 ):
-    return schema.ProjectSearchResult.search(title, limit, offset)
+    login_username: Optional[str] = None
+    if token is not None:
+        login_username = user.auth(token)
+    return schema.ProjectSearchResult.search(title, limit, offset,
+                                             login_username)
 
 
 # User
@@ -951,13 +966,17 @@ async def search_project(
         },
     },
 )
-async def projects_of_user(username: str):
+async def projects_of_user(username: str, token: Optional[str] = Cookie(None)):
+    login_username: Optional[str] = None
+    if token is not None:
+        login_username = user.auth(token)
+
     with db.session_scope() as s:
         proj_list = s.query(db.ProjectUser).filter(
             db.ProjectUser.username == username
         )
         return [
-            schema.Project.from_db(pu.project)
+            schema.Project.from_db(s, pu.project, login_username)
             for pu in proj_list
             if pu.project.is_active
         ]
