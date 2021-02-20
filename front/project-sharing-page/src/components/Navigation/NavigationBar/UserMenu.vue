@@ -14,7 +14,7 @@
       </v-btn>
     </template>
 
-    <v-card class="justify-center">
+    <v-card class="justify-center" max-width="30vw">
       <v-card-text>
         <v-list-item class="text-center justify-center">
           <v-avatar>

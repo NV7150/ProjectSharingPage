@@ -4,11 +4,11 @@
       <validation-provider
           v-slot="{ errors }"
           name="title"
-          :rules="{required: true, max:10}"
+          :rules="{required: true, max:20}"
       >
         <v-text-field
             v-model="displayName"
-            :counter="10"
+            :counter="20"
             :error-messages="errors"
             label="表示名"
             required
